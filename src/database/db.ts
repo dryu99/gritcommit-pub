@@ -49,10 +49,7 @@ export class DB {
       user: Config.DATABASE_USER,
       password: Config.DATABASE_PASSWORD,
       database: Config.DATABASE_NAME,
-      max: 10,
-      min: 2,
-      idleTimeoutMillis: 30 * 1000,
-      query_timeout: 10 * 1000,
+      max: 1,
     });
 
     this.dialect = new PostgresDialect({
