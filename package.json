@@ -6,19 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-db-types": "cross-env NODE_ENV=development kysely-codegen --camel-case --out-file ./src/database/db-generated-types.d.ts",
+    "dev:migrate-db": "cross-env NODE_ENV=development npx tsx ./src/database/migrate-db.ts"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "kysely": "^0.27.4",
+    "next": "14.2.9",
+    "pg": "^8.12.0",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.9"
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
+    "@types/pg": "^8.11.8",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
+    "kysely-codegen": "^0.16.5",
+    "kysely-migration-cli": "^0.4.2",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5"
   }
 }

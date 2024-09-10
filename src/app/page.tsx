@@ -16,7 +16,7 @@ const CommitmentForm = () => {
           id="description"
           type="text"
           className="p-2 rounded-md border border-gray-300"
-          placeholder="e.g. 'Finish blog post'"
+          placeholder="e.g. Finish blog post"
         />
       </div>
       <div className="flex gap-2 justify-between">
