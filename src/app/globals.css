@@ -2,26 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+[data-theme="light"] {
+  /* primary */
+  --color-text-primary: #000000;
+  --color-bg-primary: #ffffff;
+  --color-border-primary: #2e2e2f;
+
+  /* secondary */
+  --color-text-secondary: #000000;
+  --color-bg-secondary: #f5f5f5;
+  --color-border-secondary: #d4d4d4;
+
+  /* tertiary */
+  --color-text-tertiary: #000000;
+  --color-bg-tertiary: #151313;
+
+  /* brand */
+  --color-text-brand: #000000;
+  --color-bg-brand: #fbbf24;
+  --color-bg-brand-hover: #d3a32a;
+
+  /* button */
+  --color-text-btn: #000000;
+  --color-bg-btn: #e5e5e5;
+  --color-bg-btn-hover: #d4d4d4;
+
+  /* util */
+  --color-border-focus: #000000;
+  --color-text-placeholder: #848484;
+}
+
+[data-theme="dark"] {
+  /* primary */
+  --color-text-primary: #fafafa;
+  --color-bg-primary: #171717;
+  --color-border-primary: #2e2e2f;
+
+  /* secondary */
+  --color-text-secondary: #fafafa;
+  --color-bg-secondary: #262626;
+  --color-border-secondary: #525252;
+
+  /* tertiary */
+  --color-text-tertiary: #262626;
+  --color-bg-tertiary: #262626;
+
+  /* brand */
+  --color-text-brand: #000000;
+  --color-bg-brand: #fbbf24;
+  --color-bg-brand-hover: #d3a32a;
+
+  /* button */
+  --color-text-btn: #fafafa;
+  --color-bg-btn: #404040;
+  --color-bg-btn-hover: #525252;
+
+  /* util */
+  --color-border-focus: #ffffff;
+  --color-text-placeholder: #a3a3a3;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.DialogOverlay[data-state="open"],
+.DialogContent[data-state="open"] {
+  animation: fadeIn 100ms ease-out;
+}
+
+.DialogOverlay[data-state="closed"],
+.DialogContent[data-state="closed"] {
+  animation: fadeOut 100ms ease-in;
 }
