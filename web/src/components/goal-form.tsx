@@ -1,7 +1,7 @@
 "use client";
 
-import { createGoal } from "@/actions/home.action";
 import { useFormState } from "react-dom";
+import { createGoal } from "../actions/home.action";
 
 export const GoalForm = () => {
   const [errorMessage, dispatch] = useFormState(createGoal, undefined);

@@ -1,4 +1,4 @@
-import { GoalForm } from "@/components/goal-form";
+import { GoalForm } from "../components/goal-form";
 
 export default function HomePage() {
   return (

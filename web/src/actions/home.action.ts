@@ -1,9 +1,9 @@
 "use server";
 
-import { DB } from "@/database/db";
-import { Goal } from "@/database/db-generated-types";
 import { Insertable } from "kysely";
 import { z } from "zod";
+import { DB } from "../database/db";
+import { Goal } from "../database/db-generated-types";
 
 const TEST_USER_ID = "143c8754-b7c8-4502-bd10-02464a4941ed";
 

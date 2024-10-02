@@ -1,6 +1,6 @@
-import { DB } from "@/database/db";
-import { User } from "@/database/db-generated-types";
 import { Insertable } from "kysely";
+import { DB } from "../database/db";
+import { User } from "../database/db-generated-types";
 
 const main = async () => {
   const newUser: Insertable<User> = {
