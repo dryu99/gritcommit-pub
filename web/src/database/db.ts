@@ -26,7 +26,7 @@ export class DB {
   private static db: Kysely<DbTypes>;
   private static dialect: PostgresDialect;
 
-  public static getDb() {
+  public static get() {
     if (this.db) return this.db;
 
     // db hasn't been inited yet

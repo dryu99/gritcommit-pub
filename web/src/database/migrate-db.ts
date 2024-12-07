@@ -2,7 +2,7 @@ import { run } from "kysely-migration-cli";
 import path from "path";
 import { DB } from "./db";
 
-const db = DB.getDb();
+const db = DB.get();
 
 const migrator = DB.getMigrator(path.join(__dirname, "../database/migrations"));
 

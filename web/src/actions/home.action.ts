@@ -37,5 +37,5 @@ export const createGoal = async (
 
   console.log(goal);
 
-  await DB.getDb().insertInto("goal").values(goal).execute();
+  await DB.get().insertInto("goal").values(goal).execute();
 };

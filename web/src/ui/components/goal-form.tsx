@@ -7,7 +7,7 @@ export const GoalForm = () => {
   const [errorMessage, dispatch] = useFormState(createGoal, undefined);
 
   return (
-    <form className="flex flex-col gap-4 w-[400px]" action={dispatch}>
+    <form className="flex flex-col gap-4 w-[400px] text-sm" action={dispatch}>
       <div className="flex flex-col gap-1">
         <label htmlFor="description">Description</label>
         <input
@@ -15,7 +15,7 @@ export const GoalForm = () => {
           name="description"
           autoComplete="off"
           type="text"
-          className="p-2 rounded-md border border-gray-300"
+          className="p-2 rounded-md border"
           placeholder="e.g. Finish blog post"
         />
       </div>
@@ -26,7 +26,7 @@ export const GoalForm = () => {
             id="stakeAmount"
             name="stakeAmount"
             type="number"
-            className="p-2 rounded-md border border-gray-300"
+            className="p-2 rounded-md border"
             placeholder="e.g. 20"
           />
         </div>
@@ -36,7 +36,7 @@ export const GoalForm = () => {
             id="dueDate"
             name="dueDate"
             type="date"
-            className="p-2 rounded-md border border-gray-300"
+            className="p-2 rounded-md border"
             placeholder="Due Date"
           />
         </div>

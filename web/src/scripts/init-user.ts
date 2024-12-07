@@ -8,7 +8,7 @@ const main = async () => {
     email: "test@test.com",
   };
 
-  const user = await DB.getDb().insertInto("user").values(newUser).execute();
+  const user = await DB.get().insertInto("user").values(newUser).execute();
   console.log("User created", user);
 };
 
