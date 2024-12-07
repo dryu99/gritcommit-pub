@@ -41,7 +41,7 @@ export const GoalForm = () => {
   const [recurringType, setRecurringType] = useState<RecurringType>(
     RecurringType.Daily
   );
-  const [selectedDays, setSelectedDays] = useState<Day[]>([]);
+  const [selectedDays, setSelectedDays] = useState<Day[]>(DAYS);
   const [daysPerWeek, setDaysPerWeek] = useState(3);
 
   useEffect(() => {
@@ -98,7 +98,9 @@ export const GoalForm = () => {
   return (
     <form className="flex flex-col gap-5 w-[400px] text-sm" action={dispatch}>
       <div className="flex flex-col gap-1">
-        <label htmlFor="description">Your Commitment</label>
+        <label htmlFor="description" className="font-medium">
+          Your Commitment
+        </label>
         <input
           id="description"
           name="description"
@@ -110,7 +112,9 @@ export const GoalForm = () => {
       </div>
       <div className="flex gap-2 justify-between">
         <div className="flex flex-col gap-1">
-          <label htmlFor="stakeAmount">Stake Amount ($)</label>
+          <label htmlFor="stakeAmount" className="font-medium">
+            Stake Amount ($)
+          </label>
           <input
             id="stakeAmount"
             name="stakeAmount"
@@ -120,7 +124,9 @@ export const GoalForm = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="partnerEmail">Partner Email</label>
+          <label htmlFor="partnerEmail" className="font-medium">
+            Partner Email
+          </label>
           <input
             id="partnerEmail"
             name="partnerEmail"
@@ -147,7 +153,9 @@ export const GoalForm = () => {
       <div className="flex flex-col gap-2">
         {!isRecurring && (
           <div className="flex flex-col gap-1">
-            <label htmlFor="dueDate">Due Date</label>
+            <label htmlFor="dueDate" className="font-medium">
+              Due Date
+            </label>
             <div className="flex items-center gap-2">
               <input
                 id="dueDate"
@@ -163,27 +171,51 @@ export const GoalForm = () => {
 
         {isRecurring && (
           <div className="flex flex-col gap-2">
-            <select
-              name="recurringType"
-              className={cn(
-                "p-2 rounded-md border appearance-none mb-3",
-
-                // we do this since default select arrow has weird padding
-                "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
-                "bg-[length:0.7em] bg-[right_0.7rem_center] bg-no-repeat pr-8"
-              )}
-              value={recurringType}
-              onChange={(e) =>
-                setRecurringType(e.target.value as typeof recurringType)
-              }
-            >
-              <option value={RecurringType.Daily}>Every day</option>
-              <option value={RecurringType.CustomDays}>Custom days</option>
-              <option value={RecurringType.XPerWeek}>X days a week</option>
-            </select>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="recurringType" className="font-medium">
+                Frequency
+              </label>
+              <select
+                id="recurringType"
+                name="recurringType"
+                className={cn(
+                  "p-2 rounded-md border appearance-none mb-2",
+                  // we do this since default select arrow has weird padding
+                  "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
+                  "bg-[length:0.7em] bg-[right_0.7rem_center] bg-no-repeat pr-8"
+                )}
+                value={recurringType}
+                onChange={(e) =>
+                  setRecurringType(e.target.value as typeof recurringType)
+                }
+              >
+                <option value={RecurringType.Daily}>Every day</option>
+                <option value={RecurringType.CustomDays}>Custom days</option>
+                <option value={RecurringType.XPerWeek}>X days a week</option>
+              </select>
+            </div>
 
             {recurringType === RecurringType.CustomDays && (
               <div className="flex flex-col gap-3">
+                <p>
+                  {selectedDays.length === 0 ? (
+                    <>Never</>
+                  ) : selectedDays.length === 7 ? (
+                    <>Every day</>
+                  ) : (
+                    <>
+                      Every{" "}
+                      {selectedDays
+                        .sort(
+                          (a, b) =>
+                            DAYS.findIndex((d) => d.short === a.short) -
+                            DAYS.findIndex((d) => d.short === b.short)
+                        )
+                        .map((d) => d.short)
+                        .join(", ")}
+                    </>
+                  )}
+                </p>
                 <div className="flex gap-1">
                   {DAYS.map((day) => (
                     <button
@@ -210,24 +242,14 @@ export const GoalForm = () => {
                     </button>
                   ))}
                 </div>
-                {selectedDays.length > 0 && (
-                  <p className="font-medium">
-                    Every{" "}
-                    {selectedDays
-                      .sort(
-                        (a, b) =>
-                          DAYS.findIndex((d) => d.short === a.short) -
-                          DAYS.findIndex((d) => d.short === b.short)
-                      )
-                      .map((d) => d.short)
-                      .join(", ")}
-                  </p>
-                )}
               </div>
             )}
 
             {recurringType === RecurringType.XPerWeek && (
               <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <span>{daysPerWeek} days a week</span>
+                </div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5, 6, 7].map((num) => (
                     <button
@@ -247,9 +269,6 @@ export const GoalForm = () => {
                       {num}
                     </button>
                   ))}
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{daysPerWeek} days a week</span>
                 </div>
               </div>
             )}
