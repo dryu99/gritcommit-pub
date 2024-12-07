@@ -175,24 +175,26 @@ export const GoalForm = () => {
               <label htmlFor="recurringType" className="font-medium">
                 Frequency
               </label>
-              <select
-                id="recurringType"
-                name="recurringType"
-                className={cn(
-                  "p-2 rounded-md border appearance-none mb-2",
-                  // we do this since default select arrow has weird padding
-                  "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
-                  "bg-[length:0.7em] bg-[right_0.7rem_center] bg-no-repeat pr-8"
-                )}
-                value={recurringType}
-                onChange={(e) =>
-                  setRecurringType(e.target.value as typeof recurringType)
-                }
-              >
-                <option value={RecurringType.Daily}>Every day</option>
-                <option value={RecurringType.CustomDays}>Custom days</option>
-                <option value={RecurringType.XPerWeek}>X days a week</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <select
+                  id="recurringType"
+                  name="recurringType"
+                  className={cn(
+                    "h-10 p-2 rounded-md border appearance-none w-1/2",
+                    "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
+                    "bg-[length:0.7em] bg-[right_0.7rem_center] bg-no-repeat pr-8"
+                  )}
+                  value={recurringType}
+                  onChange={(e) =>
+                    setRecurringType(e.target.value as typeof recurringType)
+                  }
+                >
+                  <option value={RecurringType.Daily}>Every day</option>
+                  <option value={RecurringType.CustomDays}>Custom days</option>
+                  <option value={RecurringType.XPerWeek}>X days a week</option>
+                </select>
+                <span className="text-gray-500">Due @ 11:59pm</span>
+              </div>
             </div>
 
             {recurringType === RecurringType.CustomDays && (
