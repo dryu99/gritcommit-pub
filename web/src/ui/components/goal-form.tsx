@@ -14,6 +14,8 @@ export const GoalForm = () => {
   const [errorMessage, dispatch] = useActionState(createGoal, undefined);
   const [goalPlaceholder, setGoalPlaceholder] = useState("");
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [hasDate, setHasDate] = useState(false);
 
   useEffect(() => {
     let currentText = GOAL_PLACEHOLDERS[currGoalPlaceholderIndex];
@@ -67,7 +69,7 @@ export const GoalForm = () => {
   }, [currGoalPlaceholderIndex]);
 
   return (
-    <form className="flex flex-col gap-4 w-[400px] text-sm" action={dispatch}>
+    <form className="flex flex-col gap-5 w-[400px] text-sm" action={dispatch}>
       <div className="flex flex-col gap-1">
         <label htmlFor="description">Your Commitment</label>
         <input
@@ -101,15 +103,51 @@ export const GoalForm = () => {
           />
         </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <label htmlFor="dueDate">Due Date</label>
+      <div className="flex items-center gap-2">
         <input
-          id="dueDate"
-          name="dueDate"
-          type="date"
-          className="p-2 rounded-md border"
-          placeholder="Due Date"
+          type="checkbox"
+          id="isRecurring"
+          checked={isRecurring}
+          // TODO would be nice to persist dates on change
+          onChange={(e) => {
+            setIsRecurring(e.target.checked);
+            setHasDate(false);
+          }}
+          className="w-4 h-4"
         />
+        <label htmlFor="isRecurring">Recurring commitment?</label>
+      </div>
+      <div className="flex flex-col gap-2">
+        {isRecurring ? (
+          <div className="flex flex-col gap-2">
+            <select
+              name="frequency"
+              className="p-2 rounded-md border"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select frequency
+              </option>
+              <option value="daily">Every day</option>
+              <option value="weekly">Weekly</option>
+              <option value="custom">Custom days</option>
+            </select>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <label htmlFor="dueDate">Due Date</label>
+            <div className="flex items-center gap-2">
+              <input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                className="p-2 rounded-md border w-1/2"
+                onChange={(e) => setHasDate(!!e.target.value)}
+              />
+              {hasDate && <span className="text-gray-500">11:59pm</span>}
+            </div>
+          </div>
+        )}
       </div>
 
       <button
