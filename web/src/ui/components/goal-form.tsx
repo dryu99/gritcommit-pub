@@ -69,7 +69,7 @@ export const GoalForm = () => {
   return (
     <form className="flex flex-col gap-4 w-[400px] text-sm" action={dispatch}>
       <div className="flex flex-col gap-1">
-        <label htmlFor="description">Your Goal</label>
+        <label htmlFor="description">Your Commitment</label>
         <input
           id="description"
           name="description"
@@ -87,19 +87,29 @@ export const GoalForm = () => {
             name="stakeAmount"
             type="number"
             className="p-2 rounded-md border"
-            placeholder="e.g. 20"
+            placeholder="20"
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="dueDate">Due Date</label>
+          <label htmlFor="partnerEmail">Partner Email</label>
           <input
-            id="dueDate"
-            name="dueDate"
-            type="date"
+            id="partnerEmail"
+            name="partnerEmail"
+            type="email"
             className="p-2 rounded-md border"
-            placeholder="Due Date"
+            placeholder="partner@example.com"
           />
         </div>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="dueDate">Due Date</label>
+        <input
+          id="dueDate"
+          name="dueDate"
+          type="date"
+          className="p-2 rounded-md border"
+          placeholder="Due Date"
+        />
       </div>
 
       <button
