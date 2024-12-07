@@ -4,6 +4,12 @@ import { useActionState, useEffect, useState } from "react";
 import { createGoal } from "../../actions/home.action";
 import { cn } from "../classnames";
 
+enum RecurringType {
+  Daily = "daily",
+  CustomDays = "custom-days",
+  XPerWeek = "x-per-week",
+}
+
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
   "Send job applications",
@@ -11,7 +17,20 @@ const GOAL_PLACEHOLDERS = [
   "Read 20 pages daily",
 ];
 
-const DAYS = ["M", "T", "W", "Th", "F", "S", "Su"];
+type Day = {
+  narrow: string;
+  short: string;
+};
+
+const DAYS: Day[] = [
+  { narrow: "M", short: "Mon" },
+  { narrow: "T", short: "Tue" },
+  { narrow: "W", short: "Wed" },
+  { narrow: "T", short: "Thu" },
+  { narrow: "F", short: "Fri" },
+  { narrow: "S", short: "Sat" },
+  { narrow: "S", short: "Sun" },
+];
 
 export const GoalForm = () => {
   const [errorMessage, dispatch] = useActionState(createGoal, undefined);
@@ -19,10 +38,10 @@ export const GoalForm = () => {
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
   const [isRecurring, setIsRecurring] = useState(false);
   const [hasDate, setHasDate] = useState(false);
-  const [recurringType, setRecurringType] = useState<
-    "daily" | "custom-days" | "x-per-week"
-  >("daily");
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [recurringType, setRecurringType] = useState<RecurringType>(
+    RecurringType.Daily
+  );
+  const [selectedDays, setSelectedDays] = useState<Day[]>([]);
   const [daysPerWeek, setDaysPerWeek] = useState(3);
 
   useEffect(() => {
@@ -147,7 +166,7 @@ export const GoalForm = () => {
             <select
               name="recurringType"
               className={cn(
-                "p-2 rounded-md border appearance-none",
+                "p-2 rounded-md border appearance-none mb-3",
 
                 // we do this since default select arrow has weird padding
                 "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
@@ -158,47 +177,57 @@ export const GoalForm = () => {
                 setRecurringType(e.target.value as typeof recurringType)
               }
             >
-              <option value="daily">Every day</option>
-              <option value="custom-days">Custom days</option>
-              <option value="x-per-week">X days a week</option>
+              <option value={RecurringType.Daily}>Every day</option>
+              <option value={RecurringType.CustomDays}>Custom days</option>
+              <option value={RecurringType.XPerWeek}>X days a week</option>
             </select>
 
-            {recurringType === "custom-days" && (
-              <div className="flex gap-1">
-                {DAYS.map((day) => (
-                  <button
-                    key={day}
-                    type="button"
-                    onClick={() => {
-                      setSelectedDays((prev) =>
-                        prev.includes(day)
-                          ? prev.filter((d) => d !== day)
-                          : [...prev, day]
-                      );
-                    }}
-                    className={`
+            {recurringType === RecurringType.CustomDays && (
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-1">
+                  {DAYS.map((day) => (
+                    <button
+                      key={day.short}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDays((prev) =>
+                          prev.find((d) => d.short === day.short)
+                            ? prev.filter((d) => d.short !== day.short)
+                            : prev.concat(day)
+                        );
+                      }}
+                      className={`
                       w-8 h-8 rounded-full text-sm font-medium
                       ${
-                        selectedDays.includes(day)
+                        selectedDays.find((d) => d.short === day.short)
                           ? "bg-orange-600 text-white"
                           : "bg-gray-100 text-gray-600"
                       }
                       hover:opacity-80 transition-colors
                     `}
-                  >
-                    {day}
-                  </button>
-                ))}
+                    >
+                      {day.narrow}
+                    </button>
+                  ))}
+                </div>
+                {selectedDays.length > 0 && (
+                  <p className="font-medium">
+                    Every{" "}
+                    {selectedDays
+                      .sort(
+                        (a, b) =>
+                          DAYS.findIndex((d) => d.short === a.short) -
+                          DAYS.findIndex((d) => d.short === b.short)
+                      )
+                      .map((d) => d.short)
+                      .join(", ")}
+                  </p>
+                )}
               </div>
             )}
 
-            {recurringType === "x-per-week" && (
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">
-                    {daysPerWeek} days per week
-                  </span>
-                </div>
+            {recurringType === RecurringType.XPerWeek && (
+              <div className="flex flex-col gap-3">
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5, 6, 7].map((num) => (
                     <button
@@ -218,6 +247,9 @@ export const GoalForm = () => {
                       {num}
                     </button>
                   ))}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{daysPerWeek} days a week</span>
                 </div>
               </div>
             )}
