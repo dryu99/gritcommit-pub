@@ -1,11 +1,11 @@
 "use server";
 
 import { generateModelId } from "@/lib/generate-model-id";
-import { FrequencyType, ScheduleType } from "@/types/enums";
+import { FrequencyType, GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
 import { DB } from "../database/db";
-import { Goal } from "../database/db-generated-types";
+import { Goal, GoalEntry } from "../database/db-generated-types";
 
 const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
@@ -51,14 +51,22 @@ export const createGoal = async (data: any) => {
         : null,
   };
 
-  // const firstGoalEntry: Insertable<GoalEntry> = {
-  //   id: generateModelId(),
-  //   goalId: goal.id,
-  //   dueAt: goal.scheduleType === ScheduleType.Single ? rawGoal.dueDate : null,
-  //   status: GoalEntryStatus.Pending,
-  // };
+  const nextDueDate = calculateNextDueDate(rawGoal);
 
-  DB.get().insertInto("goal").values(goal).execute();
+  const firstGoalEntry: Insertable<GoalEntry> = {
+    id: generateModelId(),
+    goalId: goal.id,
+    dueAt: nextDueDate,
+    status: GoalEntryStatus.Pending,
+  };
+
+  // TODO also have to send email if user is starting today and its past 12pm
+  DB.get()
+    .transaction()
+    .execute(async (trx) => {
+      await trx.insertInto("goal").values(goal).execute();
+      await trx.insertInto("goalEntry").values(firstGoalEntry).execute();
+    });
 };
 
 const calculateNextDueDate = (rawGoal: RawGoal): Date => {
@@ -73,16 +81,13 @@ const calculateNextDueDate = (rawGoal: RawGoal): Date => {
 
   if (rawGoal.scheduleDays) {
     const todayDay = today.getDay();
-    let currDay = (todayDay + 1) % 7;
-    let incCount = 0;
-    while (incCount < 7) {
-      if (rawGoal.scheduleDays.includes(currDay)) {
-        const nextDueDate = new Date(today.setDate(today.getDate() + incCount));
-        return nextDueDate;
-      }
 
-      currDay = (currDay + 1) % 7;
-      incCount++;
+    // Check next 7 days starting from tomorrow
+    for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
+      const checkDay = (todayDay + daysAhead) % 7;
+      if (rawGoal.scheduleDays.includes(checkDay)) {
+        return new Date(today.setDate(today.getDate() + daysAhead));
+      }
     }
   }
 

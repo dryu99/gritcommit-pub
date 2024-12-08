@@ -8,3 +8,9 @@ export enum ScheduleType {
   Single = "SINGLE",
   Recurring = "RECURRING",
 }
+
+export enum GoalEntryStatus {
+  Pending = "PENDING",
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+}
