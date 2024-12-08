@@ -2,7 +2,7 @@
 
 import { Config } from "@/lib/config";
 import { generateModelId } from "@/lib/generate-model-id";
-import { FrequencyType, GoalEntryStatus, ScheduleType } from "@/types/enums";
+import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
 import { DB } from "../database/db";
@@ -10,21 +10,18 @@ import { Goal, GoalEntry } from "../database/db-generated-types";
 
 const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
-const frequencyTypeSchema = z.nativeEnum(FrequencyType);
-
 const RawGoalSchema = z.object({
   description: z.string().min(1),
   stakeAmount: z.coerce.number().min(0),
   partnerEmail: z.string().email(),
+  timezone: z.string(),
   startToday: z.boolean().optional(),
 
-  // existence of these implies scheduleType = RECURRING
-  frequencyType: frequencyTypeSchema.optional(),
+  // existence implies scheduleType = RECURRING
   scheduleDays: z.array(z.number()).optional(), // assume sorted
 
-  // existence of this implies scheduleType = SINGLE
+  // existence implies scheduleType = SINGLE
   dueDate: z.coerce.date().optional(),
-  timezone: z.string(),
 });
 
 export type RawGoal = z.infer<typeof RawGoalSchema>;
@@ -48,12 +45,9 @@ export const createGoal = async (data: any) => {
     scheduleType: rawGoal.dueDate
       ? ScheduleType.Single
       : ScheduleType.Recurring,
-    scheduleDays:
-      rawGoal.frequencyType === FrequencyType.CustomDays && rawGoal.scheduleDays
-        ? [...rawGoal.scheduleDays].sort((a, b) => a - b)
-        : rawGoal.frequencyType === FrequencyType.Daily
-        ? [0, 1, 2, 3, 4, 5, 6]
-        : null,
+    scheduleDays: rawGoal.scheduleDays
+      ? [...rawGoal.scheduleDays].sort((a, b) => a - b)
+      : null,
   };
 
   const nextDueDate = calculateNextDueDate(rawGoal);

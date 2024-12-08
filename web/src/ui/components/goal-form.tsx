@@ -1,7 +1,5 @@
 "use client";
 
-import { FrequencyType } from "@/types/enums";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 import { createGoal, RawGoal } from "../../actions/goal.action";
 
@@ -36,11 +34,7 @@ export const GoalForm = () => {
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
   const [isRecurring, setIsRecurring] = useState(false);
   const [hasDate, setHasDate] = useState(false);
-  const [frequencyType, setFrequencyType] = useState<FrequencyType>(
-    FrequencyType.Daily
-  );
   const [selectedDays, setSelectedDays] = useState<Day[]>(DAYS);
-  const [daysPerWeek, setDaysPerWeek] = useState(3);
 
   useEffect(() => {
     let currentText = GOAL_PLACEHOLDERS[currGoalPlaceholderIndex];
@@ -108,24 +102,12 @@ export const GoalForm = () => {
         return;
       }
 
-      if (frequencyType === FrequencyType.Daily) {
+      const todayIndex = new Date().getDay();
+      if (selectedDays.find((d) => d.index === todayIndex)) {
         const startToday = window.confirm(
           "Do you want to start this commitment today?"
         );
         data.startToday = startToday;
-        createGoal(data);
-        return;
-      }
-
-      if (frequencyType === FrequencyType.CustomDays) {
-        const todayIndex = new Date().getDay();
-
-        if (selectedDays.find((d) => d.index === todayIndex)) {
-          const startToday = window.confirm(
-            "Do you want to start this commitment today?"
-          );
-          data.startToday = startToday;
-        }
       }
 
       createGoal(data);
@@ -136,7 +118,7 @@ export const GoalForm = () => {
 
   return (
     <form
-      className="flex flex-col gap-5 w-full sm:w-[400px] text-sm"
+      className="flex flex-col gap-5 w-full sm:w-[420px] text-sm"
       onSubmit={handleSubmit}
     >
       <div className="flex flex-col gap-1">
@@ -210,7 +192,9 @@ export const GoalForm = () => {
                 onChange={(e) => setHasDate(!!e.target.value)}
                 required
               />
-              {hasDate && <span className="text-gray-500">11:59pm</span>}
+              {hasDate && (
+                <span className="text-xs text-gray-500">Due @ 11:59pm</span>
+              )}
             </div>
           </div>
         )}
@@ -219,42 +203,26 @@ export const GoalForm = () => {
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
               <label htmlFor="frequencyType" className="font-medium">
-                Frequency
+                Due Dates
               </label>
-              <div className="flex items-center gap-2">
-                <div className="relative w-[194px]">
-                  <select
-                    id="frequencyType"
-                    name="frequencyType"
-                    className="w-full h-10 p-2 rounded-md border appearance-none"
-                    value={frequencyType}
-                    onChange={(e) =>
-                      setFrequencyType(e.target.value as typeof frequencyType)
-                    }
-                  >
-                    <option value={FrequencyType.Daily}>Every day</option>
-                    <option value={FrequencyType.CustomDays}>
-                      Custom days
-                    </option>
-                    {/* <option value={FrequencyType.XPerWeek}>
-                      X days a week
-                    </option> */}
-                  </select>
-                  <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
-                </div>
-                <span className="text-gray-500">Due @ 11:59pm</span>
-              </div>
-            </div>
-
-            {frequencyType === FrequencyType.CustomDays && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <p>
                   {selectedDays.length === 0 ? (
                     <>Never</>
                   ) : selectedDays.length === 7 ? (
-                    <>Every day</>
+                    <>
+                      Every day{" "}
+                      <span className="text-gray-500 text-xs">
+                        (Due @ 11:59pm)
+                      </span>
+                    </>
                   ) : (
-                    <>Every {selectedDays.map((d) => d.short).join(", ")}</>
+                    <>
+                      Every {selectedDays.map((d) => d.short).join(", ")}{" "}
+                      <span className="text-gray-500 text-xs">
+                        (Due @ 11:59pm)
+                      </span>
+                    </>
                   )}
                 </p>
                 <div className="flex gap-1">
@@ -288,37 +256,7 @@ export const GoalForm = () => {
                   ))}
                 </div>
               </div>
-            )}
-
-            {frequencyType === FrequencyType.XPerWeek && (
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <span>
-                    {daysPerWeek} day{daysPerWeek === 1 ? "" : "s"} a week
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setDaysPerWeek(num)}
-                      className={`
-                        w-8 h-8 rounded-full text-sm font-medium
-                        ${
-                          daysPerWeek === num
-                            ? "bg-brand text-white"
-                            : "bg-gray-100 text-gray-600"
-                        }
-                        hover:opacity-80 transition-colors
-                      `}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
       </div>
