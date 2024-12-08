@@ -1,25 +1,26 @@
 "use server";
 
+import { FrequencyType, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
 import { DB } from "../database/db";
 import { Goal } from "../database/db-generated-types";
 
-const TEST_USER_ID = "143c8754-b7c8-4502-bd10-02464a4941ed";
+const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
+
+const frequencyTypeSchema = z.nativeEnum(FrequencyType);
 
 const GoalSchema = z.object({
   description: z.string().min(1),
   stakeAmount: z.coerce.number().min(0),
-  dueDate: z.coerce.date(),
+  partnerEmail: z.string().email(),
+  frequencyType: frequencyTypeSchema.optional(),
+  scheduleDays: z.array(z.number()).optional(),
+  dueDate: z.coerce.date().optional(),
 });
 
-export const createGoal = async (
-  prevState: string | undefined,
-  formData: FormData
-) => {
-  const rawFormData = {
-    ...Object.fromEntries(formData),
-  };
+export const createGoal = async (formData: FormData) => {
+  const rawFormData = { ...Object.fromEntries(formData) };
 
   const parsedGoal = GoalSchema.safeParse(rawFormData);
   if (!parsedGoal.success) {
@@ -32,10 +33,9 @@ export const createGoal = async (
     createdByUserId: TEST_USER_ID, // TODO: get user id from session
     description: parsedGoal.data.description,
     stakeAmount: parsedGoal.data.stakeAmount,
-    dueDate: parsedGoal.data.dueDate,
+    partnerEmail: parsedGoal.data.partnerEmail,
+    scheduleType: ScheduleType.Single,
   };
 
-  console.log(goal);
-
-  await DB.get().insertInto("goal").values(goal).execute();
+  DB.get().insertInto("goal").values(goal).execute();
 };

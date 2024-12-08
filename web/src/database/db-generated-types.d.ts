@@ -3,6 +3,7 @@
  * Please do not edit it manually.
  */
 
+import { ScheduleType } from "@/types/enums";
 import type { ColumnType } from "kysely";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
@@ -20,7 +21,7 @@ export interface Goal {
   id: string;
   partnerEmail: string;
   scheduleDays: number[] | null;
-  scheduleType: string;
+  scheduleType: ScheduleType;
   stakeAmount: Numeric;
   updatedAt: Generated<Timestamp>;
 }

@@ -2,7 +2,7 @@
 
 import { FrequencyType } from "@/types/enums";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createGoal } from "../../actions/goal.action";
 
 const GOAL_PLACEHOLDERS = [
@@ -30,7 +30,7 @@ const DAYS: Day[] = [
 ];
 
 export const GoalForm = () => {
-  const [errorMessage, dispatch] = useActionState(createGoal, undefined);
+  const [error, setError] = useState("");
   const [goalPlaceholder, setGoalPlaceholder] = useState("");
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
   const [isRecurring, setIsRecurring] = useState(false);
@@ -97,33 +97,37 @@ export const GoalForm = () => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
 
-    if (!isRecurring) {
-      dispatch(data);
-      return;
-    }
+    try {
+      if (!isRecurring) {
+        createGoal(data);
+        return;
+      }
 
-    if (frequencyType === FrequencyType.Daily) {
-      const startToday = window.confirm(
-        "Do you want to start this commitment today?"
-      );
-      data.append("startToday", startToday ? "true" : "false");
-      dispatch(data);
-      return;
-    }
-
-    if (frequencyType === FrequencyType.CustomDays) {
-      const todayIndex =
-        new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-
-      if (selectedDays.find((d) => d.index === todayIndex)) {
+      if (frequencyType === FrequencyType.Daily) {
         const startToday = window.confirm(
           "Do you want to start this commitment today?"
         );
         data.append("startToday", startToday ? "true" : "false");
+        createGoal(data);
+        return;
       }
-    }
 
-    dispatch(data);
+      if (frequencyType === FrequencyType.CustomDays) {
+        const todayIndex =
+          new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+
+        if (selectedDays.find((d) => d.index === todayIndex)) {
+          const startToday = window.confirm(
+            "Do you want to start this commitment today?"
+          );
+          data.append("startToday", startToday ? "true" : "false");
+        }
+      }
+
+      createGoal(data);
+    } catch (e: any) {
+      setError(e.message);
+    }
   };
 
   return (
@@ -319,7 +323,7 @@ export const GoalForm = () => {
       >
         Commit
       </button>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      {error && <p className="text-red-500">{error}</p>}
     </form>
   );
 };

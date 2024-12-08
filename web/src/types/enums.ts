@@ -3,3 +3,8 @@ export enum FrequencyType {
   CustomDays = "CUSTOM_DAYS",
   XPerWeek = "X_PER_WEEK",
 }
+
+export enum ScheduleType {
+  Single = "SINGLE",
+  Recurring = "RECURRING",
+}
