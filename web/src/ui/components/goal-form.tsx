@@ -5,7 +5,6 @@ import { createGoal, RawGoal } from "../../actions/goal.action";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
-  "Quit smoking",
   "Apply to 5 jobs",
   "Exercise 3 times a week",
   "Read everyday",
@@ -147,7 +146,7 @@ export const GoalForm = () => {
             name="stakeAmount"
             type="number"
             min="0"
-            className="p-2 rounded-md border"
+            className="p-2 rounded-md border w-full"
             placeholder="20"
             required
           />
@@ -160,7 +159,7 @@ export const GoalForm = () => {
             id="partnerEmail"
             name="partnerEmail"
             type="email"
-            className="p-2 rounded-md border"
+            className="p-2 rounded-md border w-full"
             placeholder="partner@example.com"
             required
           />
@@ -215,7 +214,7 @@ export const GoalForm = () => {
                     <>Never</>
                   ) : selectedDays.length === 7 ? (
                     <>
-                      Every day{" "}
+                      Everyday{" "}
                       <span className="text-gray-500 text-xs">
                         (Due @ 11:59pm)
                       </span>
