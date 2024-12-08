@@ -1,3 +1,4 @@
+import { DAYS } from "@/lib/days";
 import { fetchGoals } from "@/lib/goals/goals.helpers";
 import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
@@ -17,9 +18,22 @@ export default async function HomePage() {
       <div className="mb-4">
         <ShowGoalFormButton />
       </div>
-      <div className="flex flex-col gap-4 text-sm w-[400px]">
+      <div className="flex flex-col gap-4 text-sm w-full sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
+
+          let recurringText = "No";
+          if (goal.scheduleType === "RECURRING" && goal.scheduleDays) {
+            recurringText =
+              goal.scheduleDays.length === 7
+                ? "Everyday"
+                : goal.scheduleDays
+                    .map(
+                      (scheduleDay) =>
+                        DAYS.find((day) => day.index === scheduleDay)?.short
+                    )
+                    .join(", ");
+          }
 
           return (
             <div key={goal.id} className="bg-gray-900 p-4 rounded-lg">
@@ -43,7 +57,11 @@ export default async function HomePage() {
                 )}
               </h3>
               <div className="text-gray-400">
-                <div className="grid grid-cols-[110px_1fr]">
+                <div
+                  className={`grid grid-cols-[${
+                    goal.scheduleType === "RECURRING" ? "100px" : "100px"
+                  }_1fr]`}
+                >
                   {latestEntry && (
                     <>
                       <div>Due Date:</div>
@@ -58,8 +76,12 @@ export default async function HomePage() {
                       </div>
                     </>
                   )}
+                  <div>Recurring:</div>
+                  <div>{recurringText}</div>
                   <div>Partner:</div>
                   <div>{goal.partnerEmail}</div>
+                  <div>Staked:</div>
+                  <div className="text-green-500">${goal.stakeAmount}</div>
 
                   {/* <div>Start Date:</div>
                   <div>

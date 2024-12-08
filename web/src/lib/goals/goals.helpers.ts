@@ -14,6 +14,7 @@ export const fetchGoals = async () => {
       "goal.description",
       "goal.scheduleType",
       "goal.scheduleDays",
+      "goal.stakeAmount",
       jsonArrayFrom(
         eb
           .selectFrom("goalEntry")
