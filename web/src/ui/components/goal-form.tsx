@@ -3,7 +3,7 @@
 import { FrequencyType } from "@/types/enums";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
-import { createGoal } from "../../actions/goal.action";
+import { createGoal, RawGoal } from "../../actions/goal.action";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
@@ -95,7 +95,11 @@ export const GoalForm = () => {
   // TODO add validation to prevent empty selectedDays list from appearing
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
+    const data = Object.fromEntries(
+      new FormData(e.currentTarget)
+    ) as unknown as RawGoal;
+
+    data.scheduleDays = selectedDays.map((d) => d.index);
 
     try {
       if (!isRecurring) {
@@ -107,7 +111,7 @@ export const GoalForm = () => {
         const startToday = window.confirm(
           "Do you want to start this commitment today?"
         );
-        data.append("startToday", startToday ? "true" : "false");
+        data.startToday = startToday;
         createGoal(data);
         return;
       }
@@ -120,7 +124,7 @@ export const GoalForm = () => {
           const startToday = window.confirm(
             "Do you want to start this commitment today?"
           );
-          data.append("startToday", startToday ? "true" : "false");
+          data.startToday = startToday;
         }
       }
 
