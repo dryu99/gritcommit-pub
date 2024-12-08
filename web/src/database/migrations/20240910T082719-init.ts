@@ -21,7 +21,25 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn("description", "text", (col) => col.notNull())
     .addColumn("stake_amount", sql`numeric(10,2)`, (col) => col.notNull())
-    .addColumn("due_date", "timestamptz", (col) => col.notNull())
+    .addColumn("partner_email", "text", (col) => col.notNull())
+    .addColumn("schedule_type", "text", (col) => col.notNull())
+    .addColumn("schedule_days", sql`integer ARRAY`)
+    .addColumn("created_at", "timestamptz", (col) =>
+      col.defaultTo(sql`now()`).notNull()
+    )
+    .addColumn("updated_at", "timestamptz", (col) =>
+      col.defaultTo(sql`now()`).notNull()
+    )
+    .execute();
+
+  await db.schema
+    .createTable("goal_entry")
+    .addColumn("id", "uuid", (col) => col.primaryKey())
+    .addColumn("goal_id", "uuid", (col) => col.references("goal.id").notNull())
+    .addColumn("due_at", "timestamptz", (col) => col.notNull())
+    .addColumn("status", "text", (col) => col.notNull())
+    .addColumn("user_verified_at", "timestamptz")
+    .addColumn("partner_verified_at", "timestamptz")
     .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`now()`).notNull()
     )
@@ -44,7 +62,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await sql`
   CREATE TRIGGER "update_goal_updated_at" BEFORE UPDATE ON "goal" FOR EACH ROW EXECUTE FUNCTION "update_updated_at_column"();
   CREATE TRIGGER "update_user_updated_at" BEFORE UPDATE ON "user" FOR EACH ROW EXECUTE FUNCTION "update_updated_at_column"();
-
+  CREATE TRIGGER "update_goal_entry_updated_at" BEFORE UPDATE ON "goal_entry" FOR EACH ROW EXECUTE FUNCTION "update_updated_at_column"();
 `.execute(db);
 }
 
@@ -52,9 +70,11 @@ export async function down(db: Kysely<any>): Promise<void> {
   await sql`
     DROP TRIGGER "update_goal_updated_at" ON "goal";
     DROP TRIGGER "update_user_updated_at" ON "user";
+    DROP TRIGGER "update_goal_entry_updated_at" ON "goal_entry";
     DROP FUNCTION "update_updated_at_column";
 `.execute(db);
 
+  await db.schema.dropTable("goal_entry").execute();
   await db.schema.dropTable("goal").execute();
   await db.schema.dropTable("user").execute();
 }

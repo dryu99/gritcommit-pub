@@ -17,10 +17,23 @@ export interface Goal {
   createdAt: Generated<Timestamp>;
   createdByUserId: string;
   description: string;
-  dueDate: Timestamp;
   id: string;
+  partnerEmail: string;
+  scheduleDays: number[] | null;
+  scheduleType: string;
   stakeAmount: Numeric;
   updatedAt: Generated<Timestamp>;
+}
+
+export interface GoalEntry {
+  createdAt: Generated<Timestamp>;
+  dueAt: Timestamp;
+  goalId: string;
+  id: string;
+  partnerVerifiedAt: Timestamp | null;
+  status: string;
+  updatedAt: Generated<Timestamp>;
+  userVerifiedAt: Timestamp | null;
 }
 
 export interface User {
@@ -32,5 +45,6 @@ export interface User {
 
 export interface DB {
   goal: Goal;
+  goalEntry: GoalEntry;
   user: User;
 }

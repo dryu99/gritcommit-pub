@@ -1,17 +1,13 @@
 "use client";
 
+import { FrequencyType } from "@/types/enums";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useActionState, useEffect, useState } from "react";
-import { createGoal } from "../../actions/home.action";
-
-enum RecurringType {
-  Daily = "DAILY",
-  CustomDays = "CUSTOM_DAYS",
-  XPerWeek = "X_PER_WEEK",
-}
+import { createGoal } from "../../actions/goal.action";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
+  "Quit smoking",
   "Apply to 5 jobs",
   "Exercise 3 times a week",
   "Read everyday",
@@ -39,8 +35,8 @@ export const GoalForm = () => {
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
   const [isRecurring, setIsRecurring] = useState(false);
   const [hasDate, setHasDate] = useState(false);
-  const [recurringType, setRecurringType] = useState<RecurringType>(
-    RecurringType.Daily
+  const [frequencyType, setFrequencyType] = useState<FrequencyType>(
+    FrequencyType.Daily
   );
   const [selectedDays, setSelectedDays] = useState<Day[]>(DAYS);
   const [daysPerWeek, setDaysPerWeek] = useState(3);
@@ -96,6 +92,7 @@ export const GoalForm = () => {
     };
   }, [currGoalPlaceholderIndex]);
 
+  // TODO add validation to prevent empty selectedDays list from appearing
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -105,7 +102,7 @@ export const GoalForm = () => {
       return;
     }
 
-    if (recurringType === RecurringType.Daily) {
+    if (frequencyType === FrequencyType.Daily) {
       const startToday = window.confirm(
         "Do you want to start this commitment today?"
       );
@@ -114,7 +111,7 @@ export const GoalForm = () => {
       return;
     }
 
-    if (recurringType === RecurringType.CustomDays) {
+    if (frequencyType === FrequencyType.CustomDays) {
       const todayIndex =
         new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
@@ -203,6 +200,7 @@ export const GoalForm = () => {
                 type="date"
                 className="w-[194px] p-2 rounded-md border"
                 onChange={(e) => setHasDate(!!e.target.value)}
+                required
               />
               {hasDate && <span className="text-gray-500">11:59pm</span>}
             </div>
@@ -212,25 +210,25 @@ export const GoalForm = () => {
         {isRecurring && (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
-              <label htmlFor="recurringType" className="font-medium">
+              <label htmlFor="frequencyType" className="font-medium">
                 Frequency
               </label>
               <div className="flex items-center gap-2">
                 <div className="relative w-[194px]">
                   <select
-                    id="recurringType"
-                    name="recurringType"
+                    id="frequencyType"
+                    name="frequencyType"
                     className="w-full h-10 p-2 rounded-md border appearance-none"
-                    value={recurringType}
+                    value={frequencyType}
                     onChange={(e) =>
-                      setRecurringType(e.target.value as typeof recurringType)
+                      setFrequencyType(e.target.value as typeof frequencyType)
                     }
                   >
-                    <option value={RecurringType.Daily}>Every day</option>
-                    <option value={RecurringType.CustomDays}>
+                    <option value={FrequencyType.Daily}>Every day</option>
+                    <option value={FrequencyType.CustomDays}>
                       Custom days
                     </option>
-                    <option value={RecurringType.XPerWeek}>
+                    <option value={FrequencyType.XPerWeek}>
                       X days a week
                     </option>
                   </select>
@@ -240,7 +238,7 @@ export const GoalForm = () => {
               </div>
             </div>
 
-            {recurringType === RecurringType.CustomDays && (
+            {frequencyType === FrequencyType.CustomDays && (
               <div className="flex flex-col gap-3">
                 <p>
                   {selectedDays.length === 0 ? (
@@ -282,7 +280,7 @@ export const GoalForm = () => {
               </div>
             )}
 
-            {recurringType === RecurringType.XPerWeek && (
+            {frequencyType === FrequencyType.XPerWeek && (
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span>

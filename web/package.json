@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-db-types": "cross-env NODE_ENV=development kysely-codegen --camel-case --out-file ./src/database/db-generated-types.d.ts",
+    "dev:migrate-db": "cross-env NODE_ENV=development npx tsx ./src/database/migrate-db.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

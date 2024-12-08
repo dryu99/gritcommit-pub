@@ -44,11 +44,7 @@ export class DB {
 
   public static start() {
     this.pool = new pg.Pool({
-      host: Config.DATABASE_HOST,
-      port: Number(Config.DATABASE_PORT),
-      user: Config.DATABASE_USER,
-      password: Config.DATABASE_PASSWORD,
-      database: Config.DATABASE_NAME,
+      connectionString: Config.DATABASE_URL,
       max: 1,
     });
 
@@ -57,10 +53,7 @@ export class DB {
     });
 
     console.log(`Connecting to database...`, {
-      host: Config.DATABASE_HOST,
-      port: Number(Config.DATABASE_PORT),
-      user: Config.DATABASE_USER,
-      database: Config.DATABASE_NAME,
+      connectionString: Config.DATABASE_URL,
     });
 
     if (Config.NODE_ENV === "production") {
