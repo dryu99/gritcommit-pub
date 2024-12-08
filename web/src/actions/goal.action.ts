@@ -1,5 +1,6 @@
 "use server";
 
+import { generateModelId } from "@/lib/generate-model-id";
 import { FrequencyType, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
@@ -14,10 +15,14 @@ const RawGoalSchema = z.object({
   description: z.string().min(1),
   stakeAmount: z.coerce.number().min(0),
   partnerEmail: z.string().email(),
-  frequencyType: frequencyTypeSchema.optional(),
-  scheduleDays: z.array(z.number()).optional(),
-  dueDate: z.coerce.date().optional(),
   startToday: z.boolean().optional(),
+
+  // existence of these implies scheduleType = RECURRING
+  frequencyType: frequencyTypeSchema.optional(),
+  scheduleDays: z.array(z.number()).optional(), // assume sorted
+
+  // existence of this implies scheduleType = SINGLE
+  dueDate: z.coerce.date().optional(),
 });
 
 export type RawGoal = z.infer<typeof RawGoalSchema>;
@@ -30,12 +35,14 @@ export const createGoal = async (data: any) => {
   }
 
   const goal: Insertable<Goal> = {
-    id: crypto.randomUUID(),
+    id: generateModelId(),
     createdByUserId: TEST_USER_ID, // TODO: get user id from session
     description: rawGoal.description,
     stakeAmount: rawGoal.stakeAmount,
     partnerEmail: rawGoal.partnerEmail,
-    scheduleType: ScheduleType.Single,
+    scheduleType: rawGoal.dueDate
+      ? ScheduleType.Single
+      : ScheduleType.Recurring,
     scheduleDays:
       rawGoal.frequencyType === FrequencyType.CustomDays
         ? rawGoal.scheduleDays
@@ -44,5 +51,40 @@ export const createGoal = async (data: any) => {
         : null,
   };
 
+  // const firstGoalEntry: Insertable<GoalEntry> = {
+  //   id: generateModelId(),
+  //   goalId: goal.id,
+  //   dueAt: goal.scheduleType === ScheduleType.Single ? rawGoal.dueDate : null,
+  //   status: GoalEntryStatus.Pending,
+  // };
+
   DB.get().insertInto("goal").values(goal).execute();
+};
+
+const calculateNextDueDate = (rawGoal: RawGoal): Date => {
+  if (rawGoal.dueDate) {
+    return rawGoal.dueDate;
+  }
+
+  const today = new Date(new Date().setHours(23, 59, 0, 0));
+  if (rawGoal.startToday) {
+    return today;
+  }
+
+  if (rawGoal.scheduleDays) {
+    const todayDay = today.getDay();
+    let currDay = (todayDay + 1) % 7;
+    let incCount = 0;
+    while (incCount < 7) {
+      if (rawGoal.scheduleDays.includes(currDay)) {
+        const nextDueDate = new Date(today.setDate(today.getDate() + incCount));
+        return nextDueDate;
+      }
+
+      currDay = (currDay + 1) % 7;
+      incCount++;
+    }
+  }
+
+  throw new Error("Next due date could not be calculated");
 };
