@@ -1,5 +1,6 @@
 "use server";
 
+import { Config } from "@/lib/config";
 import { generateModelId } from "@/lib/generate-model-id";
 import { FrequencyType, GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
@@ -44,8 +45,8 @@ export const createGoal = async (data: any) => {
       ? ScheduleType.Single
       : ScheduleType.Recurring,
     scheduleDays:
-      rawGoal.frequencyType === FrequencyType.CustomDays
-        ? rawGoal.scheduleDays
+      rawGoal.frequencyType === FrequencyType.CustomDays && rawGoal.scheduleDays
+        ? [...rawGoal.scheduleDays].sort((a, b) => a - b)
         : rawGoal.frequencyType === FrequencyType.Daily
         ? [0, 1, 2, 3, 4, 5, 6]
         : null,
@@ -53,19 +54,26 @@ export const createGoal = async (data: any) => {
 
   const nextDueDate = calculateNextDueDate(rawGoal);
 
-  const firstGoalEntry: Insertable<GoalEntry> = {
+  const goalEntry: Insertable<GoalEntry> = {
     id: generateModelId(),
     goalId: goal.id,
     dueAt: nextDueDate,
     status: GoalEntryStatus.Pending,
   };
 
+  if (Config.NODE_ENV === "development") {
+    console.log("CREATE_GOAL");
+    console.log("rawGoal", rawGoal);
+    console.log("goal", goal);
+    console.log("firstGoalEntry", goalEntry);
+  }
+
   // TODO also have to send email if user is starting today and its past 12pm
   DB.get()
     .transaction()
     .execute(async (trx) => {
       await trx.insertInto("goal").values(goal).execute();
-      await trx.insertInto("goalEntry").values(firstGoalEntry).execute();
+      await trx.insertInto("goalEntry").values(goalEntry).execute();
     });
 };
 
