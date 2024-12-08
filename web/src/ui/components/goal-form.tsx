@@ -136,7 +136,7 @@ export const GoalForm = () => {
 
   return (
     <form
-      className="flex flex-col gap-5 w-[400px] text-sm"
+      className="flex flex-col gap-5 w-full sm:w-[400px] text-sm"
       onSubmit={handleSubmit}
     >
       <div className="flex flex-col gap-1">
@@ -277,7 +277,7 @@ export const GoalForm = () => {
                       w-8 h-8 rounded-full text-sm font-medium
                       ${
                         selectedDays.find((d) => d.short === day.short)
-                          ? "bg-orange-600 text-white"
+                          ? "bg-brand text-white"
                           : "bg-gray-100 text-gray-600"
                       }
                       hover:opacity-80 transition-colors
@@ -307,7 +307,7 @@ export const GoalForm = () => {
                         w-8 h-8 rounded-full text-sm font-medium
                         ${
                           daysPerWeek === num
-                            ? "bg-orange-600 text-white"
+                            ? "bg-brand text-white"
                             : "bg-gray-100 text-gray-600"
                         }
                         hover:opacity-80 transition-colors
@@ -325,7 +325,7 @@ export const GoalForm = () => {
 
       <button
         type="submit"
-        className="mt-6 bg-orange-600 text-white p-2 rounded-md hover:bg-orange-700"
+        className="mt-6 bg-brand text-white p-2 transition-colors rounded-md hover:bg-brandHover"
       >
         Commit
       </button>

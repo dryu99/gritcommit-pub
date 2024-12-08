@@ -17,8 +17,9 @@ body {
   --color-border-secondary: #e0e0e0;
 
   /* Brand */
-  --color-text-brand-yellow: #c2410c;
-  --color-bg-brand-yellow: #c2410c;
+  --color-text-brand: #ea580c;
+  --color-bg-brand: #ea580c;
+  --color-bg-brand-hover: #c2410c;
 }
 
 [data-theme="dark"] {
