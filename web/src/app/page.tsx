@@ -38,8 +38,8 @@ export default async function HomePage() {
 
           return (
             <div key={goal.id}>
-              <div className="bg-gray-900 sm:p-6 p-4 rounded-lg">
-                <h3 className="text-yellow-500 flex justify-between items-center">
+              <div className="bg-gray-900 sm:px-6 sm:py-5 p-4 rounded-lg">
+                <h3 className="text-orange-500 flex justify-between items-center mb-1">
                   <div>commit #{goals.length - i}</div>
                   {latestEntry && (
                     <div className="flex items-center gap-2">
@@ -65,11 +65,7 @@ export default async function HomePage() {
                   )}
                 </h3>
                 <div className="text-gray-400">
-                  <div
-                    className={`grid grid-cols-[${
-                      goal.scheduleType === "RECURRING" ? "100px" : "100px"
-                    }_1fr]`}
-                  >
+                  <div className={`grid grid-cols-[100px_1fr]`}>
                     {latestEntry && (
                       <>
                         <div>Due Date:</div>
