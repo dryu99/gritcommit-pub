@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -13,6 +13,27 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   title,
 }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -25,7 +46,10 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div
+          ref={modalRef}
+          className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+        >
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b">
             {title && <h2 className="text-xl font-semibold">{title}</h2>}
