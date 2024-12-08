@@ -24,6 +24,7 @@ const RawGoalSchema = z.object({
 
   // existence of this implies scheduleType = SINGLE
   dueDate: z.coerce.date().optional(),
+  timezone: z.string(),
 });
 
 export type RawGoal = z.infer<typeof RawGoalSchema>;
@@ -79,22 +80,30 @@ export const createGoal = async (data: any) => {
 
 const calculateNextDueDate = (rawGoal: RawGoal): Date => {
   if (rawGoal.dueDate) {
-    return rawGoal.dueDate;
+    const nextDueDate = new Date(
+      rawGoal.dueDate.toLocaleString("en-US", { timeZone: rawGoal.timezone })
+    );
+    nextDueDate.setHours(23, 59, 0, 0);
+    return nextDueDate;
   }
 
-  const today = new Date(new Date().setHours(23, 59, 0, 0));
+  const todayInClientTZ = new Date(
+    new Date().toLocaleString("en-US", { timeZone: rawGoal.timezone })
+  );
+  todayInClientTZ.setHours(23, 59, 0, 0);
   if (rawGoal.startToday) {
-    return today;
+    return todayInClientTZ;
   }
 
   if (rawGoal.scheduleDays) {
-    const todayDay = today.getDay();
+    const todayDay = todayInClientTZ.getDay();
 
-    // Check next 7 days starting from tomorrow
     for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
       const checkDay = (todayDay + daysAhead) % 7;
       if (rawGoal.scheduleDays.includes(checkDay)) {
-        return new Date(today.setDate(today.getDate() + daysAhead));
+        const nextDueDate = new Date(todayInClientTZ);
+        nextDueDate.setDate(todayInClientTZ.getDate() + daysAhead);
+        return nextDueDate;
       }
     }
   }

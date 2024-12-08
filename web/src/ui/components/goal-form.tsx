@@ -99,8 +99,8 @@ export const GoalForm = () => {
     const data = Object.fromEntries(
       new FormData(e.currentTarget)
     ) as unknown as RawGoal;
-
     data.scheduleDays = selectedDays.map((d) => d.index);
+    data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     try {
       if (!isRecurring) {
