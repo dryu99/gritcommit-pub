@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createGoal, RawGoal } from "../../actions/goal.action";
+import { createGoal, RawGoal } from "../../lib/goals/goals.actions";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",

@@ -1,5 +1,5 @@
 import { fetchGoals } from "@/lib/goals/goals.helpers";
-import { ShowCreateGoalFormButton } from "@/ui/components/show-create-goal-form-button";
+import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
 
 export default async function HomePage() {
@@ -14,7 +14,7 @@ export default async function HomePage() {
         Commit to your goals with grit <span>(and a buddy)</span>
       </p>
       <div className="mb-4">
-        <ShowCreateGoalFormButton />
+        <ShowGoalFormButton />
       </div>
       <div className="flex flex-col gap-4 text-sm">
         {goals.map((goal) => (

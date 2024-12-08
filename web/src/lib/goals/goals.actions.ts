@@ -6,8 +6,8 @@ import { TEST_USER_ID } from "@/lib/goals/goals.helpers";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
-import { DB } from "../database/db";
-import { Goal, GoalEntry } from "../database/db-generated-types";
+import { DB } from "../../database/db";
+import { Goal, GoalEntry } from "../../database/db-generated-types";
 
 const RawGoalSchema = z.object({
   description: z.string().min(1),

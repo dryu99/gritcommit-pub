@@ -5,7 +5,7 @@ import { Button } from "./common/button";
 import { Modal } from "./common/modal";
 import { GoalForm } from "./goal-form";
 
-export function ShowCreateGoalFormButton() {
+export function ShowGoalFormButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
