@@ -1,5 +1,5 @@
+import { ShowCreateGoalFormButton } from "@/ui/components/show-create-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
-import { GoalForm } from "../ui/components/goal-form";
 
 export default function HomePage() {
   return (
@@ -10,7 +10,8 @@ export default function HomePage() {
       <p className="text-gray-500 mb-10 text-sm text-center flex sm:flex-row gap-1 sm:gap-2 flex-col items-center">
         Commit to your goals with grit <span>(and a buddy)</span>
       </p>
-      <GoalForm />
+
+      <ShowCreateGoalFormButton />
     </div>
   );
 }
