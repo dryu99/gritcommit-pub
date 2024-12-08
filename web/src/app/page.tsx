@@ -1,4 +1,5 @@
 import { fetchGoals } from "@/lib/goals/goals.helpers";
+import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
 
@@ -16,10 +17,69 @@ export default async function HomePage() {
       <div className="mb-4">
         <ShowGoalFormButton />
       </div>
-      <div className="flex flex-col gap-4 text-sm">
-        {goals.map((goal) => (
-          <div key={goal.id}>{goal.description}</div>
-        ))}
+      <div className="flex flex-col gap-4 text-sm w-[400px]">
+        {goals.map((goal, i) => {
+          const latestEntry = goal.entries[0];
+
+          return (
+            <div key={goal.id} className="bg-gray-900 p-4 rounded-lg">
+              <h3 className="text-yellow-500 flex justify-between items-center">
+                <div>commit #{goals.length - i}</div>
+                {latestEntry && (
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {latestEntry.status === "PENDING"
+                        ? "ONGOING"
+                        : latestEntry.status}
+                    </span>
+                    <div
+                      className={cn("w-2 h-2 rounded-full", {
+                        "bg-red-500": latestEntry.status === "FAILED",
+                        "bg-yellow-500": latestEntry.status === "PENDING",
+                        "bg-green-500": latestEntry.status === "COMPLETED",
+                      })}
+                    />
+                  </div>
+                )}
+              </h3>
+              <div className="text-gray-400">
+                <div className="grid grid-cols-[110px_1fr]">
+                  {latestEntry && (
+                    <>
+                      <div>Due Date:</div>
+                      <div>
+                        {new Date(latestEntry.dueAt).toLocaleString(undefined, {
+                          year: "numeric",
+                          month: "numeric",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    </>
+                  )}
+                  <div>Partner:</div>
+                  <div>{goal.partnerEmail}</div>
+
+                  {/* <div>Start Date:</div>
+                  <div>
+                    {new Date(goal.createdAt).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div> */}
+                </div>
+
+                <div className="ml-4 mt-4 text-white whitespace-pre-wrap">
+                  {goal.description}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
