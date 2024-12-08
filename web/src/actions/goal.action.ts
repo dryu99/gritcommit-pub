@@ -29,12 +29,15 @@ const RawGoalSchema = z.object({
 
 export type RawGoal = z.infer<typeof RawGoalSchema>;
 
+// TODO do auth check
 export const createGoal = async (data: any) => {
   const { success, error, data: rawGoal } = RawGoalSchema.safeParse(data);
   if (!success) {
     console.log(error.errors);
     return error.errors.map((e) => e.message).join(", ");
   }
+
+  // TODO validate that scheudlDays.length > 0 if CustomDays === true
 
   const goal: Insertable<Goal> = {
     id: generateModelId(),

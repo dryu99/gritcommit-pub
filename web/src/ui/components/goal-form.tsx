@@ -118,8 +118,7 @@ export const GoalForm = () => {
       }
 
       if (frequencyType === FrequencyType.CustomDays) {
-        const todayIndex =
-          new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+        const todayIndex = new Date().getDay();
 
         if (selectedDays.find((d) => d.index === todayIndex)) {
           const startToday = window.confirm(
@@ -237,9 +236,9 @@ export const GoalForm = () => {
                     <option value={FrequencyType.CustomDays}>
                       Custom days
                     </option>
-                    <option value={FrequencyType.XPerWeek}>
+                    {/* <option value={FrequencyType.XPerWeek}>
                       X days a week
-                    </option>
+                    </option> */}
                   </select>
                   <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
                 </div>
