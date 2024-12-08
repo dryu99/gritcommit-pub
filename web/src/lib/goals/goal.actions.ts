@@ -2,7 +2,7 @@
 
 import { Config } from "@/lib/config";
 import { generateModelId } from "@/lib/generate-model-id";
-import { TEST_USER_ID } from "@/lib/goals/goals.helpers";
+import { TEST_USER_ID } from "@/lib/goals/goal.helpers";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { revalidatePath } from "next/cache";
@@ -81,7 +81,7 @@ const calculateNextDueDate = (rawGoal: RawGoal): Date => {
   // handle SINGLE
   if (rawGoal.dueDate) {
     const nextDueDate = new Date(
-      rawGoal.dueDate.toLocaleString("en-US", { timeZone: rawGoal.timezone })
+      rawGoal.dueDate.toLocaleString("en-US", { timeZone: rawGoal.timezone }),
     );
     nextDueDate.setHours(23, 59, 0, 0);
     return nextDueDate;
@@ -89,7 +89,7 @@ const calculateNextDueDate = (rawGoal: RawGoal): Date => {
 
   // handle RECURRING
   const todayInClientTZ = new Date(
-    new Date().toLocaleString("en-US", { timeZone: rawGoal.timezone })
+    new Date().toLocaleString("en-US", { timeZone: rawGoal.timezone }),
   );
   todayInClientTZ.setHours(23, 59, 0, 0);
   if (rawGoal.startToday) {

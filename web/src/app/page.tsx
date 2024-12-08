@@ -1,5 +1,5 @@
 import { DAYS } from "@/lib/days";
-import { fetchGoals } from "@/lib/goals/goals.helpers";
+import { fetchGoals } from "@/lib/goals/goal.helpers";
 import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
