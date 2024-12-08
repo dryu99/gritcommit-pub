@@ -2,13 +2,12 @@
 
 import { Config } from "@/lib/config";
 import { generateModelId } from "@/lib/generate-model-id";
+import { TEST_USER_ID } from "@/lib/goals/goals.helpers";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { z } from "zod";
 import { DB } from "../database/db";
 import { Goal, GoalEntry } from "../database/db-generated-types";
-
-const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
 const RawGoalSchema = z.object({
   description: z.string().min(1),
@@ -43,7 +42,7 @@ export const createGoal = async (data: any) => {
     stakeAmount: rawGoal.stakeAmount,
     partnerEmail: rawGoal.partnerEmail,
     scheduleType: rawGoal.dueDate // TODO consider passing schedule type from client. this feels prone to bugs
-      ? ScheduleType.Single
+      ? ScheduleType.Once
       : ScheduleType.Recurring,
     scheduleDays: rawGoal.scheduleDays
       ? [...rawGoal.scheduleDays].sort((a, b) => a - b)

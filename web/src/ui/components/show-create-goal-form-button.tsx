@@ -11,11 +11,7 @@ export function ShowCreateGoalFormButton() {
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Create Goal</Button>
-      <Modal
-        title="Create Goal"
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      >
+      <Modal title="Add Goal" isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <GoalForm />
       </Modal>
     </>
