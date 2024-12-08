@@ -12,9 +12,9 @@ enum RecurringType {
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
-  "Send job applications",
-  "Exercise 3 times this week",
-  "Read 20 pages daily",
+  "Apply to 5 jobs",
+  "Exercise 3 times a week",
+  "Read everyday",
 ];
 
 type Day = {
