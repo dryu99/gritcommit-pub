@@ -25,12 +25,20 @@ export const Modal: React.FC<ModalProps> = ({
       }
     }
 
+    function handleEscapeKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscapeKey);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [isOpen, onClose]);
 
@@ -75,7 +83,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
 
           {/* Content */}
-          <div className="p-4">{children}</div>
+          <div className="p-4 sm:p-8">{children}</div>
         </div>
       </div>
     </>

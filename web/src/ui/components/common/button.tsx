@@ -11,14 +11,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
-
-    const variants = {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90",
-      outline:
-        "border border-input hover:bg-accent hover:text-accent-foreground",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-    };
+      "text-sm inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-brand text-white hover:bg-brandHover";
 
     const sizes = {
       default: "h-10 py-2 px-4",
@@ -26,12 +19,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: "h-11 px-8",
     };
 
-    const variantStyles = variants[variant];
     const sizeStyles = sizes[size];
 
     return (
       <button
-        className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`}
+        className={`${baseStyles} ${sizeStyles} ${className}`}
         ref={ref}
         {...props}
       />

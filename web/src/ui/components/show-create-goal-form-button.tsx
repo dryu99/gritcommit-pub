@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "./common/button";
 import { Modal } from "./common/modal";
 import { GoalForm } from "./goal-form";
 
@@ -9,7 +10,7 @@ export function ShowCreateGoalFormButton() {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>Create Goal</button>
+      <Button onClick={() => setIsOpen(true)}>Create Goal</Button>
       <Modal
         title="Create Goal"
         isOpen={isOpen}

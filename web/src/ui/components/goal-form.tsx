@@ -119,7 +119,7 @@ export const GoalForm = () => {
 
   return (
     <form
-      className="flex flex-col gap-5 w-full sm:w-[420px] text-sm"
+      className="flex flex-col gap-5 w-full text-sm"
       onSubmit={handleSubmit}
     >
       <div className="flex flex-col gap-1">
