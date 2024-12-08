@@ -11,7 +11,7 @@ const GOAL_PLACEHOLDERS = [
   "Read everyday",
 ];
 
-export const GoalForm = () => {
+export const GoalForm = ({ onClose }: { onClose: () => void }) => {
   const [error, setError] = useState("");
   const [goalPlaceholder, setGoalPlaceholder] = useState("");
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
@@ -98,6 +98,8 @@ export const GoalForm = () => {
       createGoal(data);
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      onClose();
     }
   };
 

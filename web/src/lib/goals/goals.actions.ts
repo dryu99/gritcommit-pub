@@ -5,6 +5,7 @@ import { generateModelId } from "@/lib/generate-model-id";
 import { TEST_USER_ID } from "@/lib/goals/goals.helpers";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
@@ -66,12 +67,14 @@ export const createGoal = async (data: any) => {
   }
 
   // TODO also have to send email if user is starting today and its past 12pm
-  DB.get()
+  await DB.get()
     .transaction()
     .execute(async (trx) => {
       await trx.insertInto("goal").values(goal).execute();
       await trx.insertInto("goalEntry").values(goalEntry).execute();
     });
+
+  revalidatePath("/");
 };
 
 const calculateNextDueDate = (rawGoal: RawGoal): Date => {
