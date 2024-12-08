@@ -1,13 +1,13 @@
 "use client";
 
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useActionState, useEffect, useState } from "react";
 import { createGoal } from "../../actions/home.action";
-import { cn } from "../classnames";
 
 enum RecurringType {
-  Daily = "daily",
-  CustomDays = "custom-days",
-  XPerWeek = "x-per-week",
+  Daily = "DAILY",
+  CustomDays = "CUSTOM_DAYS",
+  XPerWeek = "X_PER_WEEK",
 }
 
 const GOAL_PLACEHOLDERS = [
@@ -20,16 +20,17 @@ const GOAL_PLACEHOLDERS = [
 type Day = {
   narrow: string;
   short: string;
+  index: number;
 };
 
 const DAYS: Day[] = [
-  { narrow: "M", short: "Mon" },
-  { narrow: "T", short: "Tue" },
-  { narrow: "W", short: "Wed" },
-  { narrow: "T", short: "Thu" },
-  { narrow: "F", short: "Fri" },
-  { narrow: "S", short: "Sat" },
-  { narrow: "S", short: "Sun" },
+  { narrow: "M", short: "Mon", index: 0 },
+  { narrow: "T", short: "Tue", index: 1 },
+  { narrow: "W", short: "Wed", index: 2 },
+  { narrow: "T", short: "Thu", index: 3 },
+  { narrow: "F", short: "Fri", index: 4 },
+  { narrow: "S", short: "Sat", index: 5 },
+  { narrow: "S", short: "Sun", index: 6 },
 ];
 
 export const GoalForm = () => {
@@ -95,8 +96,44 @@ export const GoalForm = () => {
     };
   }, [currGoalPlaceholderIndex]);
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+
+    if (!isRecurring) {
+      dispatch(data);
+      return;
+    }
+
+    if (recurringType === RecurringType.Daily) {
+      const startToday = window.confirm(
+        "Do you want to start this commitment today?"
+      );
+      data.append("startToday", startToday ? "true" : "false");
+      dispatch(data);
+      return;
+    }
+
+    if (recurringType === RecurringType.CustomDays) {
+      const todayIndex =
+        new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+
+      if (selectedDays.find((d) => d.index === todayIndex)) {
+        const startToday = window.confirm(
+          "Do you want to start this commitment today?"
+        );
+        data.append("startToday", startToday ? "true" : "false");
+      }
+    }
+
+    dispatch(data);
+  };
+
   return (
-    <form className="flex flex-col gap-5 w-[400px] text-sm" action={dispatch}>
+    <form
+      className="flex flex-col gap-5 w-[400px] text-sm"
+      onSubmit={handleSubmit}
+    >
       <div className="flex flex-col gap-1">
         <label htmlFor="description" className="font-medium">
           Your Commitment
@@ -108,6 +145,7 @@ export const GoalForm = () => {
           type="text"
           className="p-2 rounded-md border"
           placeholder={goalPlaceholder}
+          required
         />
       </div>
       <div className="flex gap-2 justify-between">
@@ -120,7 +158,6 @@ export const GoalForm = () => {
             name="stakeAmount"
             type="number"
             min="0"
-            step="0.01"
             className="p-2 rounded-md border"
             placeholder="20"
           />
@@ -135,6 +172,7 @@ export const GoalForm = () => {
             type="email"
             className="p-2 rounded-md border"
             placeholder="partner@example.com"
+            required
           />
         </div>
       </div>
@@ -163,7 +201,7 @@ export const GoalForm = () => {
                 id="dueDate"
                 name="dueDate"
                 type="date"
-                className="w-[177px] p-2 rounded-md border"
+                className="w-[194px] p-2 rounded-md border"
                 onChange={(e) => setHasDate(!!e.target.value)}
               />
               {hasDate && <span className="text-gray-500">11:59pm</span>}
@@ -178,23 +216,26 @@ export const GoalForm = () => {
                 Frequency
               </label>
               <div className="flex items-center gap-2">
-                <select
-                  id="recurringType"
-                  name="recurringType"
-                  className={cn(
-                    "w-[177px] h-10 p-2 rounded-md border appearance-none",
-                    "bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]",
-                    "bg-[length:0.7em] bg-[right_0.7rem_center] bg-no-repeat pr-8"
-                  )}
-                  value={recurringType}
-                  onChange={(e) =>
-                    setRecurringType(e.target.value as typeof recurringType)
-                  }
-                >
-                  <option value={RecurringType.Daily}>Every day</option>
-                  <option value={RecurringType.CustomDays}>Custom days</option>
-                  <option value={RecurringType.XPerWeek}>X days a week</option>
-                </select>
+                <div className="relative w-[194px]">
+                  <select
+                    id="recurringType"
+                    name="recurringType"
+                    className="w-full h-10 p-2 rounded-md border appearance-none"
+                    value={recurringType}
+                    onChange={(e) =>
+                      setRecurringType(e.target.value as typeof recurringType)
+                    }
+                  >
+                    <option value={RecurringType.Daily}>Every day</option>
+                    <option value={RecurringType.CustomDays}>
+                      Custom days
+                    </option>
+                    <option value={RecurringType.XPerWeek}>
+                      X days a week
+                    </option>
+                  </select>
+                  <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
+                </div>
                 <span className="text-gray-500">Due @ 11:59pm</span>
               </div>
             </div>
@@ -207,17 +248,7 @@ export const GoalForm = () => {
                   ) : selectedDays.length === 7 ? (
                     <>Every day</>
                   ) : (
-                    <>
-                      Every{" "}
-                      {selectedDays
-                        .sort(
-                          (a, b) =>
-                            DAYS.findIndex((d) => d.short === a.short) -
-                            DAYS.findIndex((d) => d.short === b.short)
-                        )
-                        .map((d) => d.short)
-                        .join(", ")}
-                    </>
+                    <>Every {selectedDays.map((d) => d.short).join(", ")}</>
                   )}
                 </p>
                 <div className="flex gap-1">
@@ -226,11 +257,13 @@ export const GoalForm = () => {
                       key={day.short}
                       type="button"
                       onClick={() => {
-                        setSelectedDays((prev) =>
-                          prev.find((d) => d.short === day.short)
+                        setSelectedDays((prev) => {
+                          return prev.find((d) => d.short === day.short)
                             ? prev.filter((d) => d.short !== day.short)
-                            : prev.concat(day)
-                        );
+                            : prev
+                                .concat(day)
+                                .sort((a, b) => a.index - b.index);
+                        });
                       }}
                       className={`
                       w-8 h-8 rounded-full text-sm font-medium
@@ -252,7 +285,9 @@ export const GoalForm = () => {
             {recurringType === RecurringType.XPerWeek && (
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <span>{daysPerWeek} days a week</span>
+                  <span>
+                    {daysPerWeek} day{daysPerWeek === 1 ? "" : "s"} a week
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5, 6, 7].map((num) => (

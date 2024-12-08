@@ -1,4 +1,4 @@
-import { inter } from "@/ui/fonts";
+import { ibmPlexMono } from "@/ui/fonts";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -22,7 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <body className={`${inter.className} antialiased flex h-svh flex-col`}>
+      <body
+        className={`${ibmPlexMono.className} antialiased flex h-svh flex-col`}
+      >
         {/* <header className="px-4 lg:px-6 h-14 py-4 flex items-center">
           <Link className="flex items-center justify-center" href="#">
             <h1 className={`${ibmPlexMono.className} ml-2 text-xl font-bold`}>
