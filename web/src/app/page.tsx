@@ -15,10 +15,11 @@ export default async function HomePage() {
       <p className="text-gray-500 mb-10 text-sm text-center flex sm:flex-row gap-1 sm:gap-2 flex-col items-center">
         Commit to your goals with grit <span>(and a buddy)</span>
       </p>
-      <div className="mb-4">
+      <div>
         <ShowGoalFormButton />
       </div>
-      <div className="flex flex-col gap-4 text-sm w-full sm:w-[500px]">
+      <CommitLine />
+      <div className="flex flex-col text-sm w-full sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
 
@@ -36,69 +37,75 @@ export default async function HomePage() {
           }
 
           return (
-            <div key={goal.id} className="bg-gray-900 p-4 rounded-lg">
-              <h3 className="text-yellow-500 flex justify-between items-center">
-                <div>commit #{goals.length - i}</div>
-                {latestEntry && (
-                  <div className="flex items-center gap-2">
-                    <span>
-                      {latestEntry.status === "PENDING"
-                        ? "ONGOING"
-                        : latestEntry.status}
-                    </span>
-                    <div
-                      className={cn("w-2 h-2 rounded-full", {
-                        "bg-red-500": latestEntry.status === "FAILED",
-                        "bg-yellow-500": latestEntry.status === "PENDING",
-                        "bg-green-500": latestEntry.status === "COMPLETED",
-                      })}
-                    />
-                  </div>
-                )}
-              </h3>
-              <div className="text-gray-400">
-                <div
-                  className={`grid grid-cols-[${
-                    goal.scheduleType === "RECURRING" ? "100px" : "100px"
-                  }_1fr]`}
-                >
+            <div key={goal.id}>
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h3 className="text-yellow-500 flex justify-between items-center">
+                  <div>commit #{goals.length - i}</div>
                   {latestEntry && (
-                    <>
-                      <div>Due Date:</div>
-                      <div>
-                        {new Date(latestEntry.dueAt).toLocaleString(undefined, {
-                          year: "numeric",
-                          month: "numeric",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
+                    <div className="flex items-center gap-2">
+                      <span>
+                        {latestEntry.status === "PENDING"
+                          ? "ONGOING"
+                          : latestEntry.status}
+                      </span>
+                      <div
+                        className={cn("w-2 h-2 rounded-full", {
+                          "bg-red-500": latestEntry.status === "FAILED",
+                          "bg-yellow-500": latestEntry.status === "PENDING",
+                          "bg-green-500": latestEntry.status === "COMPLETED",
                         })}
-                      </div>
-                    </>
+                      />
+                    </div>
                   )}
-                  <div>Recurring:</div>
-                  <div>{recurringText}</div>
-                  <div>Partner:</div>
-                  <div>{goal.partnerEmail}</div>
-                  <div>Staked:</div>
-                  <div className="text-green-500">${goal.stakeAmount}</div>
+                </h3>
+                <div className="text-gray-400">
+                  <div
+                    className={`grid grid-cols-[${
+                      goal.scheduleType === "RECURRING" ? "100px" : "100px"
+                    }_1fr]`}
+                  >
+                    {latestEntry && (
+                      <>
+                        <div>Due Date:</div>
+                        <div>
+                          {new Date(latestEntry.dueAt).toLocaleString(
+                            undefined,
+                            {
+                              year: "numeric",
+                              month: "numeric",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </div>
+                      </>
+                    )}
+                    <div>Recurring:</div>
+                    <div>{recurringText}</div>
+                    <div>Partner:</div>
+                    <div>{goal.partnerEmail}</div>
+                    <div>Staked:</div>
+                    <div className="text-green-500">${goal.stakeAmount}</div>
 
-                  {/* <div>Start Date:</div>
-                  <div>
-                    {new Date(goal.createdAt).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "numeric",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div> */}
-                </div>
+                    {/* <div>Start Date:</div>
+                    <div>
+                      {new Date(goal.createdAt).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div> */}
+                  </div>
 
-                <div className="ml-4 mt-4 text-white whitespace-pre-wrap">
-                  {goal.description}
+                  <div className="ml-4 mt-4 text-white whitespace-pre-wrap">
+                    {goal.description}
+                  </div>
                 </div>
               </div>
+              {i !== goals.length - 1 && <CommitLine />}
             </div>
           );
         })}
@@ -106,3 +113,13 @@ export default async function HomePage() {
     </div>
   );
 }
+
+const CommitLine = () => {
+  return (
+    <div className="flex flex-col items-center my-1">
+      <div className="w-[2px] h-3 bg-gray-700" />
+      <div className="w-3 h-3 rounded-full border-2 border-gray-700 bg-gray-900" />
+      <div className="w-[2px] h-3 bg-gray-700" />
+    </div>
+  );
+};
