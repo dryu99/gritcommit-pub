@@ -5,7 +5,7 @@ export enum FrequencyType {
 }
 
 export enum ScheduleType {
-  Single = "SINGLE",
+  Once = "ONCE",
   Recurring = "RECURRING",
 }
 

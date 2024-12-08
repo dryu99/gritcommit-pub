@@ -42,7 +42,7 @@ export const createGoal = async (data: any) => {
     description: rawGoal.description,
     stakeAmount: rawGoal.stakeAmount,
     partnerEmail: rawGoal.partnerEmail,
-    scheduleType: rawGoal.dueDate
+    scheduleType: rawGoal.dueDate // TODO consider passing schedule type from client. this feels prone to bugs
       ? ScheduleType.Single
       : ScheduleType.Recurring,
     scheduleDays: rawGoal.scheduleDays
@@ -76,6 +76,7 @@ export const createGoal = async (data: any) => {
 };
 
 const calculateNextDueDate = (rawGoal: RawGoal): Date => {
+  // handle SINGLE
   if (rawGoal.dueDate) {
     const nextDueDate = new Date(
       rawGoal.dueDate.toLocaleString("en-US", { timeZone: rawGoal.timezone })
@@ -84,6 +85,7 @@ const calculateNextDueDate = (rawGoal: RawGoal): Date => {
     return nextDueDate;
   }
 
+  // handle RECURRING
   const todayInClientTZ = new Date(
     new Date().toLocaleString("en-US", { timeZone: rawGoal.timezone })
   );

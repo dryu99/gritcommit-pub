@@ -33,8 +33,8 @@ export const GoalForm = () => {
   const [goalPlaceholder, setGoalPlaceholder] = useState("");
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
   const [isRecurring, setIsRecurring] = useState(false);
-  const [hasDate, setHasDate] = useState(false);
   const [selectedDays, setSelectedDays] = useState<Day[]>(DAYS);
+  const [dueDate, setDueDate] = useState("");
 
   useEffect(() => {
     let currentText = GOAL_PLACEHOLDERS[currGoalPlaceholderIndex];
@@ -93,8 +93,10 @@ export const GoalForm = () => {
     const data = Object.fromEntries(
       new FormData(e.currentTarget)
     ) as unknown as RawGoal;
-    data.scheduleDays = selectedDays.map((d) => d.index);
     data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    data.scheduleDays = isRecurring
+      ? selectedDays.map((d) => d.index)
+      : undefined;
 
     try {
       if (!isRecurring) {
@@ -147,6 +149,7 @@ export const GoalForm = () => {
             min="0"
             className="p-2 rounded-md border"
             placeholder="20"
+            required
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -168,10 +171,8 @@ export const GoalForm = () => {
           type="checkbox"
           id="isRecurring"
           checked={isRecurring}
-          // TODO would be nice to persist dates on change
           onChange={(e) => {
             setIsRecurring(e.target.checked);
-            setHasDate(false);
           }}
           className="w-4 h-4"
         />
@@ -188,11 +189,14 @@ export const GoalForm = () => {
                 id="dueDate"
                 name="dueDate"
                 type="date"
+                value={dueDate}
                 className="w-[194px] p-2 rounded-md border"
-                onChange={(e) => setHasDate(!!e.target.value)}
+                onChange={(e) => {
+                  setDueDate(e.target.value);
+                }}
                 required
               />
-              {hasDate && (
+              {dueDate && (
                 <span className="text-xs text-gray-500">Due @ 11:59pm</span>
               )}
             </div>
