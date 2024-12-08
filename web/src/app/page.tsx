@@ -19,7 +19,7 @@ export default async function HomePage() {
         <ShowGoalFormButton />
       </div>
       <CommitLine />
-      <div className="flex flex-col text-sm w-full sm:w-[500px]">
+      <div className="flex flex-col text-sm w-full sm:w-[500px] mb-8">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
 
@@ -38,12 +38,18 @@ export default async function HomePage() {
 
           return (
             <div key={goal.id}>
-              <div className="bg-gray-900 p-4 rounded-lg">
+              <div className="bg-gray-900 sm:p-6 p-4 rounded-lg">
                 <h3 className="text-yellow-500 flex justify-between items-center">
                   <div>commit #{goals.length - i}</div>
                   {latestEntry && (
                     <div className="flex items-center gap-2">
-                      <span>
+                      <span
+                        className={cn({
+                          "text-red-500": latestEntry.status === "FAILED",
+                          "text-green-500": latestEntry.status === "COMPLETED",
+                          "text-yellow-500": latestEntry.status === "PENDING",
+                        })}
+                      >
                         {latestEntry.status === "PENDING"
                           ? "ONGOING"
                           : latestEntry.status}
@@ -116,10 +122,10 @@ export default async function HomePage() {
 
 const CommitLine = () => {
   return (
-    <div className="flex flex-col items-center my-1">
-      <div className="w-[2px] h-3 bg-gray-700" />
-      <div className="w-3 h-3 rounded-full border-2 border-gray-700 bg-gray-900" />
-      <div className="w-[2px] h-3 bg-gray-700" />
+    <div className="flex flex-col items-center">
+      <div className="w-[2px] h-5 bg-gray-900" />
+      {/* <div className="w-2 h-2 rounded-full border-2 border-gray-900 bg-gray-900" /> */}
+      <div className="w-[2px] h-5 bg-gray-900" />
     </div>
   );
 };
