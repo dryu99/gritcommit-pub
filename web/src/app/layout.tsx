@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light">
       <body
-        className={`${ibmPlexMono.className} antialiased flex h-svh flex-col`}
+        className={`${ibmPlexMono.className} flex h-svh flex-col antialiased`}
       >
         {/* <header className="px-4 lg:px-6 h-14 py-4 flex items-center">
           <Link className="flex items-center justify-center" href="#">
@@ -40,7 +40,7 @@ export default function RootLayout({
             </Link>
           </nav>
         </header> */}
-        <main className="min-h-screen pt-8 relative flex-grow px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24">
+        <main className="relative min-h-screen flex-grow px-4 pt-8 sm:px-6 md:px-12 lg:px-16 xl:px-24">
           {children}
         </main>
       </body>

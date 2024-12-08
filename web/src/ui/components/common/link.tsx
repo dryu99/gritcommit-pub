@@ -33,10 +33,10 @@ export const Link = ({
           onClick(e);
         }
       : analytics
-      ? () => {
-          sendAnalytics(analytics);
-        }
-      : undefined;
+        ? () => {
+            sendAnalytics(analytics);
+          }
+        : undefined;
 
   if (isAnchor) {
     return (

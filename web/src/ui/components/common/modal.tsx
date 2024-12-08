@@ -48,18 +48,18 @@ export const Modal: React.FC<ModalProps> = ({
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 z-40 bg-black bg-opacity-50"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div
           ref={modalRef}
-          className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+          className="mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl"
         >
           {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex items-center justify-between border-b p-4">
             {title && <h2 className="text-xl font-semibold">{title}</h2>}
             <button
               onClick={onClose}

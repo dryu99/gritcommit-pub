@@ -48,7 +48,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
 
           // Move to next example
           setCurrGoalPlaceholderIndex(
-            (prev) => (prev + 1) % GOAL_PLACEHOLDERS.length
+            (prev) => (prev + 1) % GOAL_PLACEHOLDERS.length,
           );
 
           // Start typing the next example
@@ -74,7 +74,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = Object.fromEntries(
-      new FormData(e.currentTarget)
+      new FormData(e.currentTarget),
     ) as unknown as RawGoal;
     data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     data.scheduleDays = isRecurring
@@ -90,7 +90,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
       const todayIndex = new Date().getDay();
       if (selectedDays.find((d) => d.index === todayIndex)) {
         const startToday = window.confirm(
-          "Do you want to start this commitment today?"
+          "Do you want to start this commitment today?",
         );
         data.startToday = startToday;
       }
@@ -105,7 +105,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <form
-      className="flex flex-col gap-5 w-full text-sm"
+      className="flex w-full flex-col gap-5 text-sm"
       onSubmit={handleSubmit}
     >
       <div className="flex flex-col gap-1">
@@ -117,12 +117,12 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
           name="description"
           autoComplete="off"
           type="text"
-          className="p-2 rounded-md border"
+          className="rounded-md border p-2"
           placeholder={goalPlaceholder}
           required
         />
       </div>
-      <div className="flex gap-2 justify-between">
+      <div className="flex justify-between gap-2">
         <div className="flex flex-col gap-1">
           <label htmlFor="stakeAmount" className="font-medium">
             Stake Amount ($)
@@ -132,7 +132,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
             name="stakeAmount"
             type="number"
             min="0"
-            className="p-2 rounded-md border w-full"
+            className="w-full rounded-md border p-2"
             placeholder="20"
             required
           />
@@ -145,7 +145,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
             id="partnerEmail"
             name="partnerEmail"
             type="email"
-            className="p-2 rounded-md border w-full"
+            className="w-full rounded-md border p-2"
             placeholder="partner@example.com"
             required
           />
@@ -159,7 +159,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
           onChange={(e) => {
             setIsRecurring(e.target.checked);
           }}
-          className="w-4 h-4"
+          className="h-4 w-4"
         />
         <label htmlFor="isRecurring">Recurring commitment?</label>
       </div>
@@ -175,7 +175,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                 name="dueDate"
                 type="date"
                 value={dueDate}
-                className="w-[194px] p-2 rounded-md border"
+                className="w-[194px] rounded-md border p-2"
                 onChange={(e) => {
                   setDueDate(e.target.value);
                 }}
@@ -201,14 +201,14 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                   ) : selectedDays.length === 7 ? (
                     <>
                       Everyday{" "}
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-xs text-gray-500">
                         (Due @ 11:59pm)
                       </span>
                     </>
                   ) : (
                     <>
                       Every {selectedDays.map((d) => d.short).join(", ")}{" "}
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-xs text-gray-500">
                         (Due @ 11:59pm)
                       </span>
                     </>
@@ -226,19 +226,15 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                             : prev
                                 .concat(day)
                                 .sort(
-                                  (a, b) => a.displayIndex - b.displayIndex
+                                  (a, b) => a.displayIndex - b.displayIndex,
                                 );
                         });
                       }}
-                      className={`
-                      w-8 h-8 rounded-full text-sm font-medium
-                      ${
+                      className={`h-8 w-8 rounded-full text-sm font-medium ${
                         selectedDays.find((d) => d.short === day.short)
                           ? "bg-brand text-white"
                           : "bg-gray-100 text-gray-600"
-                      }
-                      hover:opacity-80 transition-colors
-                    `}
+                      } transition-colors hover:opacity-80`}
                     >
                       {day.narrow}
                     </button>
@@ -252,7 +248,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
 
       <button
         type="submit"
-        className="mt-6 bg-brand text-white p-2 transition-colors rounded-md hover:bg-brandHover"
+        className="mt-6 rounded-md bg-brand p-2 text-white transition-colors hover:bg-brandHover"
       >
         Commit
       </button>

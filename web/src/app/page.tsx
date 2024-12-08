@@ -9,17 +9,17 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className={`${ibmPlexMono.className} text-2xl font-bold mb-1`}>
+      <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
         GritCommit
       </h1>
-      <p className="text-gray-500 mb-10 text-sm text-center flex sm:flex-row gap-1 sm:gap-2 flex-col items-center">
+      <p className="mb-10 flex flex-col items-center gap-1 text-center text-sm text-gray-500 sm:flex-row sm:gap-2">
         Commit to your goals with grit <span>(and a buddy)</span>
       </p>
       <div>
         <ShowGoalFormButton />
       </div>
       <CommitLine />
-      <div className="flex flex-col text-sm w-full sm:w-[500px] mb-8">
+      <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
 
@@ -31,15 +31,15 @@ export default async function HomePage() {
                 : goal.scheduleDays
                     .map(
                       (scheduleDay) =>
-                        DAYS.find((day) => day.index === scheduleDay)?.short
+                        DAYS.find((day) => day.index === scheduleDay)?.short,
                     )
                     .join(", ");
           }
 
           return (
             <div key={goal.id}>
-              <div className="bg-gray-900 sm:px-6 sm:py-5 p-4 rounded-lg">
-                <h3 className="text-orange-500 flex justify-between items-center mb-1">
+              <div className="rounded-lg bg-gray-900 p-4 sm:px-6 sm:py-5">
+                <h3 className="mb-1 flex items-center justify-between text-orange-500">
                   <div>commit #{goals.length - i}</div>
                   {latestEntry && (
                     <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export default async function HomePage() {
                           : latestEntry.status}
                       </span>
                       <div
-                        className={cn("w-2 h-2 rounded-full", {
+                        className={cn("h-2 w-2 rounded-full", {
                           "bg-red-500": latestEntry.status === "FAILED",
                           "bg-yellow-500": latestEntry.status === "PENDING",
                           "bg-green-500": latestEntry.status === "COMPLETED",
@@ -78,7 +78,7 @@ export default async function HomePage() {
                               day: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
-                            }
+                            },
                           )}
                         </div>
                       </>
@@ -102,7 +102,7 @@ export default async function HomePage() {
                     </div> */}
                   </div>
 
-                  <div className="ml-4 mt-4 text-white whitespace-pre-wrap">
+                  <div className="ml-4 mt-4 whitespace-pre-wrap text-white">
                     {goal.description}
                   </div>
                 </div>
@@ -119,9 +119,9 @@ export default async function HomePage() {
 const CommitLine = () => {
   return (
     <div className="flex flex-col items-center">
-      <div className="w-[2px] h-5 bg-gray-900" />
+      <div className="h-5 w-[2px] bg-gray-900" />
       {/* <div className="w-2 h-2 rounded-full border-2 border-gray-900 bg-gray-900" /> */}
-      <div className="w-[2px] h-5 bg-gray-900" />
+      <div className="h-5 w-[2px] bg-gray-900" />
     </div>
   );
 };
