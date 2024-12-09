@@ -10,6 +10,7 @@ import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth";
+import { DateUtils } from "../date";
 import {
   sendGoalStartedEmailToOwner,
   sendGoalStartedEmailToPartner,
@@ -25,8 +26,11 @@ const CreateGoalReqBodySchema = z.object({
   // existence implies scheduleType = RECURRING
   scheduleDays: z.array(z.number()).optional(), // assume sorted
 
-  // existence implies scheduleType = SINGLE
-  dueDate: z.coerce.date().optional(),
+  // existence implies scheduleType = ONCE
+  dueDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in yyyy-mm-dd format")
+    .optional(),
 });
 
 export type CreateGoalReqBody = z.infer<typeof CreateGoalReqBodySchema>;
@@ -102,33 +106,27 @@ export const createGoal = async (data: any) => {
 };
 
 const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {
-  // handle SINGLE
+  // handle ONCE
   if (rawGoal.dueDate) {
-    const nextDueDate = new Date(
-      rawGoal.dueDate.toLocaleString("en-US", { timeZone: rawGoal.timezone }),
-    );
-    nextDueDate.setHours(23, 59, 0, 0);
-    return nextDueDate;
+    return DateUtils.dayjs(rawGoal.dueDate)
+      .tz(rawGoal.timezone)
+      .endOf("day")
+      .toDate();
   }
 
   // handle RECURRING
-  const todayInClientTZ = new Date(
-    new Date().toLocaleString("en-US", { timeZone: rawGoal.timezone }),
-  );
-  todayInClientTZ.setHours(23, 59, 0, 0);
+  const clientToday = DateUtils.dayjs().tz(rawGoal.timezone);
   if (rawGoal.startToday) {
-    return todayInClientTZ;
+    return clientToday.endOf("day").toDate();
   }
 
   if (rawGoal.scheduleDays) {
-    const todayDay = todayInClientTZ.getDay();
+    const todayDay = clientToday.day();
 
     for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
       const checkDay = (todayDay + daysAhead) % 7;
       if (rawGoal.scheduleDays.includes(checkDay)) {
-        const nextDueDate = new Date(todayInClientTZ);
-        nextDueDate.setDate(todayInClientTZ.getDate() + daysAhead);
-        return nextDueDate;
+        return clientToday.add(daysAhead, "day").endOf("day").toDate();
       }
     }
   }

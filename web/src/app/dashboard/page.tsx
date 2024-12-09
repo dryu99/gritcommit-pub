@@ -4,7 +4,6 @@ import { fetchGoals } from "@/lib/goals/goal.helpers";
 import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
-import { TrashIcon } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -30,13 +29,10 @@ export default async function DashboardPage() {
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
-          const recurringText = getScheduleText(goal);
+          const scheduleText = getScheduleText(goal);
 
           return (
             <div key={goal.id}>
-              <div>
-                <TrashIcon className="h-5 w-5" />
-              </div>
               <div className="rounded-lg bg-gray-900 p-4 sm:px-6 sm:py-5">
                 <h3 className="mb-1 flex items-center justify-between text-orange-500">
                   <div>commit #{goals.length - i}</div>
@@ -93,7 +89,7 @@ export default async function DashboardPage() {
                     <div>Partner:</div>
                     <div>{goal.partnerEmail}</div>
                     <div>Schedule:</div>
-                    <div>{recurringText}</div>
+                    <div>{scheduleText}</div>
 
                     {/* <div>Start Date:</div>
                     <div>
