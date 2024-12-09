@@ -14,10 +14,11 @@ const main = async () => {
     const newUser: Insertable<User> = {
       id: crypto.randomUUID(),
       email: testUser.email,
+      password: testUser.password,
     };
 
-    const user = await DB.get().insertInto("user").values(newUser).execute();
-    console.log("User created", user);
+    await DB.get().insertInto("user").values(newUser).execute();
+    console.log("User created", newUser);
   }
 };
 

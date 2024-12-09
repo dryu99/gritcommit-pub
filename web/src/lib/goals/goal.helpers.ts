@@ -22,7 +22,9 @@ export type GoalWithEntries = Pick<
   >[];
 };
 
-export const fetchGoals = async (): Promise<GoalWithEntries[]> => {
+export const fetchGoals = async (
+  userId: string,
+): Promise<GoalWithEntries[]> => {
   const goals = await DB.get()
     .selectFrom("goal")
     .select((eb) => [
@@ -47,7 +49,7 @@ export const fetchGoals = async (): Promise<GoalWithEntries[]> => {
           .orderBy("goalEntry.createdAt", "desc"),
       ).as("entries"),
     ])
-    .where("goal.createdByUserId", "=", TEST_USER_ID)
+    .where("goal.createdByUserId", "=", userId)
     .orderBy("goal.createdAt", "desc")
     .execute();
 

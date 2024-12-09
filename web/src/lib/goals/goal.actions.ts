@@ -5,32 +5,12 @@ import { generateModelId } from "@/lib/generate-model-id";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
+import { getSessionUser } from "../auth";
 import { sendGoalStartedEmail } from "../email.service";
-
-// TODO very hacky auth but itll do for now
-const getCurrentUser = async () => {
-  const userEmail = (await cookies()).get("userEmail")?.value;
-  if (!userEmail) {
-    throw new Error("Not authenticated");
-  }
-
-  const user = await DB.get()
-    .selectFrom("user")
-    .selectAll()
-    .where("email", "=", userEmail)
-    .executeTakeFirst();
-
-  if (!user) {
-    throw new Error("User doesn't exist");
-  }
-
-  return user;
-};
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -60,7 +40,10 @@ export const createGoal = async (data: any) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  const sessionUser = await getCurrentUser();
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    throw new Error("User not found");
+  }
 
   // TODO validate that scheudlDays.length > 0 if CustomDays === true
   const newGoal: Insertable<Goal> = {
