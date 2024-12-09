@@ -10,7 +10,10 @@ import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth";
-import { sendGoalStartedEmail } from "../email.service";
+import {
+  sendGoalStartedEmailToOwner,
+  sendGoalStartedEmailToPartner,
+} from "../email.service";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -75,7 +78,6 @@ export const createGoal = async (data: any) => {
     console.log("firstGoalEntry", newGoalEntry);
   }
 
-  // TODO also have to send email if user is starting today and its past 12pm
   await DB.get()
     .transaction()
     .execute(async (trx) => {
@@ -83,13 +85,20 @@ export const createGoal = async (data: any) => {
       await trx.insertInto("goalEntry").values(newGoalEntry).execute();
     });
 
-  revalidatePath("/");
-
-  await sendGoalStartedEmail({
+  // TODO also have to send checkin emails if user is starting today and its past 12pm
+  sendGoalStartedEmailToOwner({
     goal: newGoal,
     nextDueDate,
-    user: sessionUser,
+    email: sessionUser.email,
   });
+  sendGoalStartedEmailToPartner({
+    goal: newGoal,
+    nextDueDate,
+    partnerEmail: reqBody.partnerEmail,
+    ownerEmail: sessionUser.email,
+  });
+
+  revalidatePath("/");
 };
 
 const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {

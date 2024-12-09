@@ -1,32 +1,35 @@
-import { Goal, User } from "@/database/db-generated-types";
+import { Goal } from "@/database/db-generated-types";
 import { Config } from "@/lib/config";
-import { Insertable, Selectable } from "kysely";
+import { Insertable } from "kysely";
 import { ServerClient } from "postmark";
 import { getRecurringDaysText } from "./days";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 
-export const sendGoalStartedEmail = async ({
-  user,
+// TODO replace example-org email with sth legit
+const ADMIN_EMAIL = "admin@blunt.bio";
+
+export const sendGoalStartedEmailToOwner = async ({
+  email, // TODO should pass name too
   goal,
   nextDueDate,
 }: {
-  user: Selectable<User>;
+  email: string;
   goal: Insertable<Goal>; // TODO this should really be selectable lol
   nextDueDate: Date;
 }) => {
-  const formattedDate = nextDueDate.toLocaleDateString("en-US", {
-    weekday: "long",
+  const formattedDate = nextDueDate.toLocaleString(undefined, {
     year: "numeric",
-    month: "long",
+    month: "numeric",
     day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
-  // TODO replace example-org email with sth legit
   return EmailClient.sendEmail({
-    From: "admin@blunt.bio",
-    To: user.email,
-    ReplyTo: "admin@blunt.bio",
+    From: ADMIN_EMAIL,
+    To: email,
+    ReplyTo: ADMIN_EMAIL,
     Subject: `New commitment created!`,
     HtmlBody: `
 <p>
@@ -36,7 +39,7 @@ Your commitment has been created! Here are the details:<br/><br/>
 
 🎯 <strong>Commitment:</strong> ${goal.description}<br/>
 📅 <strong>${
-      goal.scheduleType === "RECURRING" ? "Next Due Date:" : "Due Date:"
+      goal.scheduleType === "RECURRING" ? "Next Check-in:" : "Due Date:"
     }</strong> ${formattedDate}<br/>
 🔁 <strong>Recurring:</strong> ${
       goal.scheduleType === "RECURRING" && goal.scheduleDays
@@ -51,6 +54,59 @@ We'll send you reminders as your due date approaches.<br/><br/>
 Remember, if you don't complete your commitment by the deadline, you'll need to send $${goal.stakeAmount} to your partner!<br/><br/>
 
 Good luck!<br/><br/>
+
+Cheers,<br/>
+The GritCommittee
+</p>
+`,
+  });
+};
+
+export const sendGoalStartedEmailToPartner = async ({
+  ownerEmail,
+  partnerEmail,
+  goal,
+  nextDueDate,
+}: {
+  ownerEmail: string; // TODO should pass name too
+  partnerEmail: string;
+  goal: Insertable<Goal>;
+  nextDueDate: Date;
+}) => {
+  const formattedDate = nextDueDate.toLocaleString(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return EmailClient.sendEmail({
+    From: ADMIN_EMAIL,
+    To: partnerEmail,
+    ReplyTo: ADMIN_EMAIL,
+    Subject: `You've been assigned as an accountability partner!`,
+    HtmlBody: `
+<p>
+Hi,<br/><br/>
+
+${ownerEmail} has created a new commitment! Here are the details:<br/><br/>
+
+🎯 <strong>Commitment:</strong> ${goal.description}<br/>
+📅 <strong>${
+      goal.scheduleType === "RECURRING" ? "Next Check-in:" : "Due Date:"
+    }</strong> ${formattedDate}<br/>
+🔁 <strong>Recurring:</strong> ${
+      goal.scheduleType === "RECURRING" && goal.scheduleDays
+        ? getRecurringDaysText(goal.scheduleDays)
+        : "No"
+    }<br/>
+💰 <strong>Stake Amount:</strong> $${goal.stakeAmount}<br/>
+👥 <strong>Accountability Partner:</strong> You!<br/><br/>
+
+If ${ownerEmail} doesn't complete their commitment by the deadline, they'll need to send $${goal.stakeAmount} to you!<br/><br/>
+
+Keep them accountable 🤝<br/><br/>
 
 Cheers,<br/>
 The GritCommittee

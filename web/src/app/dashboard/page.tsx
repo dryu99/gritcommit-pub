@@ -110,7 +110,7 @@ export default async function DashboardPage() {
             </div>
           );
         })}
-        <div className="mx-auto text-2xl">😴</div>
+        <div className="mx-auto text-center text-2xl">😴</div>
       </div>
     </div>
   );
