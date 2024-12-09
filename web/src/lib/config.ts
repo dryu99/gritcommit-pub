@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.local" });
+dotenv.config({
+  path: process.env.NODE_ENV === "production" ? ".env.prod" : ".env.local",
+});
 
 export const Config = Object.freeze({
   NODE_ENV: process.env.NODE_ENV as "development" | "production" | "test",

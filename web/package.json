@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate-db-types": "cross-env NODE_ENV=development kysely-codegen --camel-case --out-file ./src/database/db-generated-types.d.ts",
-    "dev:migrate-db": "cross-env NODE_ENV=development npx tsx ./src/database/migrate-db.ts"
+    "dev:migrate-db": "cross-env NODE_ENV=development tsx ./src/database/migrate-db.ts",
+    "prod:migrate-db": "cross-env NODE_ENV=production tsx ./src/database/migrate-db.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
