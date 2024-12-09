@@ -2,7 +2,7 @@ import { Goal } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { Insertable } from "kysely";
-import { getScheduleText } from "../../days";
+import { getScheduleText, toFormattedDateText } from "../../days";
 
 interface PartnerNewGoalEmailProps {
   ownerEmail: string;
@@ -16,19 +16,14 @@ export default function PartnerNewGoalEmail({
     description: "Run a marathon",
     stakeAmount: 100,
     scheduleType: ScheduleType.Once,
+    scheduleDays: [1, 2, 3, 4, 5],
     createdByUserId: "1",
     id: "1",
     partnerEmail: "partner@gmail.com",
   },
-  nextDueDate = new Date("12/20/2024 11:59:59"),
+  nextDueDate = new Date("12/20/2024 23:59:59"),
 }: PartnerNewGoalEmailProps) {
-  const formattedDate = nextDueDate.toLocaleString(undefined, {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedDate = toFormattedDateText(nextDueDate);
 
   return (
     <Html>
@@ -42,29 +37,29 @@ export default function PartnerNewGoalEmail({
         <br />
         🎯 <strong>Commitment:</strong> {goal.description}
         <br />
+        💰 <strong>Stake:</strong> ${goal.stakeAmount}
+        <br />
         {goal.scheduleType === "ONCE" && (
           <>
             📅 <strong>Due Date:</strong> {formattedDate}
             <br />
           </>
         )}
-        💰 <strong>Stake:</strong> ${goal.stakeAmount}
-        <br />
         {goal.scheduleType === "RECURRING" && (
           <>
-            🔁 <strong>Schedule:</strong> {getScheduleText(goal)}
+            📅 <strong>Schedule:</strong> {getScheduleText(goal)}
             <br />
           </>
         )}
         <br />
         If they miss{" "}
         {goal.scheduleType === "RECURRING"
-          ? "a check-in"
+          ? "a deadline"
           : "the deadline"}, {ownerEmail} owes you ${goal.stakeAmount}.
         <br />
         <br />
         When {goal.scheduleType === "RECURRING"
-          ? "a check-in"
+          ? "a deadline"
           : "the deadline"}{" "}
         arrives, you'll receive an email to verify whether they completed their
         commitment.

@@ -39,3 +39,18 @@ export const getScheduleText = (goal: {
 
   return "N/A";
 };
+
+// TODO pass in timezone? rn its not clear that this is using locale
+export const toFormattedDateText = (date: Date | string) => {
+  const formatted = new Date(date).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  });
+
+  return formatted;
+};
