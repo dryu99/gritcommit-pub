@@ -2,7 +2,7 @@
 
 import { Day, DAYS } from "@/lib/days";
 import { useEffect, useState } from "react";
-import { createGoal, RawGoal } from "../../lib/goals/goals.actions";
+import { createGoal, CreateGoalReqBody } from "../../lib/goals/goal.actions";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
@@ -73,17 +73,17 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
   // TODO add validation to prevent empty selectedDays list from appearing
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = Object.fromEntries(
+    const reqBody = Object.fromEntries(
       new FormData(e.currentTarget),
-    ) as unknown as RawGoal;
-    data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    data.scheduleDays = isRecurring
+    ) as unknown as CreateGoalReqBody;
+    reqBody.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    reqBody.scheduleDays = isRecurring
       ? selectedDays.map((d) => d.index)
       : undefined;
 
     try {
       if (!isRecurring) {
-        createGoal(data);
+        createGoal(reqBody);
         return;
       }
 
@@ -92,10 +92,10 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
         const startToday = window.confirm(
           "Do you want to start this commitment today?",
         );
-        data.startToday = startToday;
+        reqBody.startToday = startToday;
       }
 
-      createGoal(data);
+      createGoal(reqBody);
     } catch (e: any) {
       setError(e.message);
     } finally {

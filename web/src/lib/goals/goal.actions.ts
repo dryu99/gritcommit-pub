@@ -10,7 +10,7 @@ import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 
-const RawGoalSchema = z.object({
+const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
   stakeAmount: z.coerce.number().min(0),
   partnerEmail: z.string().email(),
@@ -24,11 +24,15 @@ const RawGoalSchema = z.object({
   dueDate: z.coerce.date().optional(),
 });
 
-export type RawGoal = z.infer<typeof RawGoalSchema>;
+export type CreateGoalReqBody = z.infer<typeof CreateGoalReqBodySchema>;
 
 // TODO do auth check
 export const createGoal = async (data: any) => {
-  const { success, error, data: rawGoal } = RawGoalSchema.safeParse(data);
+  const {
+    success,
+    error,
+    data: reqBody,
+  } = CreateGoalReqBodySchema.safeParse(data);
   if (!success) {
     console.log(error.errors);
     return error.errors.map((e) => e.message).join(", ");
@@ -39,18 +43,18 @@ export const createGoal = async (data: any) => {
   const goal: Insertable<Goal> = {
     id: generateModelId(),
     createdByUserId: TEST_USER_ID, // TODO: get user id from session
-    description: rawGoal.description,
-    stakeAmount: rawGoal.stakeAmount,
-    partnerEmail: rawGoal.partnerEmail,
-    scheduleType: rawGoal.dueDate // TODO consider passing schedule type from client. this feels prone to bugs
+    description: reqBody.description,
+    stakeAmount: reqBody.stakeAmount,
+    partnerEmail: reqBody.partnerEmail,
+    scheduleType: reqBody.dueDate // TODO consider passing schedule type from client. this feels prone to bugs
       ? ScheduleType.Once
       : ScheduleType.Recurring,
-    scheduleDays: rawGoal.scheduleDays
-      ? [...rawGoal.scheduleDays].sort((a, b) => a - b)
+    scheduleDays: reqBody.scheduleDays
+      ? [...reqBody.scheduleDays].sort((a, b) => a - b)
       : null,
   };
 
-  const nextDueDate = calculateNextDueDate(rawGoal);
+  const nextDueDate = calculateNextDueDate(reqBody);
 
   const goalEntry: Insertable<GoalEntry> = {
     id: generateModelId(),
@@ -61,7 +65,7 @@ export const createGoal = async (data: any) => {
 
   if (Config.NODE_ENV === "development") {
     console.log("CREATE_GOAL");
-    console.log("rawGoal", rawGoal);
+    console.log("rawGoal", reqBody);
     console.log("goal", goal);
     console.log("firstGoalEntry", goalEntry);
   }
@@ -77,7 +81,7 @@ export const createGoal = async (data: any) => {
   revalidatePath("/");
 };
 
-const calculateNextDueDate = (rawGoal: RawGoal): Date => {
+const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {
   // handle SINGLE
   if (rawGoal.dueDate) {
     const nextDueDate = new Date(
