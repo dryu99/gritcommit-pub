@@ -6,9 +6,10 @@
 import { ScheduleType } from "@/types/enums";
 import type { ColumnType } from "kysely";
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S, I | undefined, U>
+    : ColumnType<T, T | undefined, T>;
 
 export type Numeric = ColumnType<string, number | string, number | string>;
 
@@ -41,6 +42,7 @@ export interface User {
   createdAt: Generated<Timestamp>;
   email: string;
   id: string;
+  password: string | null;
   updatedAt: Generated<Timestamp>;
 }
 

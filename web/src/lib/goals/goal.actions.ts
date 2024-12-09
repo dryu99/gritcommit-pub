@@ -2,13 +2,35 @@
 
 import { Config } from "@/lib/config";
 import { generateModelId } from "@/lib/generate-model-id";
-import { TEST_USER_ID } from "@/lib/goals/goal.helpers";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
+import { sendGoalStartedEmail } from "../email.service";
+
+// TODO very hacky auth but itll do for now
+const getCurrentUser = async () => {
+  const userEmail = (await cookies()).get("userEmail")?.value;
+  if (!userEmail) {
+    throw new Error("Not authenticated");
+  }
+
+  const user = await DB.get()
+    .selectFrom("user")
+    .selectAll()
+    .where("email", "=", userEmail)
+    .executeTakeFirst();
+
+  if (!user) {
+    throw new Error("User doesn't exist");
+  }
+
+  return user;
+};
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -38,11 +60,12 @@ export const createGoal = async (data: any) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  // TODO validate that scheudlDays.length > 0 if CustomDays === true
+  const sessionUser = await getCurrentUser();
 
-  const goal: Insertable<Goal> = {
+  // TODO validate that scheudlDays.length > 0 if CustomDays === true
+  const newGoal: Insertable<Goal> = {
     id: generateModelId(),
-    createdByUserId: TEST_USER_ID, // TODO: get user id from session
+    createdByUserId: sessionUser.id,
     description: reqBody.description,
     stakeAmount: reqBody.stakeAmount,
     partnerEmail: reqBody.partnerEmail,
@@ -55,10 +78,9 @@ export const createGoal = async (data: any) => {
   };
 
   const nextDueDate = calculateNextDueDate(reqBody);
-
-  const goalEntry: Insertable<GoalEntry> = {
+  const newGoalEntry: Insertable<GoalEntry> = {
     id: generateModelId(),
-    goalId: goal.id,
+    goalId: newGoal.id,
     dueAt: nextDueDate,
     status: GoalEntryStatus.Pending,
   };
@@ -66,19 +88,25 @@ export const createGoal = async (data: any) => {
   if (Config.NODE_ENV === "development") {
     console.log("CREATE_GOAL");
     console.log("rawGoal", reqBody);
-    console.log("goal", goal);
-    console.log("firstGoalEntry", goalEntry);
+    console.log("goal", newGoal);
+    console.log("firstGoalEntry", newGoalEntry);
   }
 
   // TODO also have to send email if user is starting today and its past 12pm
   await DB.get()
     .transaction()
     .execute(async (trx) => {
-      await trx.insertInto("goal").values(goal).execute();
-      await trx.insertInto("goalEntry").values(goalEntry).execute();
+      await trx.insertInto("goal").values(newGoal).execute();
+      await trx.insertInto("goalEntry").values(newGoalEntry).execute();
     });
 
   revalidatePath("/");
+
+  await sendGoalStartedEmail({
+    goal: newGoal,
+    nextDueDate,
+    user: sessionUser,
+  });
 };
 
 const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {

@@ -1,22 +1,20 @@
+import { Goal, User } from "@/database/db-generated-types";
 import { Config } from "@/lib/config";
+import { Insertable, Selectable } from "kysely";
 import { ServerClient } from "postmark";
-import { GoalWithEntries } from "./goals/goal.helpers";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 
 export const sendGoalStartedEmail = async ({
-  email,
+  user,
   goal,
+  nextDueDate,
 }: {
-  email: string;
-  goal: GoalWithEntries;
+  user: Selectable<User>;
+  goal: Insertable<Goal>; // TODO this should really be selectable lol
+  nextDueDate: Date;
 }) => {
-  const latestEntry = goal.entries[0];
-  if (!latestEntry) {
-    throw new Error("No entries found for goal");
-  }
-
-  const formattedDate = latestEntry.dueAt.toLocaleDateString("en-US", {
+  const formattedDate = nextDueDate.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -25,9 +23,9 @@ export const sendGoalStartedEmail = async ({
 
   return EmailClient.sendEmail({
     From: "officialgritcommit@gmail.com",
-    To: email,
+    To: user.email,
     ReplyTo: "officialgritcommit@gmail.com",
-    Subject: ``,
+    Subject: `New commitment created!`,
     HtmlBody: `
 <p>
 Hi,<br/><br/>
