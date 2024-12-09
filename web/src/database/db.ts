@@ -45,7 +45,10 @@ export class DB {
   public static start() {
     this.pool = new pg.Pool({
       connectionString: Config.DATABASE_URL,
-      max: 1,
+      max: 10,
+      idleTimeoutMillis: 20000,
+      connectionTimeoutMillis: 10000,
+      statement_timeout: 30000,
     });
 
     this.dialect = new PostgresDialect({
@@ -91,7 +94,7 @@ export class DB {
       .then(
         () =>
           Config.NODE_ENV !== "test" &&
-          console.log(`Disconnected from database`)
+          console.log(`Disconnected from database`),
       );
   }
 
