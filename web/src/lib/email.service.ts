@@ -6,8 +6,7 @@ import { getRecurringDaysText } from "./days";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 
-// TODO replace example-org email with sth legit
-const ADMIN_EMAIL = "admin@blunt.bio";
+const ADMIN_EMAIL = "notifications@gritcommit.app";
 
 export const sendGoalStartedEmailToOwner = async ({
   email, // TODO should pass name too
