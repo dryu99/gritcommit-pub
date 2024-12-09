@@ -106,10 +106,11 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
-              {i !== goals.length - 1 && <CommitLine />}
+              <CommitLine />
             </div>
           );
         })}
+        <div className="mx-auto text-2xl">😴</div>
       </div>
     </div>
   );

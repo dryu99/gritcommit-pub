@@ -22,10 +22,11 @@ export const sendGoalStartedEmail = async ({
     day: "numeric",
   });
 
+  // TODO replace example-org email with sth legit
   return EmailClient.sendEmail({
-    From: "officialgritcommit@gmail.com",
+    From: "admin@blunt.bio",
     To: user.email,
-    ReplyTo: "officialgritcommit@gmail.com",
+    ReplyTo: "admin@blunt.bio",
     Subject: `New commitment created!`,
     HtmlBody: `
 <p>
