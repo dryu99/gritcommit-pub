@@ -1,4 +1,4 @@
-import { DAYS } from "@/lib/days";
+import { getRecurringDaysText } from "@/lib/days";
 import { fetchGoals } from "@/lib/goals/goal.helpers";
 import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
@@ -25,15 +25,7 @@ export default async function HomePage() {
 
           let recurringText = "No";
           if (goal.scheduleType === "RECURRING" && goal.scheduleDays) {
-            recurringText =
-              goal.scheduleDays.length === 7
-                ? "Everyday"
-                : goal.scheduleDays
-                    .map(
-                      (scheduleDay) =>
-                        DAYS.find((day) => day.index === scheduleDay)?.short,
-                    )
-                    .join(", ");
+            recurringText = getRecurringDaysText(goal.scheduleDays);
           }
 
           return (
