@@ -4,7 +4,7 @@ import { render } from "@react-email/components";
 import { Insertable } from "kysely";
 import { ServerClient } from "postmark";
 import React from "react";
-import { getScheduleText } from "./days";
+import { getScheduleText } from "../days";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 

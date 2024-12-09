@@ -10,7 +10,7 @@
     "generate-db-types": "cross-env NODE_ENV=development kysely-codegen --camel-case --out-file ./src/database/db-generated-types.d.ts",
     "dev:migrate-db": "cross-env NODE_ENV=development tsx ./src/database/migrate-db.ts",
     "prod:migrate-db": "cross-env NODE_ENV=production tsx ./src/database/migrate-db.ts",
-    "dev:email": "email dev --dir ./src/lib/emails"
+    "dev:email": "email dev --dir ./src/lib/email/templates"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

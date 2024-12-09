@@ -1,6 +1,6 @@
 "use client";
 
-import { login } from "@/lib/goals/auth.actions";
+import { login } from "@/lib/auth/auth.actions";
 import { useState } from "react";
 import { Button } from "./common/button";
 

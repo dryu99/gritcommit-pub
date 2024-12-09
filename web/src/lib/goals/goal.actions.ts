@@ -9,10 +9,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
-import { getSessionUser } from "../auth";
+import { getSessionUser } from "../auth/auth.lib";
 import { DateUtils } from "../date";
-import { sendEmail, toEmailHtml } from "../email.service";
-import PartnerNewGoalEmail from "../emails/partner-new-goal-email";
+import { sendEmail, toEmailHtml } from "../email/email.lib";
+import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),

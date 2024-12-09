@@ -1,6 +1,6 @@
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth/auth.lib";
 import { getScheduleText } from "@/lib/days";
-import { fetchGoals } from "@/lib/goals/goal.helpers";
+import { fetchGoals } from "@/lib/goals/goal.lib";
 import { cn } from "@/ui/classnames";
 import { ClientDate } from "@/ui/components/common/client-date";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";

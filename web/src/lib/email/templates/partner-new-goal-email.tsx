@@ -2,7 +2,7 @@ import { Goal } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { Insertable } from "kysely";
-import { getScheduleText } from "../days";
+import { getScheduleText } from "../../days";
 
 interface PartnerNewGoalEmailProps {
   ownerEmail: string;

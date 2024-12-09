@@ -1,5 +1,5 @@
-import { getSessionUser } from "@/lib/auth";
-import { logout } from "@/lib/goals/auth.actions";
+import { logout } from "@/lib/auth/auth.actions";
+import { getSessionUser } from "@/lib/auth/auth.lib";
 import { ibmPlexMono } from "@/ui/fonts";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";

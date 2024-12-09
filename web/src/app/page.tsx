@@ -1,4 +1,4 @@
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth/auth.lib";
 import { LoginForm } from "@/ui/components/login-form";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
