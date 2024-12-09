@@ -1,9 +1,28 @@
 import { DB } from "@/database/db";
+import { Goal, GoalEntry } from "@/database/db-generated-types";
+import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
 
 export const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
-export const fetchGoals = async () => {
+export type GoalWithEntries = Pick<
+  Selectable<Goal>,
+  | "id"
+  | "createdByUserId"
+  | "createdAt"
+  | "partnerEmail"
+  | "description"
+  | "scheduleType"
+  | "scheduleDays"
+  | "stakeAmount"
+> & {
+  entries: Pick<
+    Selectable<GoalEntry>,
+    "id" | "createdAt" | "status" | "dueAt"
+  >[];
+};
+
+export const fetchGoals = async (): Promise<GoalWithEntries[]> => {
   const goals = await DB.get()
     .selectFrom("goal")
     .select((eb) => [
@@ -25,7 +44,7 @@ export const fetchGoals = async () => {
             "goalEntry.dueAt",
           ])
           .whereRef("goal.id", "=", "goalEntry.goalId")
-          .orderBy("goalEntry.createdAt", "desc")
+          .orderBy("goalEntry.createdAt", "desc"),
       ).as("entries"),
     ])
     .where("goal.createdByUserId", "=", TEST_USER_ID)

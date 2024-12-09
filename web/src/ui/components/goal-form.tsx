@@ -1,8 +1,8 @@
 "use client";
 
 import { Day, DAYS } from "@/lib/days";
+import { createGoal, CreateGoalReqBody } from "@/lib/goals/goal.actions";
 import { useEffect, useState } from "react";
-import { createGoal, CreateGoalReqBody } from "../../lib/goals/goal.actions";
 
 const GOAL_PLACEHOLDERS = [
   "Finish blog post",
