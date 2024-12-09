@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import { getScheduleText } from "@/lib/days";
 import { fetchGoals } from "@/lib/goals/goal.helpers";
 import { cn } from "@/ui/classnames";
+import { ClientDate } from "@/ui/components/common/client-date";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
@@ -71,16 +72,7 @@ export default async function DashboardPage() {
                       <>
                         <div>Due:</div>
                         <div>
-                          {new Date(latestEntry.dueAt).toLocaleString(
-                            undefined,
-                            {
-                              year: "numeric",
-                              month: "numeric",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            },
-                          )}
+                          <ClientDate date={latestEntry.dueAt} />
                         </div>
                       </>
                     )}

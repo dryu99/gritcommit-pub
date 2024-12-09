@@ -13,7 +13,10 @@ export type Generated<T> =
 
 export type Numeric = ColumnType<string, number | string, number | string>;
 
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+// ! Selectable timestamps should actually just be date, but because of edge case
+// ! where jsonArrayFrom serializes Dates to strings, I've manually adjusted this type for now
+// ! https://github.com/kysely-org/kysely/issues/482
+export type Timestamp = ColumnType<Date | string, Date | string, Date | string>;
 
 export interface Goal {
   createdAt: Generated<Timestamp>;
