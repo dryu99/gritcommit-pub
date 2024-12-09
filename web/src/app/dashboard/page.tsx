@@ -120,7 +120,7 @@ const CommitLine = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="h-5 w-[2px] bg-gray-900" />
-      {/* <div className="w-2 h-2 rounded-full border-2 border-gray-900 bg-gray-900" /> */}
+      <div className="h-2 w-2 rounded-full border-2 border-gray-900 bg-gray-900" />
       <div className="h-5 w-[2px] bg-gray-900" />
     </div>
   );
