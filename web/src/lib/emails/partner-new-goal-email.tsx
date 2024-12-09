@@ -10,7 +10,7 @@ interface PartnerNewGoalEmailProps {
   nextDueDate: Date;
 }
 
-export const PartnerNewGoalEmail = ({
+export default function PartnerNewGoalEmail({
   ownerEmail = "owner@gmail.com",
   goal = {
     description: "Run a marathon",
@@ -21,7 +21,7 @@ export const PartnerNewGoalEmail = ({
     partnerEmail: "partner@gmail.com",
   },
   nextDueDate = new Date("12/20/2024 11:59:59"),
-}: PartnerNewGoalEmailProps) => {
+}: PartnerNewGoalEmailProps) {
   const formattedDate = nextDueDate.toLocaleString(undefined, {
     year: "numeric",
     month: "numeric",
@@ -79,6 +79,4 @@ export const PartnerNewGoalEmail = ({
       </Body>
     </Html>
   );
-};
-
-export default PartnerNewGoalEmail;
+}

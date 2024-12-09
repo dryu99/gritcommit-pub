@@ -11,10 +11,8 @@ import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth";
 import { DateUtils } from "../date";
-import {
-  sendGoalStartedEmailToOwner,
-  sendGoalStartedEmailToPartner,
-} from "../email.service";
+import { sendEmail, toEmailHtml } from "../email.service";
+import PartnerNewGoalEmail from "../emails/partner-new-goal-email";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -90,16 +88,16 @@ export const createGoal = async (data: any) => {
     });
 
   // TODO also have to send checkin emails if user is starting today and its past 12pm
-  sendGoalStartedEmailToOwner({
-    goal: newGoal,
-    nextDueDate,
-    email: sessionUser.email,
-  });
-  sendGoalStartedEmailToPartner({
-    goal: newGoal,
-    nextDueDate,
-    partnerEmail: reqBody.partnerEmail,
+  const emailHtml = await toEmailHtml(PartnerNewGoalEmail, {
     ownerEmail: sessionUser.email,
+    goal: newGoal,
+    nextDueDate: nextDueDate,
+  });
+
+  sendEmail({
+    recipientEmail: reqBody.partnerEmail,
+    subject: "Accountability partner assignment",
+    emailHtml,
   });
 
   revalidatePath("/");
