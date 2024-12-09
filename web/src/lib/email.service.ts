@@ -2,7 +2,7 @@ import { Goal } from "@/database/db-generated-types";
 import { Config } from "@/lib/config";
 import { Insertable } from "kysely";
 import { ServerClient } from "postmark";
-import { getRecurringDaysText } from "./days";
+import { getScheduleText } from "./days";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 
@@ -40,11 +40,7 @@ Your commitment has been created! Here are the details:<br/><br/>
 📅 <strong>${
       goal.scheduleType === "RECURRING" ? "Next Check-in:" : "Due Date:"
     }</strong> ${formattedDate}<br/>
-🔁 <strong>Recurring:</strong> ${
-      goal.scheduleType === "RECURRING" && goal.scheduleDays
-        ? getRecurringDaysText(goal.scheduleDays)
-        : "No"
-    }<br/>
+🔁 <strong>Schedule:</strong> ${getScheduleText(goal)}<br/>
 💰 <strong>Stake Amount:</strong> $${goal.stakeAmount}<br/>
 👥 <strong>Accountability Partner:</strong> ${goal.partnerEmail}<br/><br/>
 
@@ -95,11 +91,7 @@ ${ownerEmail} has created a new commitment! Here are the details:<br/><br/>
 📅 <strong>${
       goal.scheduleType === "RECURRING" ? "Next Check-in:" : "Due Date:"
     }</strong> ${formattedDate}<br/>
-🔁 <strong>Recurring:</strong> ${
-      goal.scheduleType === "RECURRING" && goal.scheduleDays
-        ? getRecurringDaysText(goal.scheduleDays)
-        : "No"
-    }<br/>
+🔁 <strong>Schedule:</strong> ${getScheduleText(goal)}<br/>
 💰 <strong>Stake Amount:</strong> $${goal.stakeAmount}<br/>
 👥 <strong>Accountability Partner:</strong> You!<br/><br/>
 

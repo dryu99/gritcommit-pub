@@ -1,3 +1,5 @@
+import { ScheduleType } from "@/types/enums";
+
 export type Day = {
   narrow: string;
   short: string;
@@ -15,13 +17,25 @@ export const DAYS: Day[] = [
   { narrow: "S", short: "Sun", index: 0, displayIndex: 6 },
 ];
 
-// assume: input only contains available days (ie length not always 7)
-export const getRecurringDaysText = (days: number[]) => {
-  return days.length === 7
-    ? "Everyday"
-    : days
-        .map(
-          (scheduleDay) => DAYS.find((day) => day.index === scheduleDay)?.short,
-        )
-        .join(", ");
+export const getScheduleText = (goal: {
+  scheduleType: ScheduleType;
+  scheduleDays?: number[] | null;
+}) => {
+  if (goal.scheduleType === "ONCE") {
+    return "Once";
+  }
+
+  // assume: days only contains available days (ie length not always 7)
+  if (goal.scheduleType === "RECURRING" && goal.scheduleDays) {
+    return goal.scheduleDays.length === 7
+      ? "Everyday"
+      : goal.scheduleDays
+          .map(
+            (scheduleDay) =>
+              DAYS.find((day) => day.index === scheduleDay)?.short,
+          )
+          .join(", ");
+  }
+
+  return "N/A";
 };

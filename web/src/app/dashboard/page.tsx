@@ -1,9 +1,10 @@
 import { getSessionUser } from "@/lib/auth";
-import { getRecurringDaysText } from "@/lib/days";
+import { getScheduleText } from "@/lib/days";
 import { fetchGoals } from "@/lib/goals/goal.helpers";
 import { cn } from "@/ui/classnames";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -29,14 +30,13 @@ export default async function DashboardPage() {
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
-
-          let recurringText = "No";
-          if (goal.scheduleType === "RECURRING" && goal.scheduleDays) {
-            recurringText = getRecurringDaysText(goal.scheduleDays);
-          }
+          const recurringText = getScheduleText(goal);
 
           return (
             <div key={goal.id}>
+              <div>
+                <TrashIcon className="h-5 w-5" />
+              </div>
               <div className="rounded-lg bg-gray-900 p-4 sm:px-6 sm:py-5">
                 <h3 className="mb-1 flex items-center justify-between text-orange-500">
                   <div>commit #{goals.length - i}</div>
@@ -64,10 +64,16 @@ export default async function DashboardPage() {
                   )}
                 </h3>
                 <div className="text-gray-400">
-                  <div className={`grid grid-cols-[100px_1fr]`}>
+                  <div
+                    className={cn("grid", {
+                      "grid-cols-[90px_1fr]":
+                        goal.scheduleType === "ONCE" ||
+                        goal.scheduleType === "RECURRING",
+                    })}
+                  >
                     {latestEntry && (
                       <>
-                        <div>Due Date:</div>
+                        <div>Due:</div>
                         <div>
                           {new Date(latestEntry.dueAt).toLocaleString(
                             undefined,
@@ -82,12 +88,12 @@ export default async function DashboardPage() {
                         </div>
                       </>
                     )}
-                    <div>Recurring:</div>
-                    <div>{recurringText}</div>
+                    <div>Stake:</div>
+                    <div className="text-green-500">${goal.stakeAmount}</div>
                     <div>Partner:</div>
                     <div>{goal.partnerEmail}</div>
-                    <div>Staked:</div>
-                    <div className="text-green-500">${goal.stakeAmount}</div>
+                    <div>Schedule:</div>
+                    <div>{recurringText}</div>
 
                     {/* <div>Start Date:</div>
                     <div>
