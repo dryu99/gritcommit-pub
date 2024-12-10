@@ -1,21 +1,26 @@
-import { Goal } from "@/database/db-generated-types";
+import { Goal, User } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { Insertable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 
 interface PartnerNewGoalEmailProps {
-  ownerEmail: string;
+  ownerUser: Insertable<User>;
   goal: Insertable<Goal>;
   nextDueDate: Date;
 }
 
 export default function PartnerNewGoalEmail({
-  ownerEmail = "owner@gmail.com",
+  ownerUser = {
+    email: "owner@gmail.com",
+    firstName: "John",
+    lastName: "Doe",
+    id: "1",
+  },
   goal = {
     description: "Run a marathon",
     stakeAmount: 100,
-    scheduleType: ScheduleType.Once,
+    scheduleType: ScheduleType.Recurring,
     scheduleDays: [1, 2, 3, 4, 5],
     createdByUserId: "1",
     id: "1",
@@ -25,13 +30,17 @@ export default function PartnerNewGoalEmail({
 }: PartnerNewGoalEmailProps) {
   const formattedDate = toFormattedDateText(nextDueDate);
 
+  const ownerName = ownerUser.lastName
+    ? `${ownerUser.firstName} ${ownerUser.lastName}`
+    : ownerUser.firstName;
+
   return (
     <Html>
       <Body>
         Hi {goal.partnerEmail},
         <br />
         <br />
-        {ownerEmail} has started a new commitment and has assigned you as their
+        {ownerName} has started a new commitment and has assigned you as their
         accountability partner:
         <br />
         <br />
@@ -55,7 +64,7 @@ export default function PartnerNewGoalEmail({
         If they miss{" "}
         {goal.scheduleType === "RECURRING"
           ? "a deadline"
-          : "the deadline"}, {ownerEmail} owes you ${goal.stakeAmount}.
+          : "the deadline"}, {ownerName} owes you ${goal.stakeAmount}.
         <br />
         <br />
         When {goal.scheduleType === "RECURRING"

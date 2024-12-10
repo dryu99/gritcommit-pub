@@ -88,16 +88,15 @@ export const createGoal = async (data: any) => {
     });
 
   // TODO also have to send checkin emails if user is starting today and its past 12pm
-  const emailHtml = await toEmailHtml(PartnerNewGoalEmail, {
-    ownerEmail: sessionUser.email,
-    goal: newGoal,
-    nextDueDate: nextDueDate,
-  });
 
   sendEmail({
     recipientEmail: reqBody.partnerEmail,
-    subject: "Accountability partner assignment",
-    emailHtml,
+    subject: `${sessionUser.firstName} wants you to keep them accountable for "${newGoal.description.length > 50 ? newGoal.description.slice(0, 47) + "..." : newGoal.description}"`,
+    emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
+      ownerUser: sessionUser,
+      goal: newGoal,
+      nextDueDate: nextDueDate,
+    }),
   });
 
   revalidatePath("/");

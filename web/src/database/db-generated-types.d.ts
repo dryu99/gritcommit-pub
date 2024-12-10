@@ -44,7 +44,7 @@ export interface GoalEntry {
 export interface User {
   createdAt: Generated<Timestamp>;
   email: string;
-  firstName: string | null;
+  firstName: string;
   id: string;
   lastName: string | null;
   password: string | null;

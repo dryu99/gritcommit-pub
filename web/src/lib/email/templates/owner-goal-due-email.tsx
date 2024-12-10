@@ -1,21 +1,26 @@
-import { Goal } from "@/database/db-generated-types";
+import { Goal, User } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { Insertable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 
 interface OwnerGoalDueEmailProps {
-  ownerEmail: string;
+  ownerUser: Insertable<User>;
   goal: Insertable<Goal>;
   nextDueDate: Date;
 }
 
 export default function OwnerGoalDueEmail({
-  ownerEmail = "owner@gmail.com",
+  ownerUser = {
+    email: "owner@gmail.com",
+    firstName: "John",
+    lastName: "Doe",
+    id: "1",
+  },
   goal = {
     description: "Run a marathon",
     stakeAmount: 100,
-    scheduleType: ScheduleType.Once,
+    scheduleType: ScheduleType.Recurring,
     scheduleDays: [1, 2, 3, 4, 5],
     createdByUserId: "1",
     id: "1",
@@ -25,10 +30,14 @@ export default function OwnerGoalDueEmail({
 }: OwnerGoalDueEmailProps) {
   const formattedDate = toFormattedDateText(nextDueDate);
 
+  const ownerName = ownerUser.lastName
+    ? `${ownerUser.firstName} ${ownerUser.lastName}`
+    : ownerUser.firstName;
+
   return (
     <Html>
       <Body>
-        Hi {ownerEmail},
+        Hi {ownerName},
         <br />
         <br />
         Your commitment is due today at 11:59pm:
