@@ -53,6 +53,9 @@ const main = async () => {
 
     console.log("User upserted", newUser);
   }
+
+  await DB.stop();
+  process.exit(0);
 };
 
 main();
