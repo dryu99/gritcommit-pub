@@ -12,6 +12,7 @@ import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth/auth.lib";
 import { DateUtils } from "../date";
 import { sendEmail, toEmailHtml } from "../email/email.lib";
+import OwnerNewGoalEmail from "../email/templates/owner-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 
 const CreateGoalReqBodySchema = z.object({
@@ -50,6 +51,8 @@ export const createGoal = async (data: any) => {
     throw new Error("User not found");
   }
 
+  // TODO validate that date isnt in past
+  // TODO validate startToday isn't true if scheduleDays doesnt match
   // TODO validate that scheudlDays.length > 0 if CustomDays === true
   const newGoal: Insertable<Goal> = {
     id: generateModelId(),
@@ -87,11 +90,26 @@ export const createGoal = async (data: any) => {
       await trx.insertInto("goalEntry").values(newGoalEntry).execute();
     });
 
+  // TODO handle email errors
   // TODO also have to send checkin emails if user is starting today and its past 12pm
+  const emailDescription =
+    newGoal.description.length > 50
+      ? newGoal.description.slice(0, 47) + "..."
+      : newGoal.description;
+
+  sendEmail({
+    recipientEmail: sessionUser.email,
+    subject: `Your new commitment: "${emailDescription}"`,
+    emailHtml: await toEmailHtml(OwnerNewGoalEmail, {
+      ownerUser: sessionUser,
+      goal: newGoal,
+      nextDueDate: nextDueDate,
+    }),
+  });
 
   sendEmail({
     recipientEmail: reqBody.partnerEmail,
-    subject: `${sessionUser.firstName} wants you to keep them accountable for "${newGoal.description.length > 50 ? newGoal.description.slice(0, 47) + "..." : newGoal.description}"`,
+    subject: `${sessionUser.firstName} wants you to keep them accountable for "${emailDescription}"`,
     emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
       ownerUser: sessionUser,
       goal: newGoal,
