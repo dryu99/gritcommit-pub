@@ -4,15 +4,15 @@ import { Body, Html } from "@react-email/components";
 import { Insertable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 
-interface OwnerNewGoalEmailProps {
-  ownerUser: Insertable<User>;
+interface CommitterGoalDueEmailProps {
+  committerUser: Insertable<User>;
   goal: Insertable<Goal>;
   nextDueDate: Date;
 }
 
-export default function OwnerNewGoalEmail({
-  ownerUser = {
-    email: "owner@gmail.com",
+export default function CommitterGoalDueEmail({
+  committerUser = {
+    email: "committer@gmail.com",
     firstName: "John",
     lastName: "Doe",
     id: "1",
@@ -27,27 +27,25 @@ export default function OwnerNewGoalEmail({
     partnerEmail: "partner@gmail.com",
   },
   nextDueDate = new Date("12/20/2024 23:59:59"),
-}: OwnerNewGoalEmailProps) {
+}: CommitterGoalDueEmailProps) {
   const formattedDate = toFormattedDateText(nextDueDate);
 
-  const ownerName = ownerUser.lastName
-    ? `${ownerUser.firstName} ${ownerUser.lastName}`
-    : ownerUser.firstName;
+  const committerName = committerUser.lastName
+    ? `${committerUser.firstName} ${committerUser.lastName}`
+    : committerUser.firstName;
 
   return (
     <Html>
       <Body>
-        Hi {ownerName},
+        Hi {committerName},
         <br />
         <br />
-        You've started a new commitment:
+        Your commitment is due today at 11:59pm.
         <br />
         <br />
         🎯 <strong>Commitment:</strong> {goal.description}
         <br />
         💰 <strong>Stake:</strong> ${goal.stakeAmount}
-        <br />
-        🤝 <strong>Accountability Partner:</strong> {goal.partnerEmail}
         <br />
         {goal.scheduleType === "ONCE" && (
           <>
@@ -62,18 +60,30 @@ export default function OwnerNewGoalEmail({
           </>
         )}
         <br />
-        If you miss{" "}
-        {goal.scheduleType === "RECURRING" ? "a deadline" : "the deadline"}, you
-        owe your partner ${goal.stakeAmount}.
+        Please reply to this email before the end of the day with:
         <br />
-        <br />
-        When {goal.scheduleType === "RECURRING"
-          ? "a deadline"
-          : "the deadline"}{" "}
-        arrives, you'll receive an email to verify your completion status.
-        <br />
-        <br />
-        Good luck!
+        <ul>
+          <li>
+            <strong>Y</strong> - if you completed your commitment
+            <ul style={{ margin: "8px 0" }}>
+              <li>
+                Your partner will verify your response and we'll let you know
+                the outcome
+              </li>
+            </ul>
+          </li>
+          <li>
+            <strong>N</strong> - if you did not complete your commitment.
+            <ul style={{ margin: "8px 0" }}>
+              <li>
+                In this case, please send ${goal.stakeAmount} to your partner at{" "}
+                {goal.partnerEmail}.
+              </li>
+            </ul>
+          </li>
+        </ul>
+        Remember, achieving goals takes time and <strong>grit</strong>. Whether
+        you succeeded or not today, keep pushing forward.
         <br />
         <br />
         Cheers,

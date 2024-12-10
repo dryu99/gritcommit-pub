@@ -5,14 +5,13 @@ import { generateModelId } from "@/lib/generate-model-id";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { revalidatePath } from "next/cache";
-
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth/auth.lib";
 import { DateUtils } from "../date";
 import { sendEmail, toEmailHtml } from "../email/email.lib";
-import OwnerNewGoalEmail from "../email/templates/owner-new-goal-email";
+import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 
 const CreateGoalReqBodySchema = z.object({
@@ -100,8 +99,8 @@ export const createGoal = async (data: any) => {
   sendEmail({
     recipientEmail: sessionUser.email,
     subject: `Your new commitment: "${emailDescription}"`,
-    emailHtml: await toEmailHtml(OwnerNewGoalEmail, {
-      ownerUser: sessionUser,
+    emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
+      committerUser: sessionUser,
       goal: newGoal,
       nextDueDate: nextDueDate,
     }),
@@ -111,7 +110,7 @@ export const createGoal = async (data: any) => {
     recipientEmail: reqBody.partnerEmail,
     subject: `${sessionUser.firstName} wants you to keep them accountable for "${emailDescription}"`,
     emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
-      ownerUser: sessionUser,
+      committerUser: sessionUser,
       goal: newGoal,
       nextDueDate: nextDueDate,
     }),

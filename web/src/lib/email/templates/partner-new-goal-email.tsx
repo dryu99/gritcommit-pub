@@ -5,14 +5,14 @@ import { Insertable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 
 interface PartnerNewGoalEmailProps {
-  ownerUser: Insertable<User>;
+  committerUser: Insertable<User>;
   goal: Insertable<Goal>;
   nextDueDate: Date;
 }
 
 export default function PartnerNewGoalEmail({
-  ownerUser = {
-    email: "owner@gmail.com",
+  committerUser = {
+    email: "committer@gmail.com",
     firstName: "John",
     lastName: "Doe",
     id: "1",
@@ -30,9 +30,9 @@ export default function PartnerNewGoalEmail({
 }: PartnerNewGoalEmailProps) {
   const formattedDate = toFormattedDateText(nextDueDate);
 
-  const ownerName = ownerUser.lastName
-    ? `${ownerUser.firstName} ${ownerUser.lastName}`
-    : ownerUser.firstName;
+  const committerName = committerUser.lastName
+    ? `${committerUser.firstName} ${committerUser.lastName}`
+    : committerUser.firstName;
 
   return (
     <Html>
@@ -40,8 +40,8 @@ export default function PartnerNewGoalEmail({
         Hi {goal.partnerEmail},
         <br />
         <br />
-        {ownerName} has started a new commitment and has assigned you as their
-        accountability partner:
+        {committerName} has started a new commitment and has assigned you as
+        their accountability partner:
         <br />
         <br />
         🎯 <strong>Commitment:</strong> {goal.description}
@@ -64,7 +64,7 @@ export default function PartnerNewGoalEmail({
         If they miss{" "}
         {goal.scheduleType === "RECURRING"
           ? "a deadline"
-          : "the deadline"}, {ownerName} owes you ${goal.stakeAmount}.
+          : "the deadline"}, {committerName} owes you ${goal.stakeAmount}.
         <br />
         <br />
         When {goal.scheduleType === "RECURRING"
