@@ -5,7 +5,9 @@ import React from "react";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
 
-const ADMIN_EMAIL = "notifications@gritcommit.app";
+const FROM_EMAIL = "notifications@gritcommit.app";
+const REPLY_TO_EMAIL =
+  "d131a38dc79441cf4d361088ef6486a6@inbound.postmarkapp.com";
 
 export const sendEmail = async ({
   recipientEmail,
@@ -17,9 +19,9 @@ export const sendEmail = async ({
   emailHtml: string;
 }) => {
   return EmailClient.sendEmail({
-    From: ADMIN_EMAIL,
+    From: FROM_EMAIL,
     To: recipientEmail,
-    ReplyTo: ADMIN_EMAIL,
+    ReplyTo: REPLY_TO_EMAIL,
     Subject: subject,
     HtmlBody: emailHtml,
   });
