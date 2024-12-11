@@ -60,30 +60,14 @@ export default function CommitterGoalDueEmail({
           </>
         )}
         <br />
-        Please reply to this email before the end of the day with:
+        <strong>Reply "Y"</strong> to this email if you've completed your
+        commitment (feel free to also include photos as evidence). Your partner
+        will verify your response.
         <br />
-        <ul>
-          <li>
-            <strong>Y</strong> - if you completed your commitment
-            <ul style={{ margin: "8px 0" }}>
-              <li>
-                Your partner will verify your response and we'll let you know
-                the outcome
-              </li>
-            </ul>
-          </li>
-          <li>
-            <strong>N</strong> - if you did not complete your commitment.
-            <ul style={{ margin: "8px 0" }}>
-              <li>
-                In this case, please send ${goal.stakeAmount} to your partner at{" "}
-                {goal.partnerEmail}.
-              </li>
-            </ul>
-          </li>
-        </ul>
-        Remember, achieving goals takes time and <strong>grit</strong>. Whether
-        you succeeded or not today, keep pushing forward.
+        <br />
+        If you haven't completed your commitment yet, what are you waiting for?
+        There's still time! ${goal.stakeAmount} is at stake! Go! You've got
+        this!
         <br />
         <br />
         Cheers,
