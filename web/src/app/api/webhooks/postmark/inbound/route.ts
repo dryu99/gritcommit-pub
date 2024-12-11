@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     //   const goalId = body.HtmlBody.match(/goalId=(\d+)/)?.[1];
     // }
 
-    sendEmail({
+    await sendEmail({
       recipientEmail: "carol@example.com",
-      subject: body.Subject,
+      subject: "THIS IS A TEST",
       emailHtml: `
         <pre style="
           background-color: #f5f5f5;
