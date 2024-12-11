@@ -1,3 +1,4 @@
+import { sendEmail } from "@/lib/email/email.lib";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -14,11 +15,22 @@ export async function POST(request: NextRequest) {
     //   const goalId = body.HtmlBody.match(/goalId=(\d+)/)?.[1];
     // }
 
-    // sendEmail({
-    //   recipientEmail: body.From,
-    //   subject: body.Subject,
-    //   emailHtml: body.HtmlBody,
-    // });
+    sendEmail({
+      recipientEmail: "carol@example.com",
+      subject: body.Subject,
+      emailHtml: `
+        <pre style="
+          background-color: #f5f5f5;
+          padding: 15px;
+          border-radius: 5px;
+          font-family: monospace;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        ">
+          ${JSON.stringify(body, null, 2)}
+        </pre>
+      `,
+    });
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
