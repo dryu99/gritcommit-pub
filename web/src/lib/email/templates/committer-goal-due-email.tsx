@@ -1,6 +1,6 @@
 import { Goal, User } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
-import { Body, Html } from "@react-email/components";
+import { Body, Button, Html } from "@react-email/components";
 import { Insertable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 
@@ -8,6 +8,7 @@ interface CommitterGoalDueEmailProps {
   committerUser: Insertable<User>;
   goal: Insertable<Goal>;
   nextDueDate: Date;
+  verificationToken: string;
 }
 
 export default function CommitterGoalDueEmail({
@@ -27,6 +28,7 @@ export default function CommitterGoalDueEmail({
     partnerEmail: "partner@gmail.com",
   },
   nextDueDate = new Date("12/20/2024 23:59:59"),
+  verificationToken = "1234567890",
 }: CommitterGoalDueEmailProps) {
   const formattedDate = toFormattedDateText(nextDueDate);
 
@@ -60,14 +62,37 @@ export default function CommitterGoalDueEmail({
           </>
         )}
         <br />
-        <strong>Reply "Y"</strong> to this email if you've completed your
-        commitment (feel free to also include photos as evidence). Your partner
-        will verify your response.
+        Click the button below to mark your commitment as complete.
+        <br />
+        <br />
+        <Button
+          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${verificationToken}`}
+          style={{
+            backgroundColor: "#ea580c",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            textDecoration: "none",
+            fontFamily: "monospace",
+            fontSize: "16px",
+          }}
+        >
+          Done
+        </Button>
         <br />
         <br />
         If you haven't completed your commitment yet, what are you waiting for?
-        There's still time! ${goal.stakeAmount} is at stake! Go! You've got
-        this!
+        <br />
+        <br />
+        There's still time!
+        <br />
+        <br />${goal.stakeAmount} is at stake!
+        <br />
+        <br />
+        You've got this!
+        <br />
+        <br />
+        Go!
         <br />
         <br />
         Cheers,

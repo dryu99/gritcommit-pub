@@ -24,6 +24,7 @@ export default function CommitterVerifyForm() {
     e.preventDefault();
 
     // TODO: Implement form submission
+    // action should check db for verification token.
     console.log("Submitting:", { token, message, images });
   };
 

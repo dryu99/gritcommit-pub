@@ -35,9 +35,13 @@ export interface GoalEntry {
   dueAt: Timestamp;
   goalId: string;
   id: string;
+  partnerVerificationToken: string | null;
+  partnerVerificationTokenExpiresAt: Timestamp | null;
   partnerVerifiedAt: Timestamp | null;
   status: string;
   updatedAt: Generated<Timestamp>;
+  userVerificationToken: string | null;
+  userVerificationTokenExpiresAt: Timestamp | null;
   userVerifiedAt: Timestamp | null;
 }
 
