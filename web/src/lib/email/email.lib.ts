@@ -52,5 +52,10 @@ export async function toEmailHtml<P extends object>(
   EmailComponent: React.ComponentType<P>,
   props: P,
 ): Promise<string> {
+  // this is needed when executed server-side
+  if (typeof global.React === "undefined") {
+    global.React = React;
+  }
+
   return render(React.createElement(EmailComponent, props));
 }

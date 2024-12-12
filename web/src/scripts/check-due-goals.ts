@@ -35,14 +35,12 @@ const main = async () => {
 
   // TODO does this timezone logic make sense... lets say we were running script in another server
   // TODO figure out how to do this filter in sql
-  console.log("Current date (local):", new Date().getDate());
   const dueTodayGoalEntries = pendingGoalEntries.filter((goalEntry) => {
     const entryDueDate = new Date(goalEntry.dueAt);
-    console.log("Goal entry due date (local):", entryDueDate.getDate());
     return entryDueDate.getDate() === new Date().getDate();
   });
 
-  console.log("Due today goal entries:", dueTodayGoalEntries);
+  console.log("Due today goal entries:", dueTodayGoalEntries.length);
 
   for (const goalEntry of dueTodayGoalEntries) {
     console.log("Processing goal entry:", {
@@ -99,6 +97,9 @@ const main = async () => {
         .execute();
     }
   }
+
+  console.log("Done processing due today goal entries");
+  process.exit(0);
 };
 
 main();
