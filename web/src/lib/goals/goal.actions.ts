@@ -236,9 +236,11 @@ export const handleCommitterVerify = async (formData: FormData) => {
       .set({
         partnerVerificationToken: partnerVerifyToken,
         status: GoalEntryStatus.PartnerVerifying,
+        userVerifiedAt: new Date(),
       })
       .where("id", "=", goalEntry.id)
       .execute();
+
     await sendEmail({
       recipientEmail: goalEntry.partnerEmail,
       subject: toPartnerEmailSubject(

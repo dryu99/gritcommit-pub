@@ -92,7 +92,7 @@ export default function PartnerVerifyEmail({
         <br />
         <Section>
           <Button
-            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}&approve=true`}
+            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}&approved=true`}
             style={{ ...emailButtonStyle, marginRight: "24px" }}
           >
             Yes
