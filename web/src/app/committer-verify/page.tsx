@@ -25,8 +25,6 @@ export default async function CommitterVerifyPage(props: {
 
   return (
     <main className="mx-auto max-w-lg p-6">
-      <h1 className="mb-6 text-2xl font-bold">Verify Your Commitment</h1>
-
       <CommitterVerifyForm token={token} />
     </main>
   );
