@@ -5,6 +5,7 @@ import { generateModelId } from "@/lib/generate-model-id";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Insertable } from "kysely";
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
@@ -269,9 +270,18 @@ export const handleCommitterVerify = async (formData: FormData) => {
               Name: "evidence.jpeg",
               Content: await reqBody.image
                 .arrayBuffer()
-                .then((buffer) => Buffer.from(buffer).toString("base64")),
-              ContentID: "cid:evidence@goalentry.image", // TODO create constant for this and ref in email
-              ContentType: reqBody.image.type,
+                .then((buffer) =>
+                  sharp(Buffer.from(buffer))
+                    .resize(800, 600, {
+                      fit: "inside",
+                      withoutEnlargement: true,
+                    })
+                    .jpeg({ quality: 80 })
+                    .toBuffer(),
+                )
+                .then((resizedBuffer) => resizedBuffer.toString("base64")),
+              ContentID: "cid:evidence@goalentry.image",
+              ContentType: "image/jpeg",
             },
           ]
         : undefined,
