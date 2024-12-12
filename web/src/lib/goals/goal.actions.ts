@@ -18,6 +18,7 @@ import {
 } from "../email/email.lib";
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
+import PartnerVerifyEmail from "../email/templates/partner-verify-email";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -146,4 +147,106 @@ const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {
   }
 
   throw new Error("Next due date could not be calculated");
+};
+
+const CommitterVerifyReqBodySchema = z.object({
+  token: z.string(),
+  message: z.string().optional(),
+  images: z.array(z.instanceof(File)).optional(),
+});
+
+export type CommitterVerifyReqBody = z.infer<
+  typeof CommitterVerifyReqBodySchema
+>;
+
+export const handleCommitterVerify = async (data: CommitterVerifyReqBody) => {
+  const {
+    success,
+    error,
+    data: reqBody,
+  } = CommitterVerifyReqBodySchema.safeParse(data);
+  if (!success) {
+    console.log(error.errors);
+    return error.errors.map((e) => e.message).join(", ");
+  }
+
+  const goalEntry = await DB.get()
+    .selectFrom("goalEntry")
+    .innerJoin("goal", "goal.id", "goalEntry.goalId")
+    .innerJoin("user", "user.id", "goal.createdByUserId")
+    .select([
+      "goalEntry.status",
+      "goalEntry.dueAt",
+      "goalEntry.id",
+
+      "goal.description",
+      "goal.partnerEmail",
+      "goal.stakeAmount",
+      "goal.scheduleType",
+      "goal.scheduleDays",
+
+      "user.firstName as userFirstName",
+      "user.lastName as userLastName",
+      "user.email as userEmail",
+    ])
+    .where("userVerificationToken", "=", reqBody.token)
+    .executeTakeFirst();
+
+  if (!goalEntry) throw new Error("Goal entry not found");
+  if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
+    throw new Error("Goal entry is not in verifying state");
+  if (new Date() > new Date(goalEntry.dueAt))
+    throw new Error("Goal entry is expired");
+
+  const partnerVerifyToken = crypto.randomUUID();
+
+  try {
+    await DB.get()
+      .updateTable("goalEntry")
+      .set({
+        partnerVerificationToken: partnerVerifyToken,
+        status: GoalEntryStatus.PartnerVerifying,
+      })
+      .where("id", "=", goalEntry.id)
+      .execute();
+
+    await sendEmail({
+      recipientEmail: goalEntry.partnerEmail,
+      subject: toPartnerEmailSubject(
+        goalEntry.userFirstName,
+        goalEntry.description,
+      ),
+      emailHtml: await toEmailHtml(PartnerVerifyEmail, {
+        committerUser: {
+          email: goalEntry.userEmail,
+          firstName: goalEntry.userFirstName,
+          lastName: goalEntry.userLastName,
+        },
+        goal: {
+          description: goalEntry.description,
+          stakeAmount: goalEntry.stakeAmount,
+          partnerEmail: goalEntry.partnerEmail,
+          id: goalEntry.id,
+          scheduleType: goalEntry.scheduleType,
+          scheduleDays: goalEntry.scheduleDays,
+        },
+        dueDate: new Date(goalEntry.dueAt),
+        verificationToken: partnerVerifyToken,
+      }),
+    });
+  } catch (e) {
+    console.error(e);
+
+    // TODO handle transaction better
+    await DB.get()
+      .updateTable("goalEntry")
+      .set({
+        status: GoalEntryStatus.CommitterVerifying,
+        partnerVerificationToken: null,
+      })
+      .where("id", "=", goalEntry.id)
+      .execute();
+
+    throw e;
+  }
 };

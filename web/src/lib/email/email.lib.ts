@@ -59,3 +59,13 @@ export async function toEmailHtml<P extends object>(
 
   return render(React.createElement(EmailComponent, props));
 }
+
+export const emailButtonStyle: React.CSSProperties = {
+  backgroundColor: "#ea580c",
+  color: "#fff",
+  padding: "10px 20px",
+  borderRadius: "5px",
+  textDecoration: "none",
+  fontFamily: "monospace",
+  fontSize: "16px",
+};

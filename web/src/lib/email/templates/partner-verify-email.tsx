@@ -1,11 +1,11 @@
 import { Goal, User } from "@/database/db-generated-types";
 import { ScheduleType } from "@/types/enums";
-import { Body, Button, Html } from "@react-email/components";
+import { Body, Button, Html, Section } from "@react-email/components";
 import { Selectable } from "kysely";
 import { getScheduleText, toFormattedDateText } from "../../days";
 import { emailButtonStyle } from "../email.lib";
 
-interface CommitterVerifyEmailProps {
+interface PartnerVerifyEmailProps {
   committerUser: Pick<User, "email" | "firstName" | "lastName">;
   goal: Pick<
     Selectable<Goal>,
@@ -20,7 +20,7 @@ interface CommitterVerifyEmailProps {
   verificationToken: string;
 }
 
-export default function CommitterVerifyEmail({
+export default function PartnerVerifyEmail({
   committerUser = {
     email: "committer@gmail.com",
     firstName: "John",
@@ -36,7 +36,7 @@ export default function CommitterVerifyEmail({
   },
   dueDate = new Date("12/20/2024 23:59:59"),
   verificationToken = "1234567890",
-}: CommitterVerifyEmailProps) {
+}: PartnerVerifyEmailProps) {
   const formattedDueDate = toFormattedDateText(dueDate);
 
   const committerName = committerUser.lastName
@@ -46,10 +46,10 @@ export default function CommitterVerifyEmail({
   return (
     <Html>
       <Body>
-        Hi {committerName},
+        Hi {goal.partnerEmail},
         <br />
         <br />
-        Your commitment is due today at 11:59pm.
+        {committerName} has completed their commitment:
         <br />
         <br />
         🎯 <strong>Commitment:</strong> {goal.description}
@@ -69,29 +69,23 @@ export default function CommitterVerifyEmail({
           </>
         )}
         <br />
-        Click the button below to mark your commitment as complete.
+        Please verify their completion.
         <br />
         <br />
-        <Button
-          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${verificationToken}`}
-          style={emailButtonStyle}
-        >
-          Done
-        </Button>
-        <br />
-        <br />
-        Otherwise, what are you waiting for?
-        <br />
-        <br />
-        There's still time!
-        <br />
-        <br />${goal.stakeAmount} is at stake!
-        <br />
-        <br />
-        You've got this!
-        <br />
-        <br />
-        Go!
+        <Section>
+          <Button
+            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}&approve=true`}
+            style={{ ...emailButtonStyle, marginRight: "24px" }}
+          >
+            Yes
+          </Button>
+          <Button
+            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}`}
+            style={emailButtonStyle}
+          >
+            No
+          </Button>
+        </Section>
         <br />
         <br />
         Cheers,

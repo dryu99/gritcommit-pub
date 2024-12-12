@@ -1,17 +1,15 @@
 "use client";
 
+import { handleCommitterVerify } from "@/lib/goals/goal.actions";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./common/button";
 
-export default function CommitterVerifyForm() {
+export default function CommitterVerifyForm({ token }: { token: string }) {
   const [message, setMessage] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isSworn, setIsSworn] = useState(false);
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -28,7 +26,12 @@ export default function CommitterVerifyForm() {
     // TODO: Implement form submission
     // TODO action should check db for verification token.
     // TODO if goal is expired then fail
-    console.log("Submitting:", { token, message, images });
+    console.log("Submitting:", { message, images });
+    handleCommitterVerify({
+      token,
+      message,
+      images,
+    });
   };
 
   return (
