@@ -18,6 +18,8 @@ interface PartnerVerifyEmailProps {
   >;
   dueDate: Date;
   verificationToken: string;
+  committerMessage?: string;
+  hasImage?: boolean;
 }
 
 export default function PartnerVerifyEmail({
@@ -36,6 +38,8 @@ export default function PartnerVerifyEmail({
   },
   dueDate = new Date("12/20/2024 23:59:59"),
   verificationToken = "1234567890",
+  committerMessage = "I did the thing",
+  hasImage = true,
 }: PartnerVerifyEmailProps) {
   const formattedDueDate = toFormattedDateText(dueDate);
 
@@ -69,7 +73,21 @@ export default function PartnerVerifyEmail({
           </>
         )}
         <br />
-        Please verify their completion.
+        {hasImage && (
+          <>
+            They sent you the following evidence:
+            <br />
+            <br />
+            <img src="cid:evidence@goalentry.image" alt="Evidence" />
+            <br />
+            <br />
+          </>
+        )}
+        {committerMessage && <>"{committerMessage}"</>}
+        <br />
+        <br />
+        <br />
+        Please verify their completion:
         <br />
         <br />
         <Section>

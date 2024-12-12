@@ -56,6 +56,8 @@ export default function CommitterVerifyEmail({
         <br />
         💰 <strong>Stake:</strong> ${goal.stakeAmount}
         <br />
+        🤝 <strong>Accountability Partner:</strong> {goal.partnerEmail}
+        <br />
         {goal.scheduleType === "ONCE" && (
           <>
             📅 <strong>Due Date:</strong> {formattedDueDate}

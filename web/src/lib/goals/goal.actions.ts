@@ -152,23 +152,52 @@ const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {
 const CommitterVerifyReqBodySchema = z.object({
   token: z.string(),
   message: z.string().optional(),
-  images: z.array(z.instanceof(File)).optional(),
+  image: z
+    .instanceof(File)
+    .refine(
+      (file) => {
+        // Validate file type
+        return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+      },
+      {
+        message: "File must be a valid image (JPEG, PNG, or WebP)",
+      },
+    )
+    .refine(
+      (file) => {
+        // Validate file size (e.g., 3MB limit)
+        return file.size <= 3 * 1024 * 1024;
+      },
+      {
+        message: "File size must be less than 3MB",
+      },
+    )
+    .optional(),
 });
 
 export type CommitterVerifyReqBody = z.infer<
   typeof CommitterVerifyReqBodySchema
 >;
 
-export const handleCommitterVerify = async (data: CommitterVerifyReqBody) => {
+// TODO confirm whether we acutally need formdata, it might be good enough to use body
+// this endpoint takes in form data instead of json to handle images
+export const handleCommitterVerify = async (formData: FormData) => {
   const {
     success,
     error,
     data: reqBody,
-  } = CommitterVerifyReqBodySchema.safeParse(data);
+  } = CommitterVerifyReqBodySchema.safeParse({
+    token: formData.get("token"),
+    message: formData.get("message"),
+    image: formData.get("image"),
+  });
+
   if (!success) {
     console.log(error.errors);
     return error.errors.map((e) => e.message).join(", ");
   }
+
+  console.log("reqBody", reqBody.image);
 
   const goalEntry = await DB.get()
     .selectFrom("goalEntry")
@@ -209,7 +238,6 @@ export const handleCommitterVerify = async (data: CommitterVerifyReqBody) => {
       })
       .where("id", "=", goalEntry.id)
       .execute();
-
     await sendEmail({
       recipientEmail: goalEntry.partnerEmail,
       subject: toPartnerEmailSubject(
@@ -232,7 +260,21 @@ export const handleCommitterVerify = async (data: CommitterVerifyReqBody) => {
         },
         dueDate: new Date(goalEntry.dueAt),
         verificationToken: partnerVerifyToken,
+        committerMessage: reqBody.message,
+        hasImage: !!reqBody.image,
       }),
+      attachments: reqBody.image
+        ? [
+            {
+              Name: "evidence.jpeg",
+              Content: await reqBody.image
+                .arrayBuffer()
+                .then((buffer) => Buffer.from(buffer).toString("base64")),
+              ContentID: "cid:evidence@goalentry.image", // TODO create constant for this and ref in email
+              ContentType: reqBody.image.type,
+            },
+          ]
+        : undefined,
     });
   } catch (e) {
     console.error(e);

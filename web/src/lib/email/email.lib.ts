@@ -1,6 +1,6 @@
 import { Config } from "@/lib/config";
 import { render } from "@react-email/components";
-import { ServerClient } from "postmark";
+import { Attachment, ServerClient } from "postmark";
 import React from "react";
 
 export const EmailClient = new ServerClient(Config.POSTMARK_API_KEY);
@@ -34,10 +34,12 @@ export const sendEmail = async ({
   recipientEmail,
   subject,
   emailHtml,
+  attachments,
 }: {
   recipientEmail: string;
   subject: string;
   emailHtml: string;
+  attachments?: Attachment[];
 }) => {
   return EmailClient.sendEmail({
     From: FROM_EMAIL,
@@ -45,6 +47,7 @@ export const sendEmail = async ({
     ReplyTo: REPLY_TO_EMAIL,
     Subject: subject,
     HtmlBody: emailHtml,
+    Attachments: attachments,
   });
 };
 

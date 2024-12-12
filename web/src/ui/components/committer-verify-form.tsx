@@ -27,11 +27,15 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
     // TODO action should check db for verification token.
     // TODO if goal is expired then fail
     console.log("Submitting:", { message, images });
-    handleCommitterVerify({
-      token,
-      message,
-      images,
-    });
+
+    const formData = new FormData();
+    formData.append("token", token);
+    formData.append("message", message);
+    if (images[0]) {
+      formData.append("image", images[0]);
+    }
+
+    handleCommitterVerify(formData);
   };
 
   return (
