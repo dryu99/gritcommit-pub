@@ -1,6 +1,5 @@
 "use client";
 
-import { handleCommitterVerify } from "@/lib/goals/goal.actions";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "./common/button";
@@ -10,7 +9,9 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isSworn, setIsSworn] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(true);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -21,36 +22,56 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
     setImageUrls(urls);
   };
 
-  // TODO add loading state
-  // TODO handle errors
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("token", token);
-    formData.append("message", message);
-    if (images[0]) {
-      formData.append("image", images[0]);
-    }
+    try {
+      setSubmitStatus("loading");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const formData = new FormData();
+      formData.append("token", token);
+      formData.append("message", message);
+      if (images[0]) {
+        formData.append("image", images[0]);
+      }
 
-    await handleCommitterVerify(formData);
-    setIsSubmitted(true);
+      // await handleCommitterVerify(formData);
+      setSubmitStatus("success");
+    } catch (e) {
+      setSubmitStatus("error");
+    }
   };
 
   return (
     <>
-      {isSubmitted ? (
+      {submitStatus === "success" && (
         <div>
           {/* TODO improve copy here. maybe dont use verification in header */}
-          <h1 className="mb-6 text-2xl font-bold">Verification Submitted!</h1>
+          <h2 className="mb-6 text-2xl font-bold">Verification Submitted!</h2>
           <p>
             Congrats on committing to your goal! Your partner will receive an
             email to verify your commitment shortly.
           </p>
         </div>
-      ) : (
+      )}
+
+      {submitStatus === "error" && (
+        <div>
+          <p>Oops! Something went wrong. Please try again.</p>
+        </div>
+      )}
+
+      {submitStatus === "loading" && (
+        <div>
+          <div className="flex justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+          </div>
+        </div>
+      )}
+
+      {submitStatus === "idle" && (
         <form onSubmit={handleSubmit} className="space-y-6">
-          <h1 className="mb-6 text-2xl font-bold">Verify Your Commitment</h1>
+          <h2 className="mb-6 text-2xl font-bold">Verify Your Commitment</h2>
           <div className="mb-2">
             <label htmlFor="swear" className="mb-4 block">
               With utmost gravity and unwavering truthfulness, I hereby certify
