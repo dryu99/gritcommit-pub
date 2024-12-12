@@ -54,3 +54,7 @@ export const toFormattedDateText = (date: Date | string) => {
 
   return formatted;
 };
+export function toPartnerVerificationDeadline(dueAt: Date | string): Date {
+  const HOURS_AFTER_DUE = 12;
+  return new Date(new Date(dueAt).getTime() + HOURS_AFTER_DUE * 60 * 60 * 1000);
+}
