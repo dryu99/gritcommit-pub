@@ -10,7 +10,12 @@ import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth/auth.lib";
 import { DateUtils } from "../date";
-import { sendEmail, toEmailHtml } from "../email/email.lib";
+import {
+  sendEmail,
+  toCommitterEmailSubject,
+  toEmailHtml,
+  toPartnerEmailSubject,
+} from "../email/email.lib";
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 
@@ -91,14 +96,9 @@ export const createGoal = async (data: any) => {
 
   // TODO handle email errors
   // TODO also have to send checkin emails if user is starting today and its past 12pm
-  const emailDescription =
-    newGoal.description.length > 50
-      ? newGoal.description.slice(0, 47) + "..."
-      : newGoal.description;
-
   sendEmail({
     recipientEmail: sessionUser.email,
-    subject: `Your new commitment: "${emailDescription}"`,
+    subject: toCommitterEmailSubject(newGoal.description),
     emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
       committerUser: sessionUser,
       goal: newGoal,
@@ -108,7 +108,7 @@ export const createGoal = async (data: any) => {
 
   sendEmail({
     recipientEmail: reqBody.partnerEmail,
-    subject: `${sessionUser.firstName} wants you to keep them accountable for "${emailDescription}"`,
+    subject: toPartnerEmailSubject(sessionUser.firstName, newGoal.description),
     emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
       committerUser: sessionUser,
       goal: newGoal,

@@ -3,7 +3,7 @@
  * Please do not edit it manually.
  */
 
-import { ScheduleType } from "@/types/enums";
+import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import type { ColumnType } from "kysely";
 
 export type Generated<T> =
@@ -38,7 +38,7 @@ export interface GoalEntry {
   partnerVerificationToken: string | null;
   partnerVerificationTokenExpiresAt: Timestamp | null;
   partnerVerifiedAt: Timestamp | null;
-  status: string;
+  status: GoalEntryStatus;
   updatedAt: Generated<Timestamp>;
   userVerificationToken: string | null;
   userVerificationTokenExpiresAt: Timestamp | null;

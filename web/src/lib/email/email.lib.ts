@@ -9,6 +9,27 @@ const FROM_EMAIL = "notifications@gritcommit.app";
 const REPLY_TO_EMAIL =
   "d131a38dc79441cf4d361088ef6486a6@inbound.postmarkapp.com";
 
+export const toCommitterEmailSubject = (goalDescription: string) => {
+  const shortDescription =
+    goalDescription.length > 50
+      ? goalDescription.slice(0, 47) + "..."
+      : goalDescription;
+
+  return `Your new commitment: "${shortDescription}"`;
+};
+
+export const toPartnerEmailSubject = (
+  committerName: string,
+  goalDescription: string,
+) => {
+  const shortDescription =
+    goalDescription.length > 50
+      ? goalDescription.slice(0, 47) + "..."
+      : goalDescription;
+
+  return `${committerName} wants you to keep them accountable for "${shortDescription}"`;
+};
+
 export const sendEmail = async ({
   recipientEmail,
   subject,
