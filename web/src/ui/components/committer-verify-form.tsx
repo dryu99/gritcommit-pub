@@ -26,7 +26,8 @@ export default function CommitterVerifyForm() {
     e.preventDefault();
 
     // TODO: Implement form submission
-    // action should check db for verification token.
+    // TODO action should check db for verification token.
+    // TODO if goal is expired then fail
     console.log("Submitting:", { token, message, images });
   };
 

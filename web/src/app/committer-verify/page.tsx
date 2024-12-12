@@ -12,12 +12,15 @@ export default async function CommitterVerifyPage({
 
   const goalEntry = await DB.get()
     .selectFrom("goalEntry")
-    .select(["status"])
+    .select(["status", "dueAt"])
     .where("userVerificationToken", "=", token)
     .executeTakeFirst();
 
   if (!goalEntry || goalEntry.status !== GoalEntryStatus.CommitterVerifying)
     return <div>oops</div>;
+
+  if (new Date() > new Date(goalEntry.dueAt))
+    return <div>Due date passed!</div>;
 
   return (
     <main className="mx-auto max-w-lg p-6">

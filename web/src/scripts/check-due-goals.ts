@@ -98,7 +98,7 @@ const main = async () => {
     }
   }
 
-  console.log("Done processing due today goal entries");
+  console.log("Done checking due today goals");
   process.exit(0);
 };
 
