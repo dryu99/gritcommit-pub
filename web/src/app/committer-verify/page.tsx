@@ -1,11 +1,23 @@
+import { DB } from "@/database/db";
+import { GoalEntryStatus } from "@/types/enums";
 import CommitterVerifyForm from "@/ui/components/committer-verify-form";
 
 export default async function CommitterVerifyPage({
   searchParams,
 }: {
-  searchParams: { token: string };
+  searchParams: { token?: string };
 }) {
-  // TODO fetch goal with token to see if user already verified (can check status)
+  const token = searchParams.token;
+  if (!token) return <div>oops</div>;
+
+  const goalEntry = await DB.get()
+    .selectFrom("goalEntry")
+    .select(["status"])
+    .where("userVerificationToken", "=", token)
+    .executeTakeFirst();
+
+  if (!goalEntry || goalEntry.status !== GoalEntryStatus.CommitterVerifying)
+    return <div>oops</div>;
 
   return (
     <main className="mx-auto max-w-lg p-6">

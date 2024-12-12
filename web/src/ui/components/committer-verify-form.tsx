@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Button } from "./common/button";
 
 export default function CommitterVerifyForm() {
   const [message, setMessage] = useState("");
@@ -32,7 +33,7 @@ export default function CommitterVerifyForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="mb-2">
-        <label htmlFor="swear" className="mb-6 block">
+        <label htmlFor="swear" className="mb-4 block">
           With utmost gravity and unwavering truthfulness, I hereby certify this
           deed done.
         </label>
@@ -64,7 +65,7 @@ export default function CommitterVerifyForm() {
 
           <div>
             <label htmlFor="images" className="mb-2 block">
-              Add photos (optional)
+              Add photo evidence (optional)
             </label>
             <input
               type="file"
@@ -91,12 +92,9 @@ export default function CommitterVerifyForm() {
             </div>
           )}
 
-          <button
-            type="submit"
-            className="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          >
-            Submit Verification
-          </button>
+          <Button type="submit" className="w-full">
+            Submit
+          </Button>
         </>
       )}
     </form>
