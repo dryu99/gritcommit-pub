@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "./common/button";
+import { Link } from "./common/link";
 
 export default function CommitterVerifyForm({ token }: { token: string }) {
   const [message, setMessage] = useState("");
@@ -48,10 +49,13 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
         <div>
           {/* TODO improve copy here. maybe dont use verification in header */}
           <h2 className="mb-6 text-2xl font-bold">Verification Submitted!</h2>
-          <p>
+          <p className="mb-6">
             Congrats on committing to your goal! Your partner will receive an
             email to verify your commitment shortly.
           </p>
+          <Link className="text-brand" href="/dashboard">
+            Go back home
+          </Link>
         </div>
       )}
 

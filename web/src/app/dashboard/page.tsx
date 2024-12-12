@@ -44,17 +44,27 @@ export default async function DashboardPage() {
                           "text-red-500": latestEntry.status === "FAILED",
                           "text-green-500": latestEntry.status === "COMPLETED",
                           "text-yellow-500": latestEntry.status === "PENDING",
+                          "text-blue-500":
+                            latestEntry.status === "COMMITTER_VERIFYING" ||
+                            latestEntry.status === "PARTNER_VERIFYING",
                         })}
                       >
                         {latestEntry.status === "PENDING"
                           ? "ONGOING"
-                          : latestEntry.status}
+                          : latestEntry.status === "COMMITTER_VERIFYING"
+                            ? "CHECK EMAIL"
+                            : latestEntry.status === "PARTNER_VERIFYING"
+                              ? "PARTNER VERIFYING"
+                              : latestEntry.status}
                       </span>
                       <div
                         className={cn("h-2 w-2 rounded-full", {
                           "bg-red-500": latestEntry.status === "FAILED",
                           "bg-yellow-500": latestEntry.status === "PENDING",
                           "bg-green-500": latestEntry.status === "COMPLETED",
+                          "bg-blue-500":
+                            latestEntry.status === "COMMITTER_VERIFYING" ||
+                            latestEntry.status === "PARTNER_VERIFYING",
                         })}
                       />
                     </div>
@@ -68,6 +78,7 @@ export default async function DashboardPage() {
                         goal.scheduleType === "RECURRING",
                     })}
                   >
+                    {/* TODO add highlighting when due date gets closer */}
                     {latestEntry && (
                       <>
                         <div>Due:</div>
