@@ -1,8 +1,8 @@
 import { Goal, User } from "@/database/db-generated-types";
+import { getScheduleText, toFormattedDateText } from "@/lib/date";
 import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { Selectable } from "kysely";
-import { getScheduleText, toFormattedDateText } from "../../days";
 
 interface CommitterVerifyDeniedEmailProps {
   committerUser: Pick<User, "email" | "firstName" | "lastName">;

@@ -1,5 +1,5 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { getScheduleText } from "@/lib/days";
+import { getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
 import { cn } from "@/ui/classnames";
 import { ClientDate } from "@/ui/components/common/client-date";

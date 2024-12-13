@@ -1,6 +1,6 @@
 import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/days";
+import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { LoginForm } from "@/ui/components/login-form";
 import { ibmPlexMono } from "@/ui/fonts";

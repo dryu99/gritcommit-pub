@@ -1,4 +1,4 @@
-import { CURRENT_YEAR } from "@/lib/days";
+import { CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
 
 type CommitSquare = {

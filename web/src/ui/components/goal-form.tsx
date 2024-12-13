@@ -1,6 +1,6 @@
 "use client";
 
-import { Day, DAYS } from "@/lib/days";
+import { Day, DAYS } from "@/lib/date";
 import { createGoal, CreateGoalReqBody } from "@/lib/goals/goal.actions";
 import { useEffect, useState } from "react";
 

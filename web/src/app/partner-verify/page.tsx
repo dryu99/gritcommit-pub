@@ -1,6 +1,6 @@
 import { DB } from "@/database/db";
 import { Goal, GoalEntry, User } from "@/database/db-generated-types";
-import { toPartnerVerificationDeadline } from "@/lib/days";
+import { toPartnerVerificationDeadline } from "@/lib/date";
 import {
   sendEmail,
   toCommitterEmailSubject,
