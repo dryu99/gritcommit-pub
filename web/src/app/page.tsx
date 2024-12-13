@@ -45,7 +45,6 @@ export default async function HomePage() {
   const firstDateOfTheYear = commitSquares[0]!.date;
 
   // TODO fetch all goal entries with status complete from the current year (hardcode to 2024).
-  //
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
@@ -58,73 +57,82 @@ export default async function HomePage() {
   );
 
   const maxCommits = Math.max(...commitSquares.map((c) => c.commits));
+  const totalCommits = commitSquares.reduce(
+    (acc, commit) => acc + commit.commits,
+    0,
+  );
 
   return (
     <div className="flex flex-col items-center">
       <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
         GritCommit
       </h1>
-      <p className="mb-10 text-sm text-gray-500">
+      <p className="mb-8 text-sm text-gray-500">
         Commit with grit (and a buddy)
       </p>
-      <LoginForm />
-      <div className="mt-8 rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
-        {/* TODO make this look better */}
-        <div className="flex justify-between">
-          {MONTHS.map((month) => (
-            <span key={month} className="text-xs text-primary">
-              {month}
-            </span>
-          ))}
-        </div>
-        <table className="border-separate border-spacing-1">
-          <tbody>
-            {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
-              const startsOnSecondWeek =
-                commitSquares[0]!.date.getDate() >
-                // days in first week
-                7 - firstDateOfTheYear.getDay();
+      <div className="mb-8">
+        <h4 className="text-sm text-gray-500">
+          {totalCommits} commits in {CURRENT_YEAR}
+        </h4>
+        <div className="rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
+          {/* TODO make this look better */}
+          <div className="flex justify-between">
+            {MONTHS.map((month) => (
+              <span key={month} className="text-xs text-primary">
+                {month}
+              </span>
+            ))}
+          </div>
+          <table className="border-separate border-spacing-1">
+            <tbody>
+              {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
+                const startsOnSecondWeek =
+                  commitSquares[0]!.date.getDate() >
+                  // days in first week
+                  7 - firstDateOfTheYear.getDay();
 
-              return (
-                <tr key={dayIndex} className="relative">
-                  {[0, 2, 4, 6].includes(dayIndex) && (
-                    <td className="absolute -left-6 h-[10px]" />
-                  )}
-                  {dayIndex === 1 && (
-                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                      Mon
-                    </td>
-                  )}
-                  {dayIndex === 3 && (
-                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                      Wed
-                    </td>
-                  )}
-                  {dayIndex === 5 && (
-                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                      Fri
-                    </td>
-                  )}
-                  {startsOnSecondWeek && <td className="h-[10px]" />}
-                  {commitSquares.map((commitSquare) => {
-                    const opacity =
-                      (commitSquare.commits / maxCommits) * 0.8 + 0.2;
-                    return (
-                      <td
-                        title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
-                        className="h-[10px] w-[10px] rounded-sm"
-                        style={{
-                          backgroundColor: `rgba(74, 222, 128, ${opacity})`,
-                        }}
-                      />
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={dayIndex} className="relative">
+                    {[0, 2, 4, 6].includes(dayIndex) && (
+                      <td className="absolute -left-6 h-[10px]" />
+                    )}
+                    {dayIndex === 1 && (
+                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                        Mon
+                      </td>
+                    )}
+                    {dayIndex === 3 && (
+                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                        Wed
+                      </td>
+                    )}
+                    {dayIndex === 5 && (
+                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                        Fri
+                      </td>
+                    )}
+                    {startsOnSecondWeek && <td className="h-[10px]" />}
+                    {commitSquares.map((commitSquare) => {
+                      const opacity =
+                        (commitSquare.commits / maxCommits) * 0.8 + 0.2;
+                      return (
+                        <td
+                          title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
+                          className="h-[10px] w-[10px] rounded-sm"
+                          style={{
+                            backgroundColor: `rgba(74, 222, 128, ${opacity})`,
+                          }}
+                        />
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
+      <LoginForm />
     </div>
   );
 }
