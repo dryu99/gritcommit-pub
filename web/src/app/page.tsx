@@ -11,6 +11,21 @@ const getDaysInYear = (year: number) => {
 
 const CURRENT_YEAR = 2024;
 const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+  "",
+];
 
 const DEFAULT_COMMIT_SQUARES = Array.from(
   { length: DAYS_IN_CURRENT_YEAR },
@@ -53,54 +68,62 @@ export default async function HomePage() {
         Commit with grit (and a buddy)
       </p>
       <LoginForm />
-      <div className="mt-8 rounded-lg p-4">
-        <div className="text-xs">
-          <tr>
-            <td className="h-6" />
-          </tr>
-          <tr>Mon</tr>
-          <tr>
-            <td className="h-6" />
-          </tr>
-          <tr>Wed</tr>
-          <tr>
-            <td className="h-6" />
-          </tr>
-          <tr>Fri</tr>
-          <tr>
-            <td className="h-6" />
-          </tr>
+      <div className="mt-8 rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
+        {/* TODO make this look better */}
+        <div className="flex justify-between">
+          {MONTHS.map((month) => (
+            <span key={month} className="text-xs text-primary">
+              {month}
+            </span>
+          ))}
         </div>
-        <div>
-          {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
-            const startsOnSecondWeek =
-              commitSquares[0]!.date.getDate() >
-              // days in first week
-              7 - firstDateOfTheYear.getDay();
+        <table className="border-separate border-spacing-1">
+          <tbody>
+            {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
+              const startsOnSecondWeek =
+                commitSquares[0]!.date.getDate() >
+                // days in first week
+                7 - firstDateOfTheYear.getDay();
 
-            return (
-              <tr key={dayIndex}>
-                {startsOnSecondWeek && <td className="h-6" />}
-                {commitSquares.map((commitSquare) => {
-                  const opacity =
-                    (commitSquare.commits / maxCommits) * 0.8 + 0.2;
-                  return (
-                    <td
-                      title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
-                      className="h-6 w-6"
-                      style={{
-                        backgroundColor: `rgba(74, 222, 128, ${opacity})`,
-                      }}
-                    />
-                  );
-                })}
-              </tr>
-            );
-          })}
-
-          {/* tues */}
-          <tr></tr>
-        </div>
+              return (
+                <tr key={dayIndex} className="relative">
+                  {[0, 2, 4, 6].includes(dayIndex) && (
+                    <td className="absolute -left-6 h-[10px]" />
+                  )}
+                  {dayIndex === 1 && (
+                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      Mon
+                    </td>
+                  )}
+                  {dayIndex === 3 && (
+                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      Wed
+                    </td>
+                  )}
+                  {dayIndex === 5 && (
+                    <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      Fri
+                    </td>
+                  )}
+                  {startsOnSecondWeek && <td className="h-[10px]" />}
+                  {commitSquares.map((commitSquare) => {
+                    const opacity =
+                      (commitSquare.commits / maxCommits) * 0.8 + 0.2;
+                    return (
+                      <td
+                        title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
+                        className="h-[10px] w-[10px] rounded-sm"
+                        style={{
+                          backgroundColor: `rgba(74, 222, 128, ${opacity})`,
+                        }}
+                      />
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
