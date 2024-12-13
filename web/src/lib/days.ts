@@ -58,3 +58,11 @@ export function toPartnerVerificationDeadline(dueAt: Date | string): Date {
   const HOURS_AFTER_DUE = 12;
   return new Date(new Date(dueAt).getTime() + HOURS_AFTER_DUE * 60 * 60 * 1000);
 }
+
+// normal year = 365, leap year = 366
+const getDaysInYear = (year: number) => {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+};
+
+export const CURRENT_YEAR = 2024;
+export const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
