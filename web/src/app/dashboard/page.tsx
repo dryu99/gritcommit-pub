@@ -1,8 +1,9 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
+import { toCommitSquares } from "@/lib/commit-graph.lib";
 import { getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
 import { cn } from "@/ui/classnames";
-import { CommitGraph, toCommitSquares } from "@/ui/components/commit-graph";
+import { CommitGraph } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";

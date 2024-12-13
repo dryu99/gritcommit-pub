@@ -1,7 +1,10 @@
-import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
+"use client";
+
+import { CURRENT_YEAR } from "@/lib/date";
+import { useEffect } from "react";
 import { cn } from "../classnames";
 
-type CommitSquare = {
+export type CommitSquare = {
   date: Date;
   commits: number;
 };
@@ -27,6 +30,16 @@ export const CommitGraph = ({
 }: {
   commitSquares: CommitSquare[];
 }) => {
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
   const firstDateOfTheYear = commitSquares[0]!.date;
 
   // TODO fetch all goal entries with status complete from the current year (hardcode to 2024).
@@ -101,16 +114,36 @@ export const CommitGraph = ({
                       return (
                         <td
                           key={commitSquare.date.toISOString()}
-                          title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
                           className={cn(
-                            "h-[10px] w-[10px] min-w-[10px]",
+                            "group relative h-[10px] w-[10px] min-w-[10px]",
                             "rounded-sm",
                             `opacity-${opacity * 100}`,
                             commitSquare.commits > 0
                               ? "bg-green-400"
                               : "bg-neutral-300",
                           )}
-                        />
+                        >
+                          <div
+                            className={cn(
+                              "pointer-events-none fixed z-50 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-[opacity] delay-150 duration-150",
+                              "group-hover:block group-hover:translate-x-1/2 group-hover:opacity-100",
+                              "invisible group-hover:visible",
+                            )}
+                            style={{
+                              left: "var(--mouse-x)",
+                              top: "var(--mouse-y)",
+                              transform:
+                                "translate(-50%, -100%) translateY(-10px)",
+                            }}
+                          >
+                            {`${commitSquare.date.toLocaleDateString("en-US", {
+                              month: "long",
+                              day: "numeric",
+                            })}: ${commitSquare.commits} commitment${
+                              commitSquare.commits === 1 ? "" : "s"
+                            }`}
+                          </div>
+                        </td>
                       );
                     })}
                   </tr>
@@ -122,27 +155,4 @@ export const CommitGraph = ({
       </div>
     </div>
   );
-};
-
-export const toCommitSquares = (dates: Date[]): CommitSquare[] => {
-  const commitSquares = Array.from(
-    { length: DAYS_IN_CURRENT_YEAR },
-    (_, i) => ({
-      date: new Date(CURRENT_YEAR, 0, i + 1),
-      commits: 0,
-    }),
-  );
-
-  for (const date of dates) {
-    const dayOfYear = Math.floor(
-      (date.getTime() - new Date(CURRENT_YEAR, 0, 1).getTime()) /
-        (1000 * 60 * 60 * 24),
-    );
-    const commitSquare = commitSquares[dayOfYear];
-    if (commitSquare) {
-      commitSquare.commits++;
-    }
-  }
-
-  return commitSquares;
 };

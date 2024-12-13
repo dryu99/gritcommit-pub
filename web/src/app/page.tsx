@@ -1,7 +1,8 @@
 import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
+import { toCommitSquares } from "@/lib/commit-graph.lib";
 import { CURRENT_YEAR } from "@/lib/date";
-import { CommitGraph, toCommitSquares } from "@/ui/components/commit-graph";
+import { CommitGraph } from "@/ui/components/commit-graph";
 import { LoginForm } from "@/ui/components/login-form";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
