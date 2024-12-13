@@ -34,15 +34,15 @@ export default async function DashboardPage() {
 
           return (
             <div key={goal.id}>
-              <div className="rounded-lg bg-gray-900 p-4 sm:px-6 sm:py-5">
-                <h3 className="mb-1 flex items-center justify-between text-orange-500">
+              <div className="rounded-lg border border-neutral-300 p-4 sm:px-6 sm:py-5">
+                <h3 className="mb-1 flex items-center justify-between text-brand">
                   <div>commit #{goals.length - i}</div>
                   {latestEntry && (
                     <div className="flex items-center gap-2">
                       <span
                         className={cn({
                           "text-red-500": latestEntry.status === "FAILED",
-                          "text-green-500": latestEntry.status === "COMPLETED",
+                          "text-green-600": latestEntry.status === "COMPLETED",
                           "text-yellow-500": latestEntry.status === "PENDING",
                           "text-blue-500":
                             latestEntry.status === "COMMITTER_VERIFYING" ||
@@ -61,7 +61,7 @@ export default async function DashboardPage() {
                         className={cn("h-2 w-2 rounded-full", {
                           "bg-red-500": latestEntry.status === "FAILED",
                           "bg-yellow-500": latestEntry.status === "PENDING",
-                          "bg-green-500": latestEntry.status === "COMPLETED",
+                          "bg-green-600": latestEntry.status === "COMPLETED",
                           "bg-blue-500":
                             latestEntry.status === "COMMITTER_VERIFYING" ||
                             latestEntry.status === "PARTNER_VERIFYING",
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
                     </div>
                   )}
                 </h3>
-                <div className="text-gray-400">
+                <div className="text-primary">
                   <div
                     className={cn("grid", {
                       "grid-cols-[90px_1fr]":
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
                       </>
                     )}
                     <div>Stake:</div>
-                    <div className="text-green-500">${goal.stakeAmount}</div>
+                    <div className="text-green-600">${goal.stakeAmount}</div>
                     <div>Partner:</div>
                     <div>{goal.partnerEmail}</div>
                     <div>Schedule:</div>
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
                     </div> */}
                   </div>
 
-                  <div className="ml-4 mt-4 whitespace-pre-wrap text-white">
+                  <div className="ml-6 mt-4 whitespace-pre-wrap text-primary">
                     {goal.description}
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
             </div>
           );
         })}
-        <div className="mx-auto text-center text-2xl">😴</div>
+        <div className="mx-auto text-center text-2xl opacity-50">😴</div>
       </div>
     </div>
   );
@@ -124,9 +124,9 @@ export default async function DashboardPage() {
 const CommitLine = () => {
   return (
     <div className="flex flex-col items-center">
-      <div className="h-5 w-[2px] bg-gray-900" />
-      <div className="h-2 w-2 rounded-full border-2 border-gray-900 bg-gray-900" />
-      <div className="h-5 w-[2px] bg-gray-900" />
+      <div className="h-5 w-[2px] bg-neutral-300" />
+      <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
+      <div className="h-5 w-[2px] bg-neutral-300" />
     </div>
   );
 };
