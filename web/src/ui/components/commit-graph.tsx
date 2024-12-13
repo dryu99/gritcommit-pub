@@ -1,4 +1,4 @@
-import { CURRENT_YEAR } from "@/lib/date";
+import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
 
 type CommitSquare = {
@@ -51,7 +51,8 @@ export const CommitGraph = ({
     <div className="w-full">
       <div className="mx-auto max-w-[740px]">
         <h4 className="text-sm text-gray-500">
-          {totalCommits} commits in {CURRENT_YEAR}
+          {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
+          {CURRENT_YEAR}
         </h4>
         <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
           <div className="-mb-[1px] flex w-[698px] justify-between">
@@ -99,6 +100,7 @@ export const CommitGraph = ({
                         (commitSquare.commits / maxCommits) * 0.8 + 0.2;
                       return (
                         <td
+                          key={commitSquare.date.toISOString()}
                           title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
                           className={cn(
                             "h-[10px] w-[10px] min-w-[10px]",
@@ -120,4 +122,27 @@ export const CommitGraph = ({
       </div>
     </div>
   );
+};
+
+export const toCommitSquares = (dates: Date[]): CommitSquare[] => {
+  const commitSquares = Array.from(
+    { length: DAYS_IN_CURRENT_YEAR },
+    (_, i) => ({
+      date: new Date(CURRENT_YEAR, 0, i + 1),
+      commits: 0,
+    }),
+  );
+
+  for (const date of dates) {
+    const dayOfYear = Math.floor(
+      (date.getTime() - new Date(CURRENT_YEAR, 0, 1).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+    const commitSquare = commitSquares[dayOfYear];
+    if (commitSquare) {
+      commitSquare.commits++;
+    }
+  }
+
+  return commitSquares;
 };

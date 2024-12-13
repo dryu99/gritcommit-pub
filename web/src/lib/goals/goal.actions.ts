@@ -198,8 +198,6 @@ export const handleCommitterVerify = async (formData: FormData) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  console.log("reqBody", reqBody.image);
-
   const goalEntry = await DB.get()
     .selectFrom("goalEntry")
     .innerJoin("goal", "goal.id", "goalEntry.goalId")

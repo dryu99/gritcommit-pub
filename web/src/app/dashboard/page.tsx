@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth/auth.lib";
 import { getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
 import { cn } from "@/ui/classnames";
+import { CommitGraph, toCommitSquares } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
@@ -15,6 +16,10 @@ export default async function DashboardPage() {
 
   const goals = await fetchGoals(sessionUser.id);
 
+  const commitSquares = toCommitSquares(
+    goals.flatMap((goal) => goal.entries.map((e) => new Date(e.createdAt))),
+  );
+
   return (
     <div className="flex flex-col items-center">
       <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
@@ -24,9 +29,13 @@ export default async function DashboardPage() {
         Commit with grit (and a buddy)
       </p>
       <div>
-        <ShowGoalFormButton />
+        <CommitGraph commitSquares={commitSquares} />
       </div>
       <CommitLine />
+      <div>
+        <ShowGoalFormButton />
+      </div>
+      {goals.length > 0 && <CommitLine />}
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
         {goals.map((goal, i) => {
           const latestEntry = goal.entries[0];
@@ -111,11 +120,11 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
-              <CommitLine />
+              {i !== goals.length - 1 && <CommitLine />}
             </div>
           );
         })}
-        <div className="mx-auto text-center text-2xl opacity-50">😴</div>
+        {/* <div className="mx-auto text-center text-2xl opacity-50">😴</div> */}
       </div>
     </div>
   );
