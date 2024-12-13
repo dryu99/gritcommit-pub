@@ -1,7 +1,6 @@
 "use client";
 
 import { CURRENT_YEAR } from "@/lib/date";
-import { useEffect } from "react";
 import { cn } from "../classnames";
 
 export type CommitSquare = {
@@ -30,16 +29,6 @@ export const CommitGraph = ({
 }: {
   commitSquares: CommitSquare[];
 }) => {
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
-      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   const firstDateOfTheYear = commitSquares[0]!.date;
 
   // TODO fetch all goal entries with status complete from the current year (hardcode to 2024).
@@ -122,19 +111,29 @@ export const CommitGraph = ({
                               ? "bg-green-400"
                               : "bg-neutral-300",
                           )}
+                          onMouseEnter={(e) => {
+                            const rect =
+                              e.currentTarget.getBoundingClientRect();
+                            const x = rect.left + rect.width / 2;
+                            const y = rect.top;
+                            document.documentElement.style.setProperty(
+                              "--tooltip-x",
+                              `${x}px`,
+                            );
+                            document.documentElement.style.setProperty(
+                              "--tooltip-y",
+                              `${y}px`,
+                            );
+                          }}
                         >
                           <div
                             className={cn(
-                              "pointer-events-none fixed z-50 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-[opacity] delay-150 duration-150",
-                              "group-hover:block group-hover:translate-x-1/2 group-hover:opacity-100",
-                              "invisible group-hover:visible",
+                              "pointer-events-none fixed z-50 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white",
+                              "opacity-0 transition-[opacity] delay-150 duration-150",
+                              "invisible group-hover:visible group-hover:opacity-100",
+                              "left-[var(--tooltip-x)] top-[var(--tooltip-y)]",
+                              "-translate-x-1/2 -translate-y-7",
                             )}
-                            style={{
-                              left: "var(--mouse-x)",
-                              top: "var(--mouse-y)",
-                              transform:
-                                "translate(-50%, -100%) translateY(-10px)",
-                            }}
                           >
                             {`${commitSquare.date.toLocaleDateString("en-US", {
                               month: "long",
