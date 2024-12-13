@@ -29,14 +29,6 @@ const MONTHS = [
   "",
 ];
 
-const DEFAULT_COMMIT_SQUARES = Array.from(
-  { length: DAYS_IN_CURRENT_YEAR },
-  (_, i) => ({
-    date: new Date(CURRENT_YEAR, 0, i + 1),
-    commits: 0,
-  }),
-);
-
 export default async function HomePage() {
   const sessionUser = await getSessionUser();
   if (sessionUser) {
@@ -50,7 +42,13 @@ export default async function HomePage() {
     .where("createdAt", "<=", new Date(CURRENT_YEAR, 11, 31))
     .execute();
 
-  const commitSquares = DEFAULT_COMMIT_SQUARES;
+  const commitSquares = Array.from(
+    { length: DAYS_IN_CURRENT_YEAR },
+    (_, i) => ({
+      date: new Date(CURRENT_YEAR, 0, i + 1),
+      commits: 0,
+    }),
+  );
 
   for (const goalEntry of goalEntries) {
     const createdDate = new Date(goalEntry.createdAt);
@@ -92,69 +90,75 @@ export default async function HomePage() {
       <p className="mb-8 text-sm text-gray-500">
         Commit with grit (and a buddy)
       </p>
-      <div className="mb-8">
-        <h4 className="text-sm text-gray-500">
-          {totalCommits} commits in {CURRENT_YEAR}
-        </h4>
-        <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
-          {/* TODO make this look better */}
-          <div className="flex justify-between">
-            {MONTHS.map((month) => (
-              <span key={month} className="text-xs text-primary">
-                {month}
-              </span>
-            ))}
-          </div>
-          <table className="border-separate border-spacing-1">
-            <tbody>
-              {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
-                const startsOnSecondWeek =
-                  commitSquares[0]!.date.getDate() >
-                  // days in first week
-                  7 - firstDateOfTheYear.getDay();
+      <div className="mb-8 w-full">
+        <div className="mx-auto max-w-[740px]">
+          <h4 className="text-sm text-gray-500">
+            {totalCommits} commits in {CURRENT_YEAR}
+          </h4>
+          <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
+            <div className="-mb-[1px] flex w-[698px] justify-between">
+              {MONTHS.map((month) => (
+                <span
+                  key={month}
+                  className="whitespace-nowrap text-xs text-primary"
+                >
+                  {month}
+                </span>
+              ))}
+            </div>
 
-                return (
-                  <tr key={dayIndex} className="relative">
-                    {[0, 2, 4, 6].includes(dayIndex) && (
-                      <td className="absolute -left-6 h-[10px]" />
-                    )}
-                    {dayIndex === 1 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                        Mon
-                      </td>
-                    )}
-                    {dayIndex === 3 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                        Wed
-                      </td>
-                    )}
-                    {dayIndex === 5 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
-                        Fri
-                      </td>
-                    )}
-                    {startsOnSecondWeek && <td className="h-[10px]" />}
-                    {commitSquares.map((commitSquare) => {
-                      const opacity =
-                        (commitSquare.commits / maxCommits) * 0.8 + 0.2;
-                      return (
-                        <td
-                          title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
-                          className={cn(
-                            "h-[10px] w-[10px] rounded-sm",
-                            `opacity-${opacity * 100}`,
-                            commitSquare.commits > 0
-                              ? "bg-green-400"
-                              : "bg-neutral-400",
-                          )}
-                        />
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+            <table className="border-separate border-spacing-[3px]">
+              <tbody>
+                {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
+                  const startsOnSecondWeek =
+                    commitSquares[0]!.date.getDate() >
+                    // days in first week
+                    7 - firstDateOfTheYear.getDay();
+
+                  return (
+                    <tr key={dayIndex} className="relative">
+                      {[0, 2, 4, 6].includes(dayIndex) && (
+                        <td className="absolute -left-6 h-[10px]" />
+                      )}
+                      {dayIndex === 1 && (
+                        <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                          Mon
+                        </td>
+                      )}
+                      {dayIndex === 3 && (
+                        <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                          Wed
+                        </td>
+                      )}
+                      {dayIndex === 5 && (
+                        <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                          Fri
+                        </td>
+                      )}
+                      {startsOnSecondWeek && <td className="h-[10px]" />}
+                      {commitSquares.map((commitSquare) => {
+                        const opacity =
+                          (commitSquare.commits / maxCommits) * 0.8 + 0.2;
+                        return (
+                          <td
+                            title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
+                            className={cn(
+                              "h-[10px] w-[10px] min-w-[10px]",
+                              "rounded-sm",
+                              `opacity-${opacity * 100}`,
+                              commitSquare.commits > 0
+                                ? "bg-green-400"
+                                : "bg-neutral-300",
+                            )}
+                          />
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <LoginForm />
