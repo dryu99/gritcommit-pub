@@ -6,7 +6,7 @@ import { Selectable } from "kysely";
 import { emailButtonStyle } from "../email.lib";
 
 interface CommitterVerifyEmailProps {
-  committerUser: Pick<User, "email" | "firstName" | "lastName">;
+  committerUser: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
   goal: Pick<
     Selectable<Goal>,
     | "description"

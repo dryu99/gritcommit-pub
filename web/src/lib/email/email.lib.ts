@@ -1,4 +1,5 @@
 import { Config } from "@/lib/config";
+import { ScheduleType } from "@/types/enums";
 import { render } from "@react-email/components";
 import { Attachment, ServerClient } from "postmark";
 import React from "react";
@@ -62,6 +63,24 @@ export async function toEmailHtml<P extends object>(
 
   return render(React.createElement(EmailComponent, props));
 }
+
+export const mockEmailDataRecurring = {
+  committerUser: {
+    email: "committer@gmail.com",
+    firstName: "John",
+    lastName: "Doe",
+  },
+  goal: {
+    description: "Run a marathon",
+    stakeAmount: "100",
+    scheduleType: ScheduleType.Recurring,
+    scheduleDays: [1, 2, 3, 4, 5],
+    id: "1",
+    partnerEmail: "partner@gmail.com",
+  },
+  dueDate: new Date("12/20/2024 23:59:59"),
+  verificationToken: "1234567890",
+};
 
 export const emailButtonStyle: React.CSSProperties = {
   backgroundColor: "#ea580c",

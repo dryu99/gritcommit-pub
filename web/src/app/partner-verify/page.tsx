@@ -115,6 +115,7 @@ const handlePartnerVerify = async ({
   goalEntry: Pick<Selectable<GoalEntry>, "id" | "dueAt">;
   approved: boolean;
 }) => {
+  // TODO wrap in trycatch
   await DB.get()
     .updateTable("goalEntry")
     .set({
