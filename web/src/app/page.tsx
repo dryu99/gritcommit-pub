@@ -1,4 +1,6 @@
+import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
+import { cn } from "@/ui/classnames";
 import { LoginForm } from "@/ui/components/login-form";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
@@ -31,7 +33,7 @@ const DEFAULT_COMMIT_SQUARES = Array.from(
   { length: DAYS_IN_CURRENT_YEAR },
   (_, i) => ({
     date: new Date(CURRENT_YEAR, 0, i + 1),
-    commits: Math.floor(Math.random() * 10),
+    commits: 0,
   }),
 );
 
@@ -41,7 +43,27 @@ export default async function HomePage() {
     redirect("/dashboard");
   }
 
+  const goalEntries = await DB.get()
+    .selectFrom("goalEntry")
+    .select(["createdAt"])
+    .where("createdAt", ">=", new Date(CURRENT_YEAR, 0, 1))
+    .where("createdAt", "<=", new Date(CURRENT_YEAR, 11, 31))
+    .execute();
+
   const commitSquares = DEFAULT_COMMIT_SQUARES;
+
+  for (const goalEntry of goalEntries) {
+    const createdDate = new Date(goalEntry.createdAt);
+    const dayOfYear = Math.floor(
+      (createdDate.getTime() - new Date(CURRENT_YEAR, 0, 1).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+    const commitSquare = commitSquares[dayOfYear];
+    if (commitSquare) {
+      commitSquare.commits++;
+    }
+  }
+
   const firstDateOfTheYear = commitSquares[0]!.date;
 
   // TODO fetch all goal entries with status complete from the current year (hardcode to 2024).
@@ -74,7 +96,7 @@ export default async function HomePage() {
         <h4 className="text-sm text-gray-500">
           {totalCommits} commits in {CURRENT_YEAR}
         </h4>
-        <div className="rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
+        <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
           {/* TODO make this look better */}
           <div className="flex justify-between">
             {MONTHS.map((month) => (
@@ -118,10 +140,13 @@ export default async function HomePage() {
                       return (
                         <td
                           title={`${commitSquare.date.toLocaleDateString()}: ${commitSquare.commits} commits`}
-                          className="h-[10px] w-[10px] rounded-sm"
-                          style={{
-                            backgroundColor: `rgba(74, 222, 128, ${opacity})`,
-                          }}
+                          className={cn(
+                            "h-[10px] w-[10px] rounded-sm",
+                            `opacity-${opacity * 100}`,
+                            commitSquare.commits > 0
+                              ? "bg-green-400"
+                              : "bg-neutral-400",
+                          )}
                         />
                       );
                     })}
