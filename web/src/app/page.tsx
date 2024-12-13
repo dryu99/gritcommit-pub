@@ -31,7 +31,7 @@ export default async function HomePage() {
       <p className="mb-8 text-sm text-gray-500">
         Commit with grit (and a buddy)
       </p>
-      <div className="mb-8">
+      <div className="mb-8 w-full">
         <CommitGraph commitSquares={commitSquares} />
       </div>
       <LoginForm />

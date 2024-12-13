@@ -28,9 +28,7 @@ export default async function DashboardPage() {
       <p className="mb-10 text-sm text-gray-500">
         Commit with grit (and a buddy)
       </p>
-      <div>
-        <CommitGraph commitSquares={commitSquares} />
-      </div>
+      <CommitGraph commitSquares={commitSquares} />
       <CommitLine />
       <div>
         <ShowGoalFormButton />
