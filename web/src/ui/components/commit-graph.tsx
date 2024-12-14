@@ -1,8 +1,12 @@
 "use client";
 
-import { toCommitSquares } from "@/lib/commit-graph.lib";
-import { CURRENT_YEAR } from "@/lib/date";
+import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
+
+export type CommitSquare = {
+  date: Date;
+  commits: number;
+};
 
 const COMMIT_MONTHS = [
   "Jan",
@@ -26,7 +30,7 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
-      const dayIndex = commit.date.getDay();
+      const dayIndex = commit.date.getUTCDay();
       if (!acc[dayIndex]) acc[dayIndex] = [];
       acc[dayIndex].push(commit);
       return acc;
@@ -63,9 +67,9 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
             <tbody>
               {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
                 const startsOnSecondWeek =
-                  commitSquares[0]!.date.getDate() >
+                  commitSquares[0]!.date.getUTCDate() >
                   // days in first week
-                  7 - firstDateOfTheYear.getDay();
+                  7 - firstDateOfTheYear.getUTCDay();
 
                 return (
                   <tr key={dayIndex} className="relative">
@@ -129,7 +133,7 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
                             {`${commitSquare.date.toLocaleDateString("en-US", {
                               month: "long",
                               day: "numeric",
-                              year: "numeric",
+                              timeZone: "UTC",
                               timeZoneName: "short",
                             })}: ${commitSquare.commits} commitment${
                               commitSquare.commits === 1 ? "" : "s"
@@ -147,4 +151,27 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
       </div>
     </div>
   );
+};
+
+const toCommitSquares = (dates: Date[]): CommitSquare[] => {
+  const commitSquares = Array.from(
+    { length: DAYS_IN_CURRENT_YEAR },
+    (_, i) => ({
+      date: new Date(CURRENT_YEAR, 0, i + 1),
+      commits: 0,
+    }),
+  );
+
+  for (const date of dates) {
+    const dayOfYear = Math.floor(
+      (date.getTime() - new Date(CURRENT_YEAR, 0, 1).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+    const commitSquare = commitSquares[dayOfYear];
+    if (commitSquare) {
+      commitSquare.commits++;
+    }
+  }
+
+  return commitSquares;
 };

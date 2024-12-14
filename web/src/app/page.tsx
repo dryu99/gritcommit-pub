@@ -6,6 +6,8 @@ import { LoginForm } from "@/ui/components/login-form";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
 
+export const revalidate = 120;
+
 export default async function HomePage() {
   const sessionUser = await getSessionUser();
   if (sessionUser) {
