@@ -31,7 +31,7 @@ export const CommitGraph = ({
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
-      const dayIndex = commit.date.getDay();
+      const dayIndex = commit.date.getUTCDay();
       if (!acc[dayIndex]) acc[dayIndex] = [];
       acc[dayIndex].push(commit);
       return acc;
@@ -77,9 +77,9 @@ export const CommitGraph = ({
             <tbody>
               {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
                 const startsOnSecondWeek =
-                  commitSquares[0]!.date.getDate() >
+                  commitSquares[0]!.date.getUTCDate() >
                   // days in first week
-                  7 - firstDateOfTheYear.getDay();
+                  7 - firstDateOfTheYear.getUTCDay();
 
                 return (
                   <tr key={dayIndex} className="relative">
