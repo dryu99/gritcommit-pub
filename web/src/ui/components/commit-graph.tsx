@@ -139,6 +139,7 @@ export const CommitGraph = ({
                             {`${commitSquare.date.toLocaleDateString("en-US", {
                               month: "long",
                               day: "numeric",
+                              year: "numeric",
                             })}: ${commitSquare.commits} commitment${
                               commitSquare.commits === 1 ? "" : "s"
                             }`}
