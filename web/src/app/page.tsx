@@ -24,7 +24,8 @@ export default async function HomePage() {
     goalEntries.map((entry) => new Date(entry.createdAt)),
   );
 
-  console.log("COMMIT SQUARES", commitSquares);
+  console.log("[page] FIRST 5 COMMIT SQUARES", commitSquares.slice(0, 5));
+  console.log("[page] LAST 5 COMMIT SQUARES", commitSquares.slice(-5));
 
   return (
     <div className="flex flex-col items-center">

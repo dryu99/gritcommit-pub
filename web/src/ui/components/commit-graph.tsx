@@ -1,12 +1,8 @@
 "use client";
 
+import { CommitSquare } from "@/lib/commit-graph.lib";
 import { CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
-
-export type CommitSquare = {
-  date: Date;
-  commits: number;
-};
 
 const COMMIT_MONTHS = [
   "Jan",
@@ -30,7 +26,8 @@ export const CommitGraph = ({
   commitSquares: CommitSquare[];
 }) => {
   const firstDateOfTheYear = commitSquares[0]!.date;
-  console.log("FIRST DATE OF THE YEAR", firstDateOfTheYear);
+  console.log("[graph] FIRST 5 COMMIT SQUARES", commitSquares.slice(0, 5));
+  console.log("[graph] LAST 5 COMMIT SQUARES", commitSquares.slice(-5));
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
@@ -42,7 +39,14 @@ export const CommitGraph = ({
     [] as (typeof commitSquares)[],
   );
 
-  console.log("DAY INDEX COMMIT SQUARE MATRIX", dayIndexCommitSquareMatrix);
+  console.log(
+    "[graph] DAY INDEX first 5 sunday",
+    dayIndexCommitSquareMatrix[0]?.slice(0, 5),
+  );
+  console.log(
+    "[graph] DAY INDEX last 5 sunday",
+    dayIndexCommitSquareMatrix[0]?.slice(-5),
+  );
 
   const maxCommits = Math.max(...commitSquares.map((c) => c.commits));
   const totalCommits = commitSquares.reduce(

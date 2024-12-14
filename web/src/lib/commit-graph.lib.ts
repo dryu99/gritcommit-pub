@@ -1,5 +1,9 @@
-import { CommitSquare } from "@/ui/components/commit-graph";
 import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "./date";
+
+export type CommitSquare = {
+  date: Date;
+  commits: number;
+};
 
 export const toCommitSquares = (dates: Date[]): CommitSquare[] => {
   const commitSquares = Array.from(
