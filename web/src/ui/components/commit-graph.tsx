@@ -30,8 +30,7 @@ export const CommitGraph = ({
   commitSquares: CommitSquare[];
 }) => {
   const firstDateOfTheYear = commitSquares[0]!.date;
-
-  // TODO fetch all goal entries with status complete from the current year (hardcode to 2024).
+  console.log("FIRST DATE OF THE YEAR", firstDateOfTheYear);
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
@@ -42,6 +41,8 @@ export const CommitGraph = ({
     },
     [] as (typeof commitSquares)[],
   );
+
+  console.log("DAY INDEX COMMIT SQUARE MATRIX", dayIndexCommitSquareMatrix);
 
   const maxCommits = Math.max(...commitSquares.map((c) => c.commits));
   const totalCommits = commitSquares.reduce(

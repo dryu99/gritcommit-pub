@@ -24,6 +24,8 @@ export default async function HomePage() {
     goalEntries.map((entry) => new Date(entry.createdAt)),
   );
 
+  console.log("COMMIT SQUARES", commitSquares);
+
   return (
     <div className="flex flex-col items-center">
       <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
