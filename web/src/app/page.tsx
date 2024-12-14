@@ -1,6 +1,5 @@
 import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { toCommitSquares } from "@/lib/commit-graph.lib";
 import { CURRENT_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { LoginForm } from "@/ui/components/login-form";
@@ -20,13 +19,6 @@ export default async function HomePage() {
     .where("createdAt", "<=", new Date(CURRENT_YEAR, 11, 31))
     .execute();
 
-  const commitSquares = toCommitSquares(
-    goalEntries.map((entry) => new Date(entry.createdAt)),
-  );
-
-  console.log("[page] FIRST 5 COMMIT SQUARES", commitSquares.slice(0, 5));
-  console.log("[page] LAST 5 COMMIT SQUARES", commitSquares.slice(-5));
-
   return (
     <div className="flex flex-col items-center">
       <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
@@ -36,7 +28,9 @@ export default async function HomePage() {
         Commit with grit (and a buddy)
       </p>
       <div className="mb-8 w-full">
-        <CommitGraph commitSquares={commitSquares} />
+        <CommitGraph
+          dates={goalEntries.map((entry) => new Date(entry.createdAt))}
+        />
       </div>
       <LoginForm />
     </div>

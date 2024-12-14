@@ -1,5 +1,4 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { toCommitSquares } from "@/lib/commit-graph.lib";
 import { getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
 import { cn } from "@/ui/classnames";
@@ -17,10 +16,6 @@ export default async function DashboardPage() {
 
   const goals = await fetchGoals(sessionUser.id);
 
-  const commitSquares = toCommitSquares(
-    goals.flatMap((goal) => goal.entries.map((e) => new Date(e.createdAt))),
-  );
-
   return (
     <div className="flex flex-col items-center">
       <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
@@ -29,7 +24,11 @@ export default async function DashboardPage() {
       <p className="mb-10 text-sm text-gray-500">
         Commit with grit (and a buddy)
       </p>
-      <CommitGraph commitSquares={commitSquares} />
+      <CommitGraph
+        dates={goals.flatMap((goal) =>
+          goal.entries.map((entry) => new Date(entry.createdAt)),
+        )}
+      />
       <CommitLine />
       <div>
         <ShowGoalFormButton />

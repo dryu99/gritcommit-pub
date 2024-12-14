@@ -1,6 +1,6 @@
 "use client";
 
-import { CommitSquare } from "@/lib/commit-graph.lib";
+import { toCommitSquares } from "@/lib/commit-graph.lib";
 import { CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
 
@@ -20,32 +20,18 @@ const COMMIT_MONTHS = [
   "",
 ];
 
-export const CommitGraph = ({
-  commitSquares,
-}: {
-  commitSquares: CommitSquare[];
-}) => {
+export const CommitGraph = ({ dates }: { dates: Date[] }) => {
+  const commitSquares = toCommitSquares(dates);
   const firstDateOfTheYear = commitSquares[0]!.date;
-  console.log("[graph] FIRST 5 COMMIT SQUARES", commitSquares.slice(0, 5));
-  console.log("[graph] LAST 5 COMMIT SQUARES", commitSquares.slice(-5));
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
     (acc, commit) => {
-      const dayIndex = commit.date.getUTCDay();
+      const dayIndex = commit.date.getDay();
       if (!acc[dayIndex]) acc[dayIndex] = [];
       acc[dayIndex].push(commit);
       return acc;
     },
     [] as (typeof commitSquares)[],
-  );
-
-  console.log(
-    "[graph] DAY INDEX first 5 sunday",
-    dayIndexCommitSquareMatrix[0]?.slice(0, 5),
-  );
-  console.log(
-    "[graph] DAY INDEX last 5 sunday",
-    dayIndexCommitSquareMatrix[0]?.slice(-5),
   );
 
   const maxCommits = Math.max(...commitSquares.map((c) => c.commits));
@@ -77,9 +63,9 @@ export const CommitGraph = ({
             <tbody>
               {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
                 const startsOnSecondWeek =
-                  commitSquares[0]!.date.getUTCDate() >
+                  commitSquares[0]!.date.getDate() >
                   // days in first week
-                  7 - firstDateOfTheYear.getUTCDay();
+                  7 - firstDateOfTheYear.getDay();
 
                 return (
                   <tr key={dayIndex} className="relative">
@@ -144,6 +130,7 @@ export const CommitGraph = ({
                               month: "long",
                               day: "numeric",
                               year: "numeric",
+                              timeZoneName: "short",
                             })}: ${commitSquare.commits} commitment${
                               commitSquare.commits === 1 ? "" : "s"
                             }`}
