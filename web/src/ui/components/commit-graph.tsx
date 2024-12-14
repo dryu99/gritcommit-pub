@@ -124,7 +124,7 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
                           <div
                             className={cn(
                               "pointer-events-none fixed z-50 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white",
-                              "opacity-0 transition-[opacity] delay-150 duration-150",
+                              "opacity-0 transition-[opacity] delay-100 duration-100",
                               "invisible group-hover:visible group-hover:opacity-100",
                               "left-[var(--tooltip-x)] top-[var(--tooltip-y)]",
                               "-translate-x-1/2 -translate-y-7",
@@ -133,7 +133,7 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
                             {`${commitSquare.date.toLocaleDateString("en-US", {
                               month: "long",
                               day: "numeric",
-                              timeZoneName: "short",
+                              timeZone: "UTC",
                             })}: ${commitSquare.commits} commitment${
                               commitSquare.commits === 1 ? "" : "s"
                             }`}
