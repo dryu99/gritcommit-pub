@@ -113,7 +113,7 @@ export default async function DashboardPage() {
                     </div> */}
                   </div>
 
-                  <div className="ml-6 mt-4 whitespace-pre-wrap text-primary">
+                  <div className="ml-6 mt-5 whitespace-pre-wrap text-primary">
                     {goal.description}
                   </div>
                 </div>
