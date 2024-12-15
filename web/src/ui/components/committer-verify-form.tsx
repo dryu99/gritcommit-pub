@@ -1,11 +1,19 @@
 "use client";
 
+import { GoalEntry } from "@/database/db-generated-types";
+import { Selectable } from "kysely";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./common/button";
 import { Link } from "./common/link";
 
-export default function CommitterVerifyForm({ token }: { token: string }) {
+export default function CommitterVerifyForm({
+  token,
+  goalEntry,
+}: {
+  token: string;
+  goalEntry: Pick<Selectable<GoalEntry>, "dueAt">;
+}) {
   const [message, setMessage] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -13,6 +21,32 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
+  const [timeLeft, setTimeLeft] = useState("");
+
+  const calculateTimeLeft = () => {
+    const now = new Date().getTime();
+    const dueDate = new Date(goalEntry.dueAt).getTime();
+    const difference = dueDate - now;
+
+    if (difference <= 0) {
+      return "Due date passed!";
+    }
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  useEffect(() => {
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
+    return () => clearInterval(timer);
+  }, [goalEntry.dueAt]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -42,6 +76,14 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
       setSubmitStatus("error");
     }
   };
+
+  if (timeLeft === "Due date passed!") {
+    return (
+      <div>
+        <p>Due date passed!</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -75,6 +117,13 @@ export default function CommitterVerifyForm({ token }: { token: string }) {
 
       {submitStatus === "idle" && (
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <p className="text-sm text-gray-600">Time remaining:</p>
+            <p className="min-h-[1.75rem] text-xl font-bold text-orange-500">
+              {timeLeft}
+            </p>
+          </div>
+          <div></div>
           <h2 className="mb-6 text-2xl font-bold">Verify Your Commitment</h2>
           <div className="mb-2">
             <label htmlFor="swear" className="mb-4 block">

@@ -78,16 +78,16 @@ export default async function PartnerVerifyPage(props: {
         <div>
           <h2>Approved</h2>
           <p>
-            The committer has been notified of your approval. Thanks for being a
-            good partner!
+            {goalEntry.userFirstName} has been notified of your approval. Thanks
+            for being a good partner!
           </p>
         </div>
       ) : (
         <div>
           <h2>Rejected</h2>
           <p>
-            The committer has been notified of your rejection. Thanks for being
-            a good partner!
+            {goalEntry.userFirstName} has been notified of your rejection.
+            Thanks for being a good partner!
           </p>
         </div>
       )}

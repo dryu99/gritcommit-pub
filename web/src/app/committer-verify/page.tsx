@@ -20,12 +20,13 @@ export default async function CommitterVerifyPage(props: {
   if (!goalEntry || goalEntry.status !== GoalEntryStatus.CommitterVerifying)
     return <div>oops</div>;
 
+  // this is UTC to UTC comparison so it should be fine
   if (new Date() > new Date(goalEntry.dueAt))
     return <div>Due date passed!</div>;
 
   return (
     <main className="mx-auto max-w-lg p-6">
-      <CommitterVerifyForm token={token} />
+      <CommitterVerifyForm token={token} goalEntry={goalEntry} />
     </main>
   );
 }
