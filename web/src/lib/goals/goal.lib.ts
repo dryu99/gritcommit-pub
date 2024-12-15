@@ -56,7 +56,7 @@ export const fetchGoals = async (
   return goals;
 };
 
-export type GoalMessageMetaItem = {
+export type GoalNotificationContext = {
   goalEntry: Pick<Selectable<GoalEntry>, "status" | "dueAt" | "id">;
   goal: Pick<
     Selectable<Goal>,
@@ -71,16 +71,14 @@ export type GoalMessageMetaItem = {
   user: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
 };
 
-export const fetchGoalMessageMetaItems = async ({
+export const fetchGoalNotificationContexts = async ({
   partnerVerificationToken,
   userVerificationToken,
-  takeFirst = false,
 }: {
   partnerVerificationToken?: string;
   userVerificationToken?: string;
-  takeFirst?: boolean;
-}): Promise<GoalMessageMetaItem> => {
-  const goalMeta = await DB.get()
+}): Promise<GoalNotificationContext[]> => {
+  const items = await DB.get()
     .selectFrom("goalEntry")
     .innerJoin("goal", "goal.id", "goalEntry.goalId")
     .innerJoin("user", "user.id", "goal.createdByUserId")
@@ -111,27 +109,27 @@ export const fetchGoalMessageMetaItems = async ({
     .$if(!!userVerificationToken, (eb) =>
       eb.where("userVerificationToken", "=", userVerificationToken as string),
     )
-    .executeTakeFirstOrThrow();
+    .execute();
 
-  return {
+  return items.map((item) => ({
     goalEntry: {
-      status: goalMeta.goalEntryStatus,
-      dueAt: goalMeta.goalEntryDueAt,
-      id: goalMeta.goalEntryId,
+      status: item.goalEntryStatus,
+      dueAt: item.goalEntryDueAt,
+      id: item.goalEntryId,
     },
     goal: {
-      id: goalMeta.goalId,
-      description: goalMeta.goalDescription,
-      stakeAmount: goalMeta.stakeAmount,
-      scheduleType: goalMeta.scheduleType,
-      scheduleDays: goalMeta.scheduleDays,
-      partnerEmail: goalMeta.partnerEmail,
-      createdAt: goalMeta.goalCreatedAt,
+      id: item.goalId,
+      description: item.goalDescription,
+      stakeAmount: item.stakeAmount,
+      scheduleType: item.scheduleType,
+      scheduleDays: item.scheduleDays,
+      partnerEmail: item.partnerEmail,
+      createdAt: item.goalCreatedAt,
     },
     user: {
-      email: goalMeta.userEmail,
-      firstName: goalMeta.userFirstName,
-      lastName: goalMeta.userLastName,
+      email: item.userEmail,
+      firstName: item.userFirstName,
+      lastName: item.userLastName,
     },
-  };
+  }));
 };

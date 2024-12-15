@@ -20,7 +20,7 @@ import {
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 import PartnerVerifyEmail from "../email/templates/partner-verify-email";
-import { fetchGoalMessageMetaItems } from "./goal.lib";
+import { fetchGoalNotificationContexts } from "./goal.lib";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -199,11 +199,13 @@ export const handleCommitterVerify = async (formData: FormData) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  const { goalEntry, goal, user } = await fetchGoalMessageMetaItems({
+  const notificationContexts = await fetchGoalNotificationContexts({
     userVerificationToken: reqBody.token,
   });
 
-  if (!goalEntry) throw new Error("Goal entry not found");
+  if (!notificationContexts[0]) throw new Error("Goal entry not found");
+  const { goalEntry, goal, user } = notificationContexts[0];
+
   if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
     throw new Error("Goal entry is not in verifying state");
   if (new Date() > new Date(goalEntry.dueAt))
