@@ -8,6 +8,8 @@ export const Config = Object.freeze({
   NODE_ENV: process.env.NODE_ENV as "development" | "production" | "test",
   DATABASE_URL: process.env.DATABASE_URL as string,
   POSTMARK_API_KEY: process.env.POSTMARK_API_KEY as string,
+  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID as string,
+  TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN as string,
 });
 
 export const resolveByEnv = <T>({ dev, prod }: { dev: T; prod: T }) => {
