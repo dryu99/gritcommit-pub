@@ -1,6 +1,6 @@
-import { getScheduleText, toFormattedDateText } from "@/lib/date";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
+import { EmailCommitment } from "../common";
 
 interface CommitterVerifyDeniedEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -9,8 +9,6 @@ interface CommitterVerifyDeniedEmailProps {
 export default function CommitterVerifyDeniedEmail({
   goalEntry = mockCompleteGoalEntry,
 }: CommitterVerifyDeniedEmailProps) {
-  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
-
   const name = goalEntry.userLastName
     ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
     : goalEntry.userFirstName;
@@ -25,28 +23,15 @@ export default function CommitterVerifyDeniedEmail({
         commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
+        <EmailCommitment
+          dueAt={goalEntry.dueAt}
+          description={goalEntry.goalDescription}
+          stakeAmount={goalEntry.goalStakeAmount}
+          scheduleType={goalEntry.goalScheduleType}
+          scheduleDays={goalEntry.goalScheduleDays}
+          partnerEmail={goalEntry.goalPartnerEmail}
+        />
         <br />
-        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
-        <br />
-        🤝 <strong>Accountability Partner:</strong> {goalEntry.goalPartnerEmail}
-        <br />
-        {goalEntry.goalScheduleType === "ONCE" && (
-          <>
-            📅 <strong>Due Date:</strong> {formattedDueDate}
-            <br />
-          </>
-        )}
-        {goalEntry.goalScheduleType === "RECURRING" && (
-          <>
-            📅 <strong>Schedule:</strong>{" "}
-            {getScheduleText({
-              scheduleType: goalEntry.goalScheduleType,
-              scheduleDays: goalEntry.goalScheduleDays,
-            })}
-            <br />
-          </>
-        )}
         <br />
         {/* TODO inclyude links to etransfer */}
         {/* TODO this should be differentg based onr ecurring and once */}

@@ -1,6 +1,6 @@
-import { getScheduleText, toFormattedDateText } from "@/lib/date";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html } from "@react-email/components";
+import { EmailCommitment } from "../common";
 import { emailButtonStyle } from "../email.lib";
 
 interface CommitterVerifyEmailProps {
@@ -15,8 +15,6 @@ export default function CommitterVerifyEmail({
     userVerificationToken: "1234567890",
   },
 }: CommitterVerifyEmailProps) {
-  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
-
   const committerName = goalEntry.userLastName
     ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
     : goalEntry.userFirstName;
@@ -30,28 +28,15 @@ export default function CommitterVerifyEmail({
         Your commitment is due today at 11:59pm.
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
+        <EmailCommitment
+          dueAt={goalEntry.dueAt}
+          description={goalEntry.goalDescription}
+          stakeAmount={goalEntry.goalStakeAmount}
+          scheduleType={goalEntry.goalScheduleType}
+          scheduleDays={goalEntry.goalScheduleDays}
+          partnerEmail={goalEntry.goalPartnerEmail}
+        />
         <br />
-        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
-        <br />
-        🤝 <strong>Accountability Partner:</strong> {goalEntry.goalPartnerEmail}
-        <br />
-        {goalEntry.goalScheduleType === "ONCE" && (
-          <>
-            📅 <strong>Due Date:</strong> {formattedDueDate}
-            <br />
-          </>
-        )}
-        {goalEntry.goalScheduleType === "RECURRING" && (
-          <>
-            📅 <strong>Schedule:</strong>{" "}
-            {getScheduleText({
-              scheduleType: goalEntry.goalScheduleType,
-              scheduleDays: goalEntry.goalScheduleDays,
-            })}
-            <br />
-          </>
-        )}
         <br />
         Click the button below to mark your commitment as complete.
         <br />

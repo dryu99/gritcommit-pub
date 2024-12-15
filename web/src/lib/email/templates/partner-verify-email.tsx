@@ -1,6 +1,6 @@
-import { getScheduleText, toFormattedDateText } from "@/lib/date";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html, Section } from "@react-email/components";
+import { EmailCommitment } from "../common";
 import { emailButtonStyle } from "../email.lib";
 
 interface PartnerVerifyEmailProps {
@@ -19,8 +19,6 @@ export default function PartnerVerifyEmail({
   committerMessage = "I did the thing",
   hasImage = true,
 }: PartnerVerifyEmailProps) {
-  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
-
   const committerName = goalEntry.userLastName
     ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
     : goalEntry.userFirstName;
@@ -34,26 +32,14 @@ export default function PartnerVerifyEmail({
         {committerName} has completed their commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
+        <EmailCommitment
+          dueAt={goalEntry.dueAt}
+          description={goalEntry.goalDescription}
+          stakeAmount={goalEntry.goalStakeAmount}
+          scheduleType={goalEntry.goalScheduleType}
+          scheduleDays={goalEntry.goalScheduleDays}
+        />
         <br />
-        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
-        <br />
-        {goalEntry.goalScheduleType === "ONCE" && (
-          <>
-            📅 <strong>Due Date:</strong> {formattedDueDate}
-            <br />
-          </>
-        )}
-        {goalEntry.goalScheduleType === "RECURRING" && (
-          <>
-            📅 <strong>Schedule:</strong>{" "}
-            {getScheduleText({
-              scheduleType: goalEntry.goalScheduleType,
-              scheduleDays: goalEntry.goalScheduleDays,
-            })}
-            <br />
-          </>
-        )}
         <br />
         {hasImage && (
           <>

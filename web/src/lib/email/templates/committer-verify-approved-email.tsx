@@ -1,6 +1,6 @@
-import { getScheduleText, toFormattedDateText } from "@/lib/date";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
+import { EmailCommitment } from "../common";
 
 interface CommitterVerifyApprovedEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -9,8 +9,6 @@ interface CommitterVerifyApprovedEmailProps {
 export default function CommitterVerifyApprovedEmail({
   goalEntry = mockCompleteGoalEntry,
 }: CommitterVerifyApprovedEmailProps) {
-  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
-
   const name = goalEntry.userLastName
     ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
     : goalEntry.userFirstName;
@@ -25,28 +23,15 @@ export default function CommitterVerifyApprovedEmail({
         following commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
+        <EmailCommitment
+          dueAt={goalEntry.dueAt}
+          description={goalEntry.goalDescription}
+          stakeAmount={goalEntry.goalStakeAmount}
+          scheduleType={goalEntry.goalScheduleType}
+          scheduleDays={goalEntry.goalScheduleDays}
+          partnerEmail={goalEntry.goalPartnerEmail}
+        />
         <br />
-        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
-        <br />
-        🤝 <strong>Accountability Partner:</strong> {goalEntry.goalPartnerEmail}
-        <br />
-        {goalEntry.goalScheduleType === "ONCE" && (
-          <>
-            📅 <strong>Due Date:</strong> {formattedDueDate}
-            <br />
-          </>
-        )}
-        {goalEntry.goalScheduleType === "RECURRING" && (
-          <>
-            📅 <strong>Schedule:</strong>{" "}
-            {getScheduleText({
-              scheduleType: goalEntry.goalScheduleType,
-              scheduleDays: goalEntry.goalScheduleDays,
-            })}
-            <br />
-          </>
-        )}
         <br />
         {/* TODO this should be differentg based onr ecurring and once */}
         Congratulations! You've completed your commitment.
