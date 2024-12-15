@@ -20,6 +20,7 @@ import {
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 import PartnerVerifyEmail from "../email/templates/partner-verify-email";
+import { fetchGoalMessageMetaItems } from "./goal.lib";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -198,27 +199,9 @@ export const handleCommitterVerify = async (formData: FormData) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  const goalEntry = await DB.get()
-    .selectFrom("goalEntry")
-    .innerJoin("goal", "goal.id", "goalEntry.goalId")
-    .innerJoin("user", "user.id", "goal.createdByUserId")
-    .select([
-      "goalEntry.status",
-      "goalEntry.dueAt",
-      "goalEntry.id",
-
-      "goal.description",
-      "goal.partnerEmail",
-      "goal.stakeAmount",
-      "goal.scheduleType",
-      "goal.scheduleDays",
-
-      "user.firstName as userFirstName",
-      "user.lastName as userLastName",
-      "user.email as userEmail",
-    ])
-    .where("userVerificationToken", "=", reqBody.token)
-    .executeTakeFirst();
+  const { goalEntry, goal, user } = await fetchGoalMessageMetaItems({
+    userVerificationToken: reqBody.token,
+  });
 
   if (!goalEntry) throw new Error("Goal entry not found");
   if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
@@ -240,25 +223,11 @@ export const handleCommitterVerify = async (formData: FormData) => {
       .execute();
 
     await sendEmail({
-      recipientEmail: goalEntry.partnerEmail,
-      subject: toPartnerEmailSubject(
-        goalEntry.userFirstName,
-        goalEntry.description,
-      ),
+      recipientEmail: goal.partnerEmail,
+      subject: toPartnerEmailSubject(user.firstName, goal.description),
       emailHtml: await toEmailHtml(PartnerVerifyEmail, {
-        committerUser: {
-          email: goalEntry.userEmail,
-          firstName: goalEntry.userFirstName,
-          lastName: goalEntry.userLastName,
-        },
-        goal: {
-          description: goalEntry.description,
-          stakeAmount: goalEntry.stakeAmount,
-          partnerEmail: goalEntry.partnerEmail,
-          id: goalEntry.id,
-          scheduleType: goalEntry.scheduleType,
-          scheduleDays: goalEntry.scheduleDays,
-        },
+        committerUser: user,
+        goal,
         dueDate: new Date(goalEntry.dueAt),
         verificationToken: partnerVerifyToken,
         committerMessage: reqBody.message,

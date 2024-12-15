@@ -1,5 +1,5 @@
 import { DB } from "@/database/db";
-import { Goal, GoalEntry } from "@/database/db-generated-types";
+import { Goal, GoalEntry, User } from "@/database/db-generated-types";
 import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
 
@@ -54,4 +54,84 @@ export const fetchGoals = async (
     .execute();
 
   return goals;
+};
+
+export type GoalMessageMetaItem = {
+  goalEntry: Pick<Selectable<GoalEntry>, "status" | "dueAt" | "id">;
+  goal: Pick<
+    Selectable<Goal>,
+    | "id"
+    | "createdAt"
+    | "description"
+    | "stakeAmount"
+    | "scheduleType"
+    | "scheduleDays"
+    | "partnerEmail"
+  >;
+  user: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
+};
+
+export const fetchGoalMessageMetaItems = async ({
+  partnerVerificationToken,
+  userVerificationToken,
+  takeFirst = false,
+}: {
+  partnerVerificationToken?: string;
+  userVerificationToken?: string;
+  takeFirst?: boolean;
+}): Promise<GoalMessageMetaItem> => {
+  const goalMeta = await DB.get()
+    .selectFrom("goalEntry")
+    .innerJoin("goal", "goal.id", "goalEntry.goalId")
+    .innerJoin("user", "user.id", "goal.createdByUserId")
+    .select([
+      "goalEntry.status as goalEntryStatus",
+      "goalEntry.dueAt as goalEntryDueAt",
+      "goalEntry.id as goalEntryId",
+
+      "goal.id as goalId",
+      "goal.partnerEmail",
+      "goal.scheduleDays",
+      "goal.scheduleType",
+      "goal.stakeAmount",
+      "goal.description as goalDescription",
+      "goal.createdAt as goalCreatedAt",
+
+      "user.email as userEmail",
+      "user.firstName as userFirstName",
+      "user.lastName as userLastName",
+    ])
+    .$if(!!partnerVerificationToken, (eb) =>
+      eb.where(
+        "partnerVerificationToken",
+        "=",
+        partnerVerificationToken as string,
+      ),
+    )
+    .$if(!!userVerificationToken, (eb) =>
+      eb.where("userVerificationToken", "=", userVerificationToken as string),
+    )
+    .executeTakeFirstOrThrow();
+
+  return {
+    goalEntry: {
+      status: goalMeta.goalEntryStatus,
+      dueAt: goalMeta.goalEntryDueAt,
+      id: goalMeta.goalEntryId,
+    },
+    goal: {
+      id: goalMeta.goalId,
+      description: goalMeta.goalDescription,
+      stakeAmount: goalMeta.stakeAmount,
+      scheduleType: goalMeta.scheduleType,
+      scheduleDays: goalMeta.scheduleDays,
+      partnerEmail: goalMeta.partnerEmail,
+      createdAt: goalMeta.goalCreatedAt,
+    },
+    user: {
+      email: goalMeta.userEmail,
+      firstName: goalMeta.userFirstName,
+      lastName: goalMeta.userLastName,
+    },
+  };
 };

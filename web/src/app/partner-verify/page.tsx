@@ -1,5 +1,4 @@
 import { DB } from "@/database/db";
-import { Goal, GoalEntry, User } from "@/database/db-generated-types";
 import { toPartnerVerificationDeadline } from "@/lib/date";
 import {
   sendEmail,
@@ -8,8 +7,11 @@ import {
 } from "@/lib/email/email.lib";
 import CommitterVerifyApprovedEmail from "@/lib/email/templates/committer-verify-approved-email";
 import CommitterVerifyDeniedEmail from "@/lib/email/templates/committer-verify-denied-email";
+import {
+  fetchGoalMessageMetaItems,
+  GoalMessageMetaItem,
+} from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
-import { Selectable } from "kysely";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -21,55 +23,25 @@ export default async function PartnerVerifyPage(props: {
   const approved = !!searchParams.approved;
   if (!token || typeof token !== "string") return <div>oops</div>;
 
-  const goalEntry = await DB.get()
-    .selectFrom("goalEntry")
-    .innerJoin("goal", "goal.id", "goalEntry.goalId")
-    .innerJoin("user", "user.id", "goal.createdByUserId")
-    .select([
-      "status",
-      "dueAt",
-      "goalEntry.id",
-      "description",
+  const goalMessageMeta = await fetchGoalMessageMetaItems({
+    partnerVerificationToken: token,
+  });
 
-      "goal.id as goalId",
-      "goal.partnerEmail",
-      "goal.scheduleDays",
-      "goal.scheduleType",
-      "goal.stakeAmount",
-
-      "user.email as userEmail",
-      "user.firstName as userFirstName",
-      "user.lastName as userLastName",
-    ])
-    .where("partnerVerificationToken", "=", token)
-    .executeTakeFirst();
-
-  if (!goalEntry || goalEntry.status !== GoalEntryStatus.PartnerVerifying)
+  if (
+    !goalMessageMeta ||
+    goalMessageMeta.goalEntry.status !== GoalEntryStatus.PartnerVerifying
+  )
     return <div>oops</div>;
 
-  if (new Date() > toPartnerVerificationDeadline(goalEntry.dueAt))
+  if (
+    new Date() > toPartnerVerificationDeadline(goalMessageMeta.goalEntry.dueAt)
+  )
     return <div>Verification deadline passed!</div>;
 
   // db and email stuff can happen async
   handlePartnerVerify({
     approved,
-    committerUser: {
-      email: goalEntry.userEmail,
-      firstName: goalEntry.userFirstName,
-      lastName: goalEntry.userLastName,
-    },
-    goal: {
-      description: goalEntry.description,
-      id: goalEntry.id,
-      partnerEmail: goalEntry.partnerEmail,
-      scheduleDays: goalEntry.scheduleDays,
-      scheduleType: goalEntry.scheduleType,
-      stakeAmount: goalEntry.stakeAmount,
-    },
-    goalEntry: {
-      id: goalEntry.id,
-      dueAt: goalEntry.dueAt,
-    },
+    goalMessageMeta,
   });
 
   return (
@@ -78,16 +50,16 @@ export default async function PartnerVerifyPage(props: {
         <div>
           <h2 className="mb-4 text-2xl font-bold">Approved</h2>
           <p>
-            {goalEntry.userFirstName} has been notified of your approval. Thanks
-            for being a good partner!
+            {goalMessageMeta.user.firstName} has been notified of your approval.
+            Thanks for being a good partner!
           </p>
         </div>
       ) : (
         <div>
           <h2 className="mb-4 text-2xl font-bold">Rejected</h2>
           <p>
-            {goalEntry.userFirstName} has been notified of your rejection.
-            Thanks for being a good partner!
+            {goalMessageMeta.user.firstName} has been notified of your
+            rejection.
           </p>
         </div>
       )}
@@ -97,24 +69,14 @@ export default async function PartnerVerifyPage(props: {
 
 // TODO clean this shit up lol
 const handlePartnerVerify = async ({
-  committerUser,
-  goal,
-  goalEntry,
+  goalMessageMeta,
   approved,
 }: {
-  committerUser: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
-  goal: Pick<
-    Selectable<Goal>,
-    | "description"
-    | "id"
-    | "partnerEmail"
-    | "scheduleDays"
-    | "scheduleType"
-    | "stakeAmount"
-  >;
-  goalEntry: Pick<Selectable<GoalEntry>, "id" | "dueAt">;
+  goalMessageMeta: GoalMessageMetaItem;
   approved: boolean;
 }) => {
+  const { goalEntry, goal, user } = goalMessageMeta;
+
   // TODO have to create new goal entry if goal is recurring
   // TODO wrap in trycatch
   await DB.get()
@@ -127,16 +89,16 @@ const handlePartnerVerify = async ({
     .execute();
 
   await sendEmail({
-    recipientEmail: committerUser.email,
+    recipientEmail: user.email,
     subject: toCommitterEmailSubject(goal.description),
     emailHtml: approved
       ? await toEmailHtml(CommitterVerifyApprovedEmail, {
-          committerUser,
+          committerUser: user,
           goal,
           dueDate: new Date(goalEntry.dueAt),
         })
       : await toEmailHtml(CommitterVerifyDeniedEmail, {
-          committerUser,
+          committerUser: user,
           goal,
           dueDate: new Date(goalEntry.dueAt),
         }),
