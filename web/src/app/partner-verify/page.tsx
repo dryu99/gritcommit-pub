@@ -88,37 +88,7 @@ const handlePartnerVerify = async ({
     recipientEmail: goalEntry.userEmail,
     subject: toCommitterEmailSubject(goalEntry.goalDescription),
     emailHtml: approved
-      ? await toEmailHtml(CommitterVerifyApprovedEmail, {
-          committerUser: {
-            email: goalEntry.userEmail,
-            firstName: goalEntry.userFirstName,
-            lastName: goalEntry.userLastName,
-          },
-          goal: {
-            id: goalEntry.goalId,
-            description: goalEntry.goalDescription,
-            stakeAmount: goalEntry.goalStakeAmount,
-            scheduleType: goalEntry.goalScheduleType,
-            scheduleDays: goalEntry.goalScheduleDays,
-            partnerEmail: goalEntry.goalPartnerEmail,
-          },
-          dueDate: new Date(goalEntry.dueAt),
-        })
-      : await toEmailHtml(CommitterVerifyDeniedEmail, {
-          committerUser: {
-            email: goalEntry.userEmail,
-            firstName: goalEntry.userFirstName,
-            lastName: goalEntry.userLastName,
-          },
-          goal: {
-            id: goalEntry.goalId,
-            description: goalEntry.goalDescription,
-            stakeAmount: goalEntry.goalStakeAmount,
-            scheduleType: goalEntry.goalScheduleType,
-            scheduleDays: goalEntry.goalScheduleDays,
-            partnerEmail: goalEntry.goalPartnerEmail,
-          },
-          dueDate: new Date(goalEntry.dueAt),
-        }),
+      ? await toEmailHtml(CommitterVerifyApprovedEmail, { goalEntry })
+      : await toEmailHtml(CommitterVerifyDeniedEmail, { goalEntry }),
   });
 };
