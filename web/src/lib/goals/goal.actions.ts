@@ -246,21 +246,10 @@ export const handleCommitterVerify = async (formData: FormData) => {
         goalEntry.goalDescription,
       ),
       emailHtml: await toEmailHtml(PartnerVerifyEmail, {
-        committerUser: {
-          email: goalEntry.userEmail,
-          firstName: goalEntry.userFirstName,
-          lastName: goalEntry.userLastName,
+        goalEntry: {
+          ...goalEntry,
+          partnerVerificationToken: partnerVerifyToken,
         },
-        goal: {
-          id: goalEntry.goalId,
-          description: goalEntry.goalDescription,
-          stakeAmount: goalEntry.goalStakeAmount,
-          scheduleType: goalEntry.goalScheduleType,
-          scheduleDays: goalEntry.goalScheduleDays,
-          partnerEmail: goalEntry.goalPartnerEmail,
-        },
-        dueDate: new Date(goalEntry.dueAt),
-        verificationToken: partnerVerifyToken,
         committerMessage: reqBody.message,
         hasImage: !!reqBody.image,
       }),

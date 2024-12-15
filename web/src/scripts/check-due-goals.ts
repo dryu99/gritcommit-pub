@@ -46,7 +46,12 @@ const main = async () => {
       await sendEmail({
         recipientEmail: goalEntry.userEmail,
         subject: toCommitterEmailSubject(goalEntry.goalDescription),
-        emailHtml: await toEmailHtml(CommitterVerifyEmail, { goalEntry }),
+        emailHtml: await toEmailHtml(CommitterVerifyEmail, {
+          goalEntry: {
+            ...goalEntry,
+            userVerificationToken: newVerificationToken,
+          },
+        }),
       });
     } catch (error) {
       console.error(`Failed to process goal entry ${goalEntry.id}:`, error);

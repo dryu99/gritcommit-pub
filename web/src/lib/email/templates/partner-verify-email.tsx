@@ -1,74 +1,56 @@
-import { Goal, User } from "@/database/db-generated-types";
 import { getScheduleText, toFormattedDateText } from "@/lib/date";
-import { ScheduleType } from "@/types/enums";
+import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html, Section } from "@react-email/components";
-import { Selectable } from "kysely";
 import { emailButtonStyle } from "../email.lib";
 
 interface PartnerVerifyEmailProps {
-  committerUser: Pick<User, "email" | "firstName" | "lastName">;
-  goal: Pick<
-    Selectable<Goal>,
-    | "description"
-    | "stakeAmount"
-    | "scheduleType"
-    | "id"
-    | "partnerEmail"
-    | "scheduleDays"
-  >;
-  dueDate: Date;
-  verificationToken: string;
+  goalEntry: CompleteGoalEntry & {
+    partnerVerificationToken: string;
+  };
   committerMessage?: string;
   hasImage?: boolean;
 }
 
 export default function PartnerVerifyEmail({
-  committerUser = {
-    email: "committer@gmail.com",
-    firstName: "John",
-    lastName: "Doe",
+  goalEntry = {
+    ...mockCompleteGoalEntry,
+    partnerVerificationToken: "1234567890",
   },
-  goal = {
-    description: "Run a marathon",
-    stakeAmount: "100",
-    scheduleType: ScheduleType.Recurring,
-    scheduleDays: [1, 2, 3, 4, 5],
-    id: "1",
-    partnerEmail: "partner@gmail.com",
-  },
-  dueDate = new Date("12/20/2024 23:59:59"),
-  verificationToken = "1234567890",
   committerMessage = "I did the thing",
   hasImage = true,
 }: PartnerVerifyEmailProps) {
-  const formattedDueDate = toFormattedDateText(dueDate);
+  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
 
-  const committerName = committerUser.lastName
-    ? `${committerUser.firstName} ${committerUser.lastName}`
-    : committerUser.firstName;
+  const committerName = goalEntry.userLastName
+    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
+    : goalEntry.userFirstName;
 
   return (
     <Html>
       <Body>
-        Hi {goal.partnerEmail},
+        Hi {goalEntry.goalPartnerEmail},
         <br />
         <br />
         {committerName} has completed their commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goal.description}
+        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
         <br />
-        💰 <strong>Stake:</strong> ${goal.stakeAmount}
+        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
         <br />
-        {goal.scheduleType === "ONCE" && (
+        {goalEntry.goalScheduleType === "ONCE" && (
           <>
             📅 <strong>Due Date:</strong> {formattedDueDate}
             <br />
           </>
         )}
-        {goal.scheduleType === "RECURRING" && (
+        {goalEntry.goalScheduleType === "RECURRING" && (
           <>
-            📅 <strong>Schedule:</strong> {getScheduleText(goal)}
+            📅 <strong>Schedule:</strong>{" "}
+            {getScheduleText({
+              scheduleType: goalEntry.goalScheduleType,
+              scheduleDays: goalEntry.goalScheduleDays,
+            })}
             <br />
           </>
         )}
@@ -92,13 +74,13 @@ export default function PartnerVerifyEmail({
         <br />
         <Section>
           <Button
-            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}&approved=true`}
+            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${goalEntry.partnerVerificationToken}&approved=true`}
             style={{ ...emailButtonStyle, marginRight: "24px" }}
           >
             Yes
           </Button>
           <Button
-            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${verificationToken}`}
+            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${goalEntry.partnerVerificationToken}`}
             style={emailButtonStyle}
           >
             No

@@ -4,11 +4,16 @@ import { Body, Button, Html } from "@react-email/components";
 import { emailButtonStyle } from "../email.lib";
 
 interface CommitterVerifyEmailProps {
-  goalEntry: CompleteGoalEntry;
+  goalEntry: CompleteGoalEntry & {
+    userVerificationToken: string;
+  };
 }
 
 export default function CommitterVerifyEmail({
-  goalEntry = mockCompleteGoalEntry,
+  goalEntry = {
+    ...mockCompleteGoalEntry,
+    userVerificationToken: "1234567890",
+  },
 }: CommitterVerifyEmailProps) {
   const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
 
