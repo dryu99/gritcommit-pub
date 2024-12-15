@@ -8,8 +8,8 @@ import {
 import CommitterVerifyApprovedEmail from "@/lib/email/templates/committer-verify-approved-email";
 import CommitterVerifyDeniedEmail from "@/lib/email/templates/committer-verify-denied-email";
 import {
-  fetchGoalNotificationContexts,
-  GoalNotificationContext,
+  CompleteGoalEntry,
+  fetchCompleteGoalEntry,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 
@@ -23,26 +23,23 @@ export default async function PartnerVerifyPage(props: {
   const approved = !!searchParams.approved;
   if (!token || typeof token !== "string") return <div>oops</div>;
 
-  const notificationContexts = await fetchGoalNotificationContexts({
+  const goalEntries = await fetchCompleteGoalEntry({
     partnerVerificationToken: token,
   });
 
-  if (!notificationContexts[0]) return <div>oops</div>;
-  const notificationContext = notificationContexts[0];
+  if (!goalEntries[0]) return <div>oops</div>;
+  const goalEntry = goalEntries[0];
 
-  if (notificationContext.goalEntry.status !== GoalEntryStatus.PartnerVerifying)
+  if (goalEntry.status !== GoalEntryStatus.PartnerVerifying)
     return <div>oops</div>;
 
-  if (
-    new Date() >
-    toPartnerVerificationDeadline(notificationContext.goalEntry.dueAt)
-  )
+  if (new Date() > toPartnerVerificationDeadline(goalEntry.dueAt))
     return <div>Verification deadline passed!</div>;
 
   // db and email stuff can happen async
   handlePartnerVerify({
     approved,
-    goalNotificationContext: notificationContext,
+    goalEntry,
   });
 
   return (
@@ -51,15 +48,15 @@ export default async function PartnerVerifyPage(props: {
         <div>
           <h2 className="mb-4 text-2xl font-bold">Approved</h2>
           <p>
-            {notificationContext.user.firstName} has been notified of your
-            approval. Thanks for being a good partner!
+            {goalEntry.userFirstName} has been notified of your approval. Thanks
+            for being a good partner!
           </p>
         </div>
       ) : (
         <div>
           <h2 className="mb-4 text-2xl font-bold">Rejected</h2>
           <p>
-            {notificationContext.user.firstName} has been notified of your
+            {goalEntry.userFirstName} has been notified of your rejection.
             rejection.
           </p>
         </div>
@@ -70,14 +67,12 @@ export default async function PartnerVerifyPage(props: {
 
 // TODO clean this shit up lol
 const handlePartnerVerify = async ({
-  goalNotificationContext,
+  goalEntry,
   approved,
 }: {
-  goalNotificationContext: GoalNotificationContext;
+  goalEntry: CompleteGoalEntry;
   approved: boolean;
 }) => {
-  const { goalEntry, goal, user } = goalNotificationContext;
-
   // TODO have to create new goal entry if goal is recurring
   // TODO wrap in trycatch
   await DB.get()
@@ -90,17 +85,39 @@ const handlePartnerVerify = async ({
     .execute();
 
   await sendEmail({
-    recipientEmail: user.email,
-    subject: toCommitterEmailSubject(goal.description),
+    recipientEmail: goalEntry.userEmail,
+    subject: toCommitterEmailSubject(goalEntry.goalDescription),
     emailHtml: approved
       ? await toEmailHtml(CommitterVerifyApprovedEmail, {
-          committerUser: user,
-          goal,
+          committerUser: {
+            email: goalEntry.userEmail,
+            firstName: goalEntry.userFirstName,
+            lastName: goalEntry.userLastName,
+          },
+          goal: {
+            id: goalEntry.goalId,
+            description: goalEntry.goalDescription,
+            stakeAmount: goalEntry.goalStakeAmount,
+            scheduleType: goalEntry.goalScheduleType,
+            scheduleDays: goalEntry.goalScheduleDays,
+            partnerEmail: goalEntry.goalPartnerEmail,
+          },
           dueDate: new Date(goalEntry.dueAt),
         })
       : await toEmailHtml(CommitterVerifyDeniedEmail, {
-          committerUser: user,
-          goal,
+          committerUser: {
+            email: goalEntry.userEmail,
+            firstName: goalEntry.userFirstName,
+            lastName: goalEntry.userLastName,
+          },
+          goal: {
+            id: goalEntry.goalId,
+            description: goalEntry.goalDescription,
+            stakeAmount: goalEntry.goalStakeAmount,
+            scheduleType: goalEntry.goalScheduleType,
+            scheduleDays: goalEntry.goalScheduleDays,
+            partnerEmail: goalEntry.goalPartnerEmail,
+          },
           dueDate: new Date(goalEntry.dueAt),
         }),
   });

@@ -20,7 +20,7 @@ import {
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 import PartnerVerifyEmail from "../email/templates/partner-verify-email";
-import { fetchGoalNotificationContexts } from "./goal.lib";
+import { fetchCompleteGoalEntry } from "./goal.lib";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -199,12 +199,12 @@ export const handleCommitterVerify = async (formData: FormData) => {
     return error.errors.map((e) => e.message).join(", ");
   }
 
-  const notificationContexts = await fetchGoalNotificationContexts({
+  const goalEntries = await fetchCompleteGoalEntry({
     userVerificationToken: reqBody.token,
   });
 
-  if (!notificationContexts[0]) throw new Error("Goal entry not found");
-  const { goalEntry, goal, user } = notificationContexts[0];
+  if (!goalEntries[0]) throw new Error("Goal entry not found");
+  const goalEntry = goalEntries[0];
 
   if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
     throw new Error("Goal entry is not in verifying state");
@@ -225,11 +225,25 @@ export const handleCommitterVerify = async (formData: FormData) => {
       .execute();
 
     await sendEmail({
-      recipientEmail: goal.partnerEmail,
-      subject: toPartnerEmailSubject(user.firstName, goal.description),
+      recipientEmail: goalEntry.goalPartnerEmail,
+      subject: toPartnerEmailSubject(
+        goalEntry.userFirstName,
+        goalEntry.goalDescription,
+      ),
       emailHtml: await toEmailHtml(PartnerVerifyEmail, {
-        committerUser: user,
-        goal,
+        committerUser: {
+          email: goalEntry.userEmail,
+          firstName: goalEntry.userFirstName,
+          lastName: goalEntry.userLastName,
+        },
+        goal: {
+          id: goalEntry.goalId,
+          description: goalEntry.goalDescription,
+          stakeAmount: goalEntry.goalStakeAmount,
+          scheduleType: goalEntry.goalScheduleType,
+          scheduleDays: goalEntry.goalScheduleDays,
+          partnerEmail: goalEntry.goalPartnerEmail,
+        },
         dueDate: new Date(goalEntry.dueAt),
         verificationToken: partnerVerifyToken,
         committerMessage: reqBody.message,

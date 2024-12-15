@@ -56,42 +56,48 @@ export const fetchGoals = async (
   return goals;
 };
 
-export type GoalNotificationContext = {
-  goalEntry: Pick<Selectable<GoalEntry>, "status" | "dueAt" | "id">;
-  goal: Pick<
-    Selectable<Goal>,
-    | "id"
-    | "createdAt"
-    | "description"
-    | "stakeAmount"
-    | "scheduleType"
-    | "scheduleDays"
-    | "partnerEmail"
-  >;
-  user: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
+export type CompleteGoalEntry = {
+  // goal entry
+  id: Selectable<GoalEntry>["id"];
+  status: Selectable<GoalEntry>["status"];
+  dueAt: Selectable<GoalEntry>["dueAt"];
+
+  // goal
+  goalId: Selectable<Goal>["id"];
+  goalCreatedAt: Selectable<Goal>["createdAt"];
+  goalDescription: Selectable<Goal>["description"];
+  goalStakeAmount: Selectable<Goal>["stakeAmount"];
+  goalScheduleType: Selectable<Goal>["scheduleType"];
+  goalScheduleDays: Selectable<Goal>["scheduleDays"];
+  goalPartnerEmail: Selectable<Goal>["partnerEmail"];
+
+  // user
+  userEmail: Selectable<User>["email"];
+  userFirstName: Selectable<User>["firstName"];
+  userLastName: Selectable<User>["lastName"];
 };
 
-export const fetchGoalNotificationContexts = async ({
+export const fetchCompleteGoalEntry = async ({
   partnerVerificationToken,
   userVerificationToken,
 }: {
   partnerVerificationToken?: string;
   userVerificationToken?: string;
-}): Promise<GoalNotificationContext[]> => {
-  const items = await DB.get()
+}): Promise<CompleteGoalEntry[]> => {
+  return DB.get()
     .selectFrom("goalEntry")
     .innerJoin("goal", "goal.id", "goalEntry.goalId")
     .innerJoin("user", "user.id", "goal.createdByUserId")
     .select([
-      "goalEntry.status as goalEntryStatus",
-      "goalEntry.dueAt as goalEntryDueAt",
-      "goalEntry.id as goalEntryId",
+      "goalEntry.status",
+      "goalEntry.dueAt",
+      "goalEntry.id",
 
       "goal.id as goalId",
-      "goal.partnerEmail",
-      "goal.scheduleDays",
-      "goal.scheduleType",
-      "goal.stakeAmount",
+      "goal.partnerEmail as goalPartnerEmail",
+      "goal.scheduleDays as goalScheduleDays",
+      "goal.scheduleType as goalScheduleType",
+      "goal.stakeAmount as goalStakeAmount",
       "goal.description as goalDescription",
       "goal.createdAt as goalCreatedAt",
 
@@ -110,26 +116,4 @@ export const fetchGoalNotificationContexts = async ({
       eb.where("userVerificationToken", "=", userVerificationToken as string),
     )
     .execute();
-
-  return items.map((item) => ({
-    goalEntry: {
-      status: item.goalEntryStatus,
-      dueAt: item.goalEntryDueAt,
-      id: item.goalEntryId,
-    },
-    goal: {
-      id: item.goalId,
-      description: item.goalDescription,
-      stakeAmount: item.stakeAmount,
-      scheduleType: item.scheduleType,
-      scheduleDays: item.scheduleDays,
-      partnerEmail: item.partnerEmail,
-      createdAt: item.goalCreatedAt,
-    },
-    user: {
-      email: item.userEmail,
-      firstName: item.userFirstName,
-      lastName: item.userLastName,
-    },
-  }));
 };
