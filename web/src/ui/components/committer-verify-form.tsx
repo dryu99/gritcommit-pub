@@ -1,6 +1,7 @@
 "use client";
 
 import { GoalEntry } from "@/database/db-generated-types";
+import { handleCommitterVerify } from "@/lib/goals/goal.actions";
 import { Selectable } from "kysely";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -62,7 +63,6 @@ export default function CommitterVerifyForm({
 
     try {
       setSubmitStatus("loading");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
       const formData = new FormData();
       formData.append("token", token);
       formData.append("message", message);
@@ -70,7 +70,7 @@ export default function CommitterVerifyForm({
         formData.append("image", images[0]);
       }
 
-      // await handleCommitterVerify(formData);
+      await handleCommitterVerify(formData);
       setSubmitStatus("success");
     } catch (e) {
       setSubmitStatus("error");

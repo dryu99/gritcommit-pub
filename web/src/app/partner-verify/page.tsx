@@ -28,7 +28,7 @@ export default async function PartnerVerifyPage(props: {
     .select([
       "status",
       "dueAt",
-      "id",
+      "goalEntry.id",
       "description",
 
       "goal.id as goalId",
@@ -76,7 +76,7 @@ export default async function PartnerVerifyPage(props: {
     <main className="mx-auto max-w-lg p-6">
       {approved ? (
         <div>
-          <h2>Approved</h2>
+          <h2 className="mb-4 text-2xl font-bold">Approved</h2>
           <p>
             {goalEntry.userFirstName} has been notified of your approval. Thanks
             for being a good partner!
@@ -84,7 +84,7 @@ export default async function PartnerVerifyPage(props: {
         </div>
       ) : (
         <div>
-          <h2>Rejected</h2>
+          <h2 className="mb-4 text-2xl font-bold">Rejected</h2>
           <p>
             {goalEntry.userFirstName} has been notified of your rejection.
             Thanks for being a good partner!
