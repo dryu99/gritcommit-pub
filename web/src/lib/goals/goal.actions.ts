@@ -20,7 +20,7 @@ import {
 import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
 import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 import PartnerVerifyEmail from "../email/templates/partner-verify-email";
-import { fetchCompleteGoalEntry } from "./goal.lib";
+import { CompleteGoalEntry, fetchCompleteGoalEntry } from "./goal.lib";
 
 const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
@@ -97,15 +97,30 @@ export const createGoal = async (data: any) => {
       await trx.insertInto("goalEntry").values(newGoalEntry).execute();
     });
 
+  const completeGoalEntry: CompleteGoalEntry = {
+    id: newGoalEntry.id,
+    status: newGoalEntry.status,
+    dueAt: newGoalEntry.dueAt,
+
+    goalId: newGoal.id,
+    goalDescription: newGoal.description,
+    goalStakeAmount: String(newGoal.stakeAmount),
+    goalScheduleType: newGoal.scheduleType,
+    goalScheduleDays: newGoal.scheduleDays ?? null,
+    goalPartnerEmail: newGoal.partnerEmail,
+
+    userEmail: sessionUser.email,
+    userFirstName: sessionUser.firstName,
+    userLastName: sessionUser.lastName,
+  };
+
   // TODO handle email errors
   // TODO also have to send checkin emails if user is starting today and its past 12pm
   sendEmail({
     recipientEmail: sessionUser.email,
     subject: toCommitterEmailSubject(newGoal.description),
     emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
-      committerUser: sessionUser,
-      goal: newGoal,
-      nextDueDate: nextDueDate,
+      goalEntry: completeGoalEntry,
     }),
   });
 
@@ -113,9 +128,7 @@ export const createGoal = async (data: any) => {
     recipientEmail: reqBody.partnerEmail,
     subject: toPartnerEmailSubject(sessionUser.firstName, newGoal.description),
     emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
-      committerUser: sessionUser,
-      goal: newGoal,
-      nextDueDate: nextDueDate,
+      goalEntry: completeGoalEntry,
     }),
   });
 

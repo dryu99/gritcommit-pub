@@ -1,38 +1,35 @@
-import { Goal, User } from "@/database/db-generated-types";
 import { getScheduleText, toFormattedDateText } from "@/lib/date";
-import { ScheduleType } from "@/types/enums";
+import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
-import { Insertable } from "kysely";
 
 interface CommitterNewGoalEmailProps {
-  committerUser: Insertable<User>;
-  goal: Insertable<Goal>;
-  nextDueDate: Date;
+  goalEntry: CompleteGoalEntry;
 }
 
 export default function CommitterNewGoalEmail({
-  committerUser = {
-    email: "committer@gmail.com",
-    firstName: "John",
-    lastName: "Doe",
+  goalEntry = {
+    dueAt: new Date("12/20/2024 23:59:59"),
     id: "1",
-  },
-  goal = {
-    description: "Run a marathon",
-    stakeAmount: 100,
-    scheduleType: ScheduleType.Recurring,
-    scheduleDays: [1, 2, 3, 4, 5],
-    createdByUserId: "1",
-    id: "1",
-    partnerEmail: "partner@gmail.com",
-  },
-  nextDueDate = new Date("12/20/2024 23:59:59"),
-}: CommitterNewGoalEmailProps) {
-  const formattedDate = toFormattedDateText(nextDueDate);
+    status: GoalEntryStatus.Completed,
 
-  const committerName = committerUser.lastName
-    ? `${committerUser.firstName} ${committerUser.lastName}`
-    : committerUser.firstName;
+    goalId: "1",
+    goalDescription: "Run a marathon",
+    goalStakeAmount: "100",
+    goalScheduleType: ScheduleType.Recurring,
+    goalPartnerEmail: "partner@gmail.com",
+    goalScheduleDays: [1, 2, 3, 4, 5],
+
+    userEmail: "committer@gmail.com",
+    userFirstName: "John",
+    userLastName: "Doe",
+  },
+}: CommitterNewGoalEmailProps) {
+  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
+
+  const committerName = goalEntry.userLastName
+    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
+    : goalEntry.userFirstName;
 
   return (
     <Html>
@@ -43,31 +40,38 @@ export default function CommitterNewGoalEmail({
         You've started a new commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goal.description}
+        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
         <br />
-        💰 <strong>Stake:</strong> ${goal.stakeAmount}
+        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
         <br />
-        🤝 <strong>Accountability Partner:</strong> {goal.partnerEmail}
+        🤝 <strong>Accountability Partner:</strong> {goalEntry.goalPartnerEmail}
         <br />
-        {goal.scheduleType === "ONCE" && (
+        {goalEntry.goalScheduleType === "ONCE" && (
           <>
-            📅 <strong>Due Date:</strong> {formattedDate}
+            📅 <strong>Due Date:</strong> {formattedDueDate}
             <br />
           </>
         )}
-        {goal.scheduleType === "RECURRING" && (
+        {goalEntry.goalScheduleType === "RECURRING" && (
           <>
-            📅 <strong>Schedule:</strong> {getScheduleText(goal)}
+            📅 <strong>Schedule:</strong>{" "}
+            {getScheduleText({
+              scheduleType: goalEntry.goalScheduleType,
+              scheduleDays: goalEntry.goalScheduleDays,
+            })}
             <br />
           </>
         )}
         <br />
         If you miss{" "}
-        {goal.scheduleType === "RECURRING" ? "a deadline" : "the deadline"}, you
-        owe your partner ${goal.stakeAmount}.
+        {goalEntry.goalScheduleType === "RECURRING"
+          ? "a deadline"
+          : "the deadline"}
+        , you owe your partner ${goalEntry.goalStakeAmount}.
         <br />
         <br />
-        When {goal.scheduleType === "RECURRING"
+        When{" "}
+        {goalEntry.goalScheduleType === "RECURRING"
           ? "a deadline"
           : "the deadline"}{" "}
         arrives, you'll receive an email to verify your completion status.

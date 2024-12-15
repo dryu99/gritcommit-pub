@@ -19,7 +19,6 @@ export default function CommitterVerifyApprovedEmail({
     goalScheduleType: ScheduleType.Recurring,
     goalPartnerEmail: "partner@gmail.com",
     goalScheduleDays: [1, 2, 3, 4, 5],
-    goalCreatedAt: new Date(),
 
     userEmail: "committer@gmail.com",
     userFirstName: "John",

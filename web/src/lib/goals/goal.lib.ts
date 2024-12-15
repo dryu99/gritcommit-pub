@@ -64,7 +64,7 @@ export type CompleteGoalEntry = {
 
   // goal
   goalId: Selectable<Goal>["id"];
-  goalCreatedAt: Selectable<Goal>["createdAt"];
+  // goalCreatedAt: Selectable<Goal>["createdAt"];
   goalDescription: Selectable<Goal>["description"];
   goalStakeAmount: Selectable<Goal>["stakeAmount"];
   goalScheduleType: Selectable<Goal>["scheduleType"];
