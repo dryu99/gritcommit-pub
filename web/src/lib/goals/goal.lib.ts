@@ -1,5 +1,6 @@
 import { DB } from "@/database/db";
 import { Goal, GoalEntry, User } from "@/database/db-generated-types";
+import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
 
@@ -61,6 +62,8 @@ export type CompleteGoalEntry = {
   id: Selectable<GoalEntry>["id"];
   status: Selectable<GoalEntry>["status"];
   dueAt: Selectable<GoalEntry>["dueAt"];
+  userVerificationToken: Selectable<GoalEntry>["userVerificationToken"];
+  partnerVerificationToken: Selectable<GoalEntry>["partnerVerificationToken"];
 
   // goal
   goalId: Selectable<Goal>["id"];
@@ -80,9 +83,11 @@ export type CompleteGoalEntry = {
 export const fetchCompleteGoalEntry = async ({
   partnerVerificationToken,
   userVerificationToken,
+  status,
 }: {
   partnerVerificationToken?: string;
   userVerificationToken?: string;
+  status?: GoalEntryStatus;
 }): Promise<CompleteGoalEntry[]> => {
   return DB.get()
     .selectFrom("goalEntry")
@@ -92,6 +97,8 @@ export const fetchCompleteGoalEntry = async ({
       "goalEntry.status",
       "goalEntry.dueAt",
       "goalEntry.id",
+      "goalEntry.userVerificationToken",
+      "goalEntry.partnerVerificationToken",
 
       "goal.id as goalId",
       "goal.partnerEmail as goalPartnerEmail",
@@ -105,6 +112,9 @@ export const fetchCompleteGoalEntry = async ({
       "user.firstName as userFirstName",
       "user.lastName as userLastName",
     ])
+    .$if(!!status, (eb) =>
+      eb.where("goalEntry.status", "=", status as GoalEntryStatus),
+    )
     .$if(!!partnerVerificationToken, (eb) =>
       eb.where(
         "partnerVerificationToken",
@@ -116,4 +126,23 @@ export const fetchCompleteGoalEntry = async ({
       eb.where("userVerificationToken", "=", userVerificationToken as string),
     )
     .execute();
+};
+
+export const mockCompleteGoalEntry: CompleteGoalEntry = {
+  dueAt: new Date("12/20/2024 23:59:59"),
+  id: "1",
+  status: GoalEntryStatus.Completed,
+  userVerificationToken: "1234567890",
+  partnerVerificationToken: "1234567890",
+
+  goalId: "1",
+  goalDescription: "Run a marathon",
+  goalStakeAmount: "100",
+  goalScheduleType: ScheduleType.Recurring,
+  goalPartnerEmail: "partner@gmail.com",
+  goalScheduleDays: [1, 2, 3, 4, 5],
+
+  userEmail: "committer@gmail.com",
+  userFirstName: "John",
+  userLastName: "Doe",
 };

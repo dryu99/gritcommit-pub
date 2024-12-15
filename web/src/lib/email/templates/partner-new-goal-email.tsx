@@ -1,6 +1,5 @@
 import { getScheduleText, toFormattedDateText } from "@/lib/date";
-import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
-import { GoalEntryStatus, ScheduleType } from "@/types/enums";
+import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
 
 interface PartnerNewGoalEmailProps {
@@ -8,22 +7,7 @@ interface PartnerNewGoalEmailProps {
 }
 
 export default function PartnerNewGoalEmail({
-  goalEntry = {
-    dueAt: new Date("12/20/2024 23:59:59"),
-    id: "1",
-    status: GoalEntryStatus.Completed,
-
-    goalId: "1",
-    goalDescription: "Run a marathon",
-    goalStakeAmount: "100",
-    goalScheduleType: ScheduleType.Recurring,
-    goalPartnerEmail: "partner@gmail.com",
-    goalScheduleDays: [1, 2, 3, 4, 5],
-
-    userEmail: "committer@gmail.com",
-    userFirstName: "John",
-    userLastName: "Doe",
-  },
+  goalEntry = mockCompleteGoalEntry,
 }: PartnerNewGoalEmailProps) {
   const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
 

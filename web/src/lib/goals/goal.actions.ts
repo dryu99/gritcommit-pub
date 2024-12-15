@@ -101,6 +101,8 @@ export const createGoal = async (data: any) => {
     id: newGoalEntry.id,
     status: newGoalEntry.status,
     dueAt: newGoalEntry.dueAt,
+    userVerificationToken: null,
+    partnerVerificationToken: null,
 
     goalId: newGoal.id,
     goalDescription: newGoal.description,

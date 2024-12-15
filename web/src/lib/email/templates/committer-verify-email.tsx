@@ -1,47 +1,20 @@
-import { Goal, User } from "@/database/db-generated-types";
 import { getScheduleText, toFormattedDateText } from "@/lib/date";
-import { ScheduleType } from "@/types/enums";
+import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html } from "@react-email/components";
-import { Selectable } from "kysely";
 import { emailButtonStyle } from "../email.lib";
 
 interface CommitterVerifyEmailProps {
-  committerUser: Pick<Selectable<User>, "email" | "firstName" | "lastName">;
-  goal: Pick<
-    Selectable<Goal>,
-    | "description"
-    | "stakeAmount"
-    | "scheduleType"
-    | "id"
-    | "partnerEmail"
-    | "scheduleDays"
-  >;
-  dueDate: Date;
-  verificationToken: string;
+  goalEntry: CompleteGoalEntry;
 }
 
 export default function CommitterVerifyEmail({
-  committerUser = {
-    email: "committer@gmail.com",
-    firstName: "John",
-    lastName: "Doe",
-  },
-  goal = {
-    description: "Run a marathon",
-    stakeAmount: "100",
-    scheduleType: ScheduleType.Recurring,
-    scheduleDays: [1, 2, 3, 4, 5],
-    id: "1",
-    partnerEmail: "partner@gmail.com",
-  },
-  dueDate = new Date("12/20/2024 23:59:59"),
-  verificationToken = "1234567890",
+  goalEntry = mockCompleteGoalEntry,
 }: CommitterVerifyEmailProps) {
-  const formattedDueDate = toFormattedDateText(dueDate);
+  const formattedDueDate = toFormattedDateText(goalEntry.dueAt);
 
-  const committerName = committerUser.lastName
-    ? `${committerUser.firstName} ${committerUser.lastName}`
-    : committerUser.firstName;
+  const committerName = goalEntry.userLastName
+    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
+    : goalEntry.userFirstName;
 
   return (
     <Html>
@@ -52,21 +25,25 @@ export default function CommitterVerifyEmail({
         Your commitment is due today at 11:59pm.
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goal.description}
+        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
         <br />
-        💰 <strong>Stake:</strong> ${goal.stakeAmount}
+        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
         <br />
-        🤝 <strong>Accountability Partner:</strong> {goal.partnerEmail}
+        🤝 <strong>Accountability Partner:</strong> {goalEntry.goalPartnerEmail}
         <br />
-        {goal.scheduleType === "ONCE" && (
+        {goalEntry.goalScheduleType === "ONCE" && (
           <>
             📅 <strong>Due Date:</strong> {formattedDueDate}
             <br />
           </>
         )}
-        {goal.scheduleType === "RECURRING" && (
+        {goalEntry.goalScheduleType === "RECURRING" && (
           <>
-            📅 <strong>Schedule:</strong> {getScheduleText(goal)}
+            📅 <strong>Schedule:</strong>{" "}
+            {getScheduleText({
+              scheduleType: goalEntry.goalScheduleType,
+              scheduleDays: goalEntry.goalScheduleDays,
+            })}
             <br />
           </>
         )}
@@ -75,7 +52,7 @@ export default function CommitterVerifyEmail({
         <br />
         <br />
         <Button
-          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${verificationToken}`}
+          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${goalEntry.userVerificationToken}`}
           style={emailButtonStyle}
         >
           Done
@@ -87,7 +64,7 @@ export default function CommitterVerifyEmail({
         <br />
         There's still time!
         <br />
-        <br />${goal.stakeAmount} is at stake!
+        <br />${goalEntry.goalStakeAmount} is at stake!
         <br />
         <br />
         You've got this!

@@ -1,30 +1,12 @@
+import { fetchCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
 // this job runs everyday at 12:00am PST
 const main = async () => {
-  const pendingGoalEntries = await DB.get()
-    .selectFrom("goalEntry")
-    .innerJoin("goal", "goal.id", "goalEntry.goalId")
-    .innerJoin("user", "user.id", "goal.createdByUserId")
-    .select([
-      "goalEntry.id",
-      "goalEntry.status",
-      "goalEntry.dueAt",
-
-      "user.email as userEmail",
-      "user.firstName as userFirstName",
-      "user.lastName as userLastName",
-
-      "goal.description",
-      "goal.stakeAmount",
-      "goal.partnerEmail",
-      "goal.scheduleType",
-      "goal.scheduleDays",
-      "goal.createdAt",
-    ])
-    .where("status", "=", GoalEntryStatus.CommitterVerifying)
-    .execute();
+  const pendingGoalEntries = await fetchCompleteGoalEntry({
+    status: GoalEntryStatus.CommitterVerifying,
+  });
 
   const dueTodayGoalEntries = pendingGoalEntries.filter((goalEntry) => {
     const entryDueDate = new Date(goalEntry.dueAt);
@@ -35,10 +17,10 @@ const main = async () => {
 
   for (const goalEntry of dueTodayGoalEntries) {
     console.log("Processing goal entry:", {
-      description: goalEntry.description,
+      description: goalEntry.goalDescription,
       dueAt: goalEntry.dueAt,
       userEmail: goalEntry.userEmail,
-      partnerEmail: goalEntry.partnerEmail,
+      partnerEmail: goalEntry.goalPartnerEmail,
     });
     try {
       await DB.get()

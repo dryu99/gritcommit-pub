@@ -4,34 +4,16 @@ import {
   toEmailHtml,
 } from "@/lib/email/email.lib";
 import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
+import { fetchCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
 // TODO figure out how this should work across timezones. run multiple times?
 // this job runs everyday at 8am PST
 const main = async () => {
-  const pendingGoalEntries = await DB.get()
-    .selectFrom("goalEntry")
-    .innerJoin("goal", "goal.id", "goalEntry.goalId")
-    .innerJoin("user", "user.id", "goal.createdByUserId")
-    .select([
-      "goalEntry.id",
-      "goalEntry.status",
-      "goalEntry.dueAt",
-
-      "user.email as userEmail",
-      "user.firstName as userFirstName",
-      "user.lastName as userLastName",
-
-      "goal.description",
-      "goal.stakeAmount",
-      "goal.partnerEmail",
-      "goal.scheduleType",
-      "goal.scheduleDays",
-      "goal.createdAt",
-    ])
-    .where("status", "=", GoalEntryStatus.Pending)
-    .execute();
+  const pendingGoalEntries = await fetchCompleteGoalEntry({
+    status: GoalEntryStatus.Pending,
+  });
 
   // TODO does this timezone logic make sense... lets say we were running script in another server
   // TODO figure out how to do this filter in sql
@@ -44,10 +26,10 @@ const main = async () => {
 
   for (const goalEntry of dueTodayGoalEntries) {
     console.log("Processing goal entry:", {
-      description: goalEntry.description,
+      description: goalEntry.goalDescription,
       dueAt: goalEntry.dueAt,
       userEmail: goalEntry.userEmail,
-      partnerEmail: goalEntry.partnerEmail,
+      partnerEmail: goalEntry.goalPartnerEmail,
     });
     try {
       const newVerificationToken = crypto.randomUUID();
@@ -63,24 +45,8 @@ const main = async () => {
 
       await sendEmail({
         recipientEmail: goalEntry.userEmail,
-        subject: toCommitterEmailSubject(goalEntry.description),
-        emailHtml: await toEmailHtml(CommitterVerifyEmail, {
-          committerUser: {
-            email: goalEntry.userEmail,
-            firstName: goalEntry.userFirstName,
-            lastName: goalEntry.userLastName,
-          },
-          goal: {
-            id: goalEntry.id,
-            description: goalEntry.description,
-            stakeAmount: goalEntry.stakeAmount,
-            scheduleType: goalEntry.scheduleType,
-            scheduleDays: goalEntry.scheduleDays,
-            partnerEmail: goalEntry.partnerEmail,
-          },
-          dueDate: new Date(goalEntry.dueAt),
-          verificationToken: newVerificationToken,
-        }),
+        subject: toCommitterEmailSubject(goalEntry.goalDescription),
+        emailHtml: await toEmailHtml(CommitterVerifyEmail, { goalEntry }),
       });
     } catch (error) {
       console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
