@@ -2,6 +2,7 @@ import { TWILIO_PHONE_NUMBER } from "@/lib/sms/sms.lib";
 import { NextRequest, NextResponse } from "next/server";
 import MessagingResponse from "twilio/lib/twiml/MessagingResponse";
 
+// ! this code doesn't work, just leaving it here for reference
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { From: SenderNumber, NumMedia, MessageSid } = body;
