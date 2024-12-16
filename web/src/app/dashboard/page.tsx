@@ -1,5 +1,5 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { getScheduleText } from "@/lib/date";
+import { DateUtils, getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { cn } from "@/ui/classnames";
@@ -63,6 +63,14 @@ export default async function DashboardPage(props: {
           const latestEntry = goal.entries[0];
           const scheduleText = getScheduleText(goal);
 
+          // TODO consider moving this to a client component like the ClientDate
+          //      rn this will always show usertimezone date even if user is in diff timezone
+          const daysLeft = latestEntry
+            ? DateUtils.dayjs(latestEntry.dueAt)
+                .tz(sessionUser.timezone)
+                .diff(DateUtils.dayjs().tz(sessionUser.timezone), "day")
+            : undefined;
+
           return (
             <div key={goal.id}>
               <div className="rounded-lg border border-neutral-300 p-4 sm:px-6 sm:py-5">
@@ -81,12 +89,16 @@ export default async function DashboardPage(props: {
                         })}
                       >
                         {latestEntry.status === "PENDING"
-                          ? "IN PROGRESS"
+                          ? daysLeft === 1
+                            ? "DUE TOMORROW"
+                            : daysLeft === 0
+                              ? "DUE TODAY"
+                              : `${daysLeft} DAYS LEFT`
                           : latestEntry.status === "COMMITTER_VERIFYING"
                             ? "CHECK EMAIL"
                             : latestEntry.status === "PARTNER_VERIFYING"
                               ? "PARTNER VERIFYING"
-                              : latestEntry.status}
+                              : ""}
                       </span>
                       <div
                         className={cn("h-2 w-2 rounded-full", {
