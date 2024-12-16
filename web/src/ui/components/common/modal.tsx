@@ -16,6 +16,17 @@ export const Modal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Add scroll lock effect
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         modalRef.current &&
