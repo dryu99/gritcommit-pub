@@ -7,7 +7,6 @@ import { CommitGraph } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
 import { Link } from "@/ui/components/common/link";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
-import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
 
 type SearchParamStatus = "completed" | "dropped" | undefined;
@@ -42,12 +41,6 @@ export default async function DashboardPage(props: {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
-        GritCommit
-      </h1>
-      <p className="mb-10 text-sm text-gray-500">
-        Commit with grit (and a buddy)
-      </p>
       <CommitGraph
         dates={goals.flatMap((goal) =>
           goal.entries.map((entry) => new Date(entry.createdAt)),

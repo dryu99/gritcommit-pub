@@ -27,7 +27,7 @@ export default async function HomePage() {
         GritCommit
       </h1>
       <p className="mb-8 text-sm text-gray-500">
-        Commit with grit (and a buddy)
+        Commit to your goals with grit (and a buddy)
       </p>
       <div className="mb-8 w-full">
         <CommitGraph

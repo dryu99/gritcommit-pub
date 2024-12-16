@@ -1,5 +1,6 @@
 import { logout } from "@/lib/auth/auth.actions";
 import { getSessionUser } from "@/lib/auth/auth.lib";
+import { Link } from "@/ui/components/common/link";
 import { ibmPlexMono } from "@/ui/fonts";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -31,10 +32,17 @@ export default async function RootLayout({
       >
         <header className="flex h-14 items-center px-4 py-4 lg:px-6">
           {sessionUser && (
+            <nav className="font-bold">
+              <Link href="/">
+                <span className="mr-2">🤝</span>GritCommit
+              </Link>
+            </nav>
+          )}
+          {sessionUser && (
             <nav className="ml-auto flex gap-4 sm:gap-6">
               <button
                 onClick={logout}
-                className="text-sm underline-offset-4 hover:underline"
+                className="text-xs underline-offset-4 hover:underline"
               >
                 Logout
               </button>

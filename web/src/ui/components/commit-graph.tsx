@@ -47,7 +47,7 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-[740px]">
-        <h4 className="text-sm text-gray-500">
+        <h4 className="mb-2 text-sm text-gray-500">
           {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
           {CURRENT_YEAR}
         </h4>
