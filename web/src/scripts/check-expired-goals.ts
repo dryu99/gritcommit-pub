@@ -1,3 +1,11 @@
+import { toNextRecurringDueDate } from "@/lib/date";
+import {
+  sendEmail,
+  toCommitterEmailSubject,
+  toEmailHtml,
+} from "@/lib/email/email.lib";
+import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
+import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
   toRecentlyExpiredGoalEntries,
@@ -5,8 +13,9 @@ import {
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
-// this job runs everyday at 12:00am PST
+// this job runs every hour (so basically every midnight somewhere in the world)
 const main = async () => {
+  console.log("Checking expired goals: ", new Date().toISOString());
   const pendingGoalEntries = await fetchCompleteGoalEntry({
     status: GoalEntryStatus.CommitterVerifying,
   });
@@ -21,37 +30,50 @@ const main = async () => {
       userEmail: goalEntry.userEmail,
       partnerEmail: goalEntry.goalPartnerEmail,
     });
+
     try {
       await DB.get()
-        .updateTable("goalEntry")
-        .set({
-          status: GoalEntryStatus.Failed,
-        })
-        .where("id", "=", goalEntry.id)
-        .execute();
+        .transaction()
+        .execute(async (trx) => {
+          // Update existing goal entry
+          await DB.get()
+            .updateTable("goalEntry")
+            .set({
+              status: GoalEntryStatus.Failed,
+            })
+            .where("id", "=", goalEntry.id)
+            .execute();
 
-      // TODO send fail email
-      // await sendEmail({
-      //   recipientEmail: goalEntry.userEmail,
-      //   subject: toCommitterEmailSubject(goalEntry.description),
-      //   emailHtml: await toEmailHtml(CommitterVerifyEmail, {
-      //     committerUser: {
-      //       email: goalEntry.userEmail,
-      //       firstName: goalEntry.userFirstName,
-      //       lastName: goalEntry.userLastName,
-      //     },
-      //     goal: {
-      //       id: goalEntry.id,
-      //       description: goalEntry.description,
-      //       stakeAmount: goalEntry.stakeAmount,
-      //       scheduleType: goalEntry.scheduleType,
-      //       scheduleDays: goalEntry.scheduleDays,
-      //       partnerEmail: goalEntry.partnerEmail,
-      //     },
-      //     dueDate: new Date(goalEntry.dueAt),
-      //   }),
-      // });
+          // Create next recurring entry if applicable
+          if (
+            goalEntry.goalScheduleType === "RECURRING" &&
+            goalEntry.goalScheduleDays
+          ) {
+            await trx
+              .insertInto("goalEntry")
+              .values({
+                id: generateModelId(),
+                status: GoalEntryStatus.Pending,
+                goalId: goalEntry.goalId,
+                dueAt: toNextRecurringDueDate({
+                  timezone: goalEntry.userTimezone,
+                  scheduleDays: goalEntry.goalScheduleDays,
+                  prevDueDate: goalEntry.dueAt,
+                }),
+              })
+              .execute();
+          }
+        });
+
+      await sendEmail({
+        recipientEmail: goalEntry.userEmail,
+        subject: toCommitterEmailSubject(goalEntry.goalDescription),
+        emailHtml: await toEmailHtml(CommitterFailEmail, {
+          goalEntry,
+        }),
+      });
     } catch (error) {
+      // TODO sentry
       console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
     }
   }

@@ -152,7 +152,9 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
 };
 
 // recently expired = current time is past the due date by at most 1 hour
-// we do 1 hour check in case there are some stale goals that we don't to process
+// we do 1 hour check to account for timezones
+// e.g. it's 12am EST and we want to send email to those due dates that was due at 11:59pm EST
+//      we don't want to send emails for people who's goals were due at 11:59pm PST (which is 8:59pm PST)
 export const toRecentlyExpiredGoalEntries = (
   goalEntries: CompleteGoalEntry[],
 ) => {

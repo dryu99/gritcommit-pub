@@ -74,40 +74,42 @@ const handlePartnerVerify = async ({
   goalEntry: CompleteGoalEntry;
   approved: boolean;
 }) => {
-  const db = DB.get();
-
   try {
-    await db.transaction().execute(async (trx) => {
-      // Update existing goal entry
-      await trx
-        .updateTable("goalEntry")
-        .set({
-          status: approved ? GoalEntryStatus.Completed : GoalEntryStatus.Failed,
-          partnerVerifiedAt: new Date(),
-        })
-        .where("id", "=", goalEntry.id)
-        .execute();
-
-      // Create next recurring entry if applicable
-      if (
-        goalEntry.goalScheduleType === "RECURRING" &&
-        goalEntry.goalScheduleDays
-      ) {
+    await DB.get()
+      .transaction()
+      .execute(async (trx) => {
+        // Update existing goal entry
         await trx
-          .insertInto("goalEntry")
-          .values({
-            id: generateModelId(),
-            status: GoalEntryStatus.Pending,
-            goalId: goalEntry.goalId,
-            dueAt: toNextRecurringDueDate({
-              timezone: goalEntry.userTimezone,
-              scheduleDays: goalEntry.goalScheduleDays,
-              prevDueDate: goalEntry.dueAt,
-            }),
+          .updateTable("goalEntry")
+          .set({
+            status: approved
+              ? GoalEntryStatus.Completed
+              : GoalEntryStatus.Failed,
+            partnerVerifiedAt: new Date(),
           })
+          .where("id", "=", goalEntry.id)
           .execute();
-      }
-    });
+
+        // Create next recurring entry if applicable
+        if (
+          goalEntry.goalScheduleType === "RECURRING" &&
+          goalEntry.goalScheduleDays
+        ) {
+          await trx
+            .insertInto("goalEntry")
+            .values({
+              id: generateModelId(),
+              status: GoalEntryStatus.Pending,
+              goalId: goalEntry.goalId,
+              dueAt: toNextRecurringDueDate({
+                timezone: goalEntry.userTimezone,
+                scheduleDays: goalEntry.goalScheduleDays,
+                prevDueDate: goalEntry.dueAt,
+              }),
+            })
+            .execute();
+        }
+      });
 
     // Send email after transaction succeeds
     await sendEmail({
