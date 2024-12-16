@@ -1,4 +1,7 @@
-import { fetchCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import {
+  fetchCompleteGoalEntry,
+  toRecentlyExpiredGoalEntries,
+} from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
@@ -8,14 +11,10 @@ const main = async () => {
     status: GoalEntryStatus.CommitterVerifying,
   });
 
-  const dueTodayGoalEntries = pendingGoalEntries.filter((goalEntry) => {
-    const entryDueDate = new Date(goalEntry.dueAt);
-    return entryDueDate.getDate() === new Date().getDate();
-  });
+  const expiredGoalEntries = toRecentlyExpiredGoalEntries(pendingGoalEntries);
+  console.log("Expired goal entries:", expiredGoalEntries.length);
 
-  console.log("Due today goal entries:", dueTodayGoalEntries.length);
-
-  for (const goalEntry of dueTodayGoalEntries) {
+  for (const goalEntry of expiredGoalEntries) {
     console.log("Processing goal entry:", {
       description: goalEntry.goalDescription,
       dueAt: goalEntry.dueAt,

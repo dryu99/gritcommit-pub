@@ -8,6 +8,9 @@ dayjs.extend(timezone);
 
 export const DateUtils = { dayjs };
 
+// we have this since dates from db can sometimes be string (if json parsing was used)
+export type SafeDate = Date | string;
+
 export type Day = {
   narrow: string;
   short: string;
@@ -49,7 +52,7 @@ export const getScheduleText = (goal: {
 };
 
 // TODO pass in timezone? rn its not clear that this is using locale
-export const toFormattedDateText = (date: Date | string) => {
+export const toFormattedDateText = (date: SafeDate) => {
   const formatted = new Date(date).toLocaleString(undefined, {
     month: "short",
     day: "numeric",
@@ -63,7 +66,7 @@ export const toFormattedDateText = (date: Date | string) => {
   return formatted;
 };
 
-export function toPartnerVerificationDeadline(dueAt: Date | string): Date {
+export function toPartnerVerificationDeadline(dueAt: SafeDate): Date {
   const HOURS_AFTER_DUE = 12;
   return new Date(new Date(dueAt).getTime() + HOURS_AFTER_DUE * 60 * 60 * 1000);
 }
@@ -108,7 +111,7 @@ export const toNextRecurringDueDate = ({
 }: {
   timezone: string;
   scheduleDays: number[];
-  prevDueDate: Date | string;
+  prevDueDate: SafeDate;
 }): Date => {
   const lastDue = DateUtils.dayjs.tz(prevDueDate, timezone);
   return findNextScheduledDay(lastDue, scheduleDays);

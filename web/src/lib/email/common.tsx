@@ -1,5 +1,5 @@
 import { ScheduleType } from "@/types/enums";
-import { getScheduleText } from "../date";
+import { getScheduleText, SafeDate } from "../date";
 
 import { toFormattedDateText } from "../date";
 
@@ -11,7 +11,7 @@ export const EmailCommitment = ({
   scheduleDays,
   partnerEmail,
 }: {
-  dueAt: Date | string;
+  dueAt: SafeDate;
   description: string;
   stakeAmount: string;
   scheduleType: ScheduleType;

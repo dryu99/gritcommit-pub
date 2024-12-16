@@ -3,6 +3,7 @@ import { Goal, GoalEntry, User } from "@/database/db-generated-types";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
+import { DateUtils } from "../date";
 
 export const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
@@ -148,4 +149,20 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userFirstName: "John",
   userLastName: "Doe",
   userTimezone: "America/Los_Angeles",
+};
+
+// recently expired = current time is past the due date by at most 1 hour
+// we do 1 hour check in case there are some stale goals that we don't to process
+export const toRecentlyExpiredGoalEntries = (
+  goalEntries: CompleteGoalEntry[],
+) => {
+  return goalEntries.filter((goalEntry) => {
+    const userTimezone = goalEntry.userTimezone;
+    const now = DateUtils.dayjs().tz(userTimezone);
+    const oneHourAgo = now.subtract(1, "hour");
+
+    const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, userTimezone);
+
+    return dueDate.isAfter(oneHourAgo) && dueDate.isBefore(now);
+  });
 };
