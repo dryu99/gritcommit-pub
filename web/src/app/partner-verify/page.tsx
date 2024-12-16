@@ -13,10 +13,8 @@ import {
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
 export default async function PartnerVerifyPage(props: {
-  searchParams: SearchParams;
+  searchParams: Promise<{ token?: string; approved?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const token = searchParams.token;

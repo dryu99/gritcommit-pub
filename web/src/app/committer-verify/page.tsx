@@ -2,10 +2,8 @@ import { DB } from "@/database/db";
 import { GoalEntryStatus } from "@/types/enums";
 import CommitterVerifyForm from "@/ui/components/committer-verify-form";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
 export default async function CommitterVerifyPage(props: {
-  searchParams: SearchParams;
+  searchParams: Promise<{ token?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const token = searchParams.token;

@@ -1,20 +1,34 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
 import { getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
+import { GoalEntryStatus } from "@/types/enums";
 import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
+import { Link } from "@/ui/components/common/link";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: {
+  searchParams: Promise<{ status?: GoalEntryStatus }>;
+}) {
   const sessionUser = await getSessionUser();
   if (!sessionUser) {
     redirect("/");
   }
 
+  const searchParams = await props.searchParams;
+
   const goals = await fetchGoals(sessionUser.id);
+
+  // TODO theres subtle behaviour here where user can set status in url to any status and see data we potentailyl dont want them to see
+  const filteredGoals = goals.filter((goal) => {
+    if (searchParams.status) {
+      return goal.entries[0]?.status === searchParams.status;
+    }
+    return true;
+  });
 
   return (
     <div className="flex flex-col items-center">
@@ -33,9 +47,11 @@ export default async function DashboardPage() {
       <div>
         <ShowGoalFormButton />
       </div>
+      <CommitLine />
+      <GoalStatusFilters currentStatus={searchParams.status} />
       {goals.length > 0 && <CommitLine />}
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
-        {goals.map((goal, i) => {
+        {filteredGoals.map((goal, i) => {
           const latestEntry = goal.entries[0];
           const scheduleText = getScheduleText(goal);
 
@@ -57,7 +73,7 @@ export default async function DashboardPage() {
                         })}
                       >
                         {latestEntry.status === "PENDING"
-                          ? "ONGOING"
+                          ? "IN PROGRESS"
                           : latestEntry.status === "COMMITTER_VERIFYING"
                             ? "CHECK EMAIL"
                             : latestEntry.status === "PARTNER_VERIFYING"
@@ -134,6 +150,44 @@ const CommitLine = () => {
       <div className="h-5 w-[2px] bg-neutral-300" />
       <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
       <div className="h-5 w-[2px] bg-neutral-300" />
+    </div>
+  );
+};
+
+const GoalStatusFilters = ({
+  currentStatus,
+}: {
+  currentStatus?: GoalEntryStatus;
+}) => {
+  return (
+    <div className="grid grid-cols-3 gap-8">
+      <Link
+        href={`/dashboard`}
+        className={cn("text-center text-sm", {
+          "font-medium text-brand": currentStatus === undefined,
+          "text-gray-500": currentStatus !== undefined,
+        })}
+      >
+        In Progress
+      </Link>
+      <Link
+        href={`/dashboard?status=${GoalEntryStatus.Completed}`}
+        className={cn("text-center text-sm", {
+          "font-medium text-brand": currentStatus === GoalEntryStatus.Completed,
+          "text-gray-500": currentStatus !== GoalEntryStatus.Completed,
+        })}
+      >
+        Completed
+      </Link>
+      <Link
+        href={`/dashboard?status=${GoalEntryStatus.Failed}`}
+        className={cn("text-center text-sm", {
+          "font-medium text-brand": currentStatus === GoalEntryStatus.Failed,
+          "text-gray-500": currentStatus !== GoalEntryStatus.Failed,
+        })}
+      >
+        Dropped
+      </Link>
     </div>
   );
 };
