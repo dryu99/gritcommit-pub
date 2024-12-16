@@ -24,17 +24,21 @@ export default async function DashboardPage(props: {
 
   const goals = await fetchGoals(sessionUser.id);
 
-  const realStatus =
-    searchParams.status === "completed"
-      ? GoalEntryStatus.Completed
-      : searchParams.status === "dropped"
-        ? GoalEntryStatus.Failed
-        : GoalEntryStatus.Pending;
-
   // TODO rn this only accounts for most recent goal entry which should be okay?
-  const filteredGoals = realStatus
-    ? goals.filter((goal) => goal.entries[0]?.status === realStatus)
-    : goals;
+  const filteredGoals = goals.filter((goal) => {
+    const latestEntry = goal.entries[0];
+    if (!latestEntry) return false;
+
+    return searchParams.status === "completed"
+      ? latestEntry.status === GoalEntryStatus.Completed
+      : searchParams.status === "dropped"
+        ? latestEntry.status === GoalEntryStatus.Failed
+        : [
+            GoalEntryStatus.Pending,
+            GoalEntryStatus.CommitterVerifying,
+            GoalEntryStatus.PartnerVerifying,
+          ].includes(latestEntry.status);
+  });
 
   return (
     <div className="flex flex-col items-center">
@@ -61,7 +65,7 @@ export default async function DashboardPage(props: {
         </>
       )}
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
-        {filteredGoals.length === 0 && (
+        {goals.length > 0 && filteredGoals.length === 0 && (
           <div className="mx-auto text-center text-2xl opacity-50">😴</div>
         )}
         {filteredGoals.map((goal, i) => {
@@ -180,19 +184,20 @@ const CommitLine = ({
   );
 };
 
+// TODO clicking on links feels clunky because we're using SSR. to solve this we can either do client side rendering OR do some caching
 const GoalStatusFilters = ({
   currentStatus,
 }: {
   currentStatus?: SearchParamStatus;
 }) => {
   const baseLinkStyles =
-    "px-4 py-2 text-center text-sm transition-colors hover:bg-neutral-300 rounded-md";
+    "px-4 py-2 text-center text-xs transition-colors hover:bg-neutral-300 rounded-md flex items-center justify-center min-h-[32px]";
   const activeLinkStyles =
     "bg-primary font-medium text-primary hover:bg-primary";
   const inactiveLinkStyles = "text-gray-500 bg-neutral-200";
 
   return (
-    <div className="grid w-[500px] grid-cols-3 gap-1 rounded-md border border-neutral-300 bg-neutral-200">
+    <div className="grid w-full grid-cols-3 gap-1 rounded-md border border-neutral-300 bg-neutral-200 sm:w-[500px]">
       <Link
         href={`/dashboard`}
         className={cn(baseLinkStyles, {
