@@ -10,8 +10,10 @@ import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { ibmPlexMono } from "@/ui/fonts";
 import { redirect } from "next/navigation";
 
+type SearchParamStatus = "completed" | "dropped" | undefined;
+
 export default async function DashboardPage(props: {
-  searchParams: Promise<{ status?: GoalEntryStatus }>;
+  searchParams: Promise<{ status?: SearchParamStatus }>;
 }) {
   const sessionUser = await getSessionUser();
   if (!sessionUser) {
@@ -22,13 +24,17 @@ export default async function DashboardPage(props: {
 
   const goals = await fetchGoals(sessionUser.id);
 
-  // TODO theres subtle behaviour here where user can set status in url to any status and see data we potentailyl dont want them to see
-  const filteredGoals = goals.filter((goal) => {
-    if (searchParams.status) {
-      return goal.entries[0]?.status === searchParams.status;
-    }
-    return true;
-  });
+  const realStatus =
+    searchParams.status === "completed"
+      ? GoalEntryStatus.Completed
+      : searchParams.status === "dropped"
+        ? GoalEntryStatus.Failed
+        : GoalEntryStatus.Pending;
+
+  // TODO rn this only accounts for most recent goal entry which should be okay?
+  const filteredGoals = realStatus
+    ? goals.filter((goal) => goal.entries[0]?.status === realStatus)
+    : goals;
 
   return (
     <div className="flex flex-col items-center">
@@ -157,7 +163,7 @@ const CommitLine = () => {
 const GoalStatusFilters = ({
   currentStatus,
 }: {
-  currentStatus?: GoalEntryStatus;
+  currentStatus?: SearchParamStatus;
 }) => {
   return (
     <div className="grid grid-cols-3 gap-8">
@@ -171,19 +177,19 @@ const GoalStatusFilters = ({
         In Progress
       </Link>
       <Link
-        href={`/dashboard?status=${GoalEntryStatus.Completed}`}
+        href={`/dashboard?status=completed`}
         className={cn("text-center text-sm", {
-          "font-medium text-brand": currentStatus === GoalEntryStatus.Completed,
-          "text-gray-500": currentStatus !== GoalEntryStatus.Completed,
+          "font-medium text-brand": currentStatus === "completed",
+          "text-gray-500": currentStatus !== "completed",
         })}
       >
         Completed
       </Link>
       <Link
-        href={`/dashboard?status=${GoalEntryStatus.Failed}`}
+        href={`/dashboard?status=dropped`}
         className={cn("text-center text-sm", {
-          "font-medium text-brand": currentStatus === GoalEntryStatus.Failed,
-          "text-gray-500": currentStatus !== GoalEntryStatus.Failed,
+          "font-medium text-brand": currentStatus === "dropped",
+          "text-gray-500": currentStatus !== "dropped",
         })}
       >
         Dropped
