@@ -78,6 +78,7 @@ export const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
 
 /**
  * Calculates the initial due date when creating a new recurring goal
+ * Uses the current date as a starting point
  */
 export const toInitialRecurringDueDate = ({
   timezone,
@@ -88,7 +89,7 @@ export const toInitialRecurringDueDate = ({
   scheduleDays: number[];
   startToday?: boolean;
 }): Date => {
-  const today = DateUtils.dayjs.tz(timezone);
+  const today = DateUtils.dayjs().tz(timezone);
 
   if (startToday) {
     return today.endOf("day").toDate();

@@ -1,5 +1,97 @@
-import { describe, expect, test } from "vitest";
-import { DateUtils, toNextRecurringDueDate } from "./date";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import {
+  DateUtils,
+  toInitialRecurringDueDate,
+  toNextRecurringDueDate,
+} from "./date";
+
+describe("toInitialRecurringDueDate", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test("returns end of today when startToday is true", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-19 12:00:00.000", "America/Los_Angeles") // Tuesday noon
+        .toDate(),
+    );
+
+    const result = toInitialRecurringDueDate({
+      timezone: "America/Los_Angeles",
+      scheduleDays: [1, 3, 5], // Mon, Wed, Fri
+      startToday: true,
+    });
+
+    // Should return end of Tuesday (today)
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-19 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+    );
+  });
+
+  test("finds next scheduled day when current day (Tuesday) is between scheduled days", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-19 12:00:00.000", "America/Los_Angeles") // Tuesday noon
+        .toDate(),
+    );
+
+    const result = toInitialRecurringDueDate({
+      timezone: "America/Los_Angeles",
+      scheduleDays: [1, 3, 5], // Mon, Wed, Fri
+      startToday: false,
+    });
+
+    // Should return end of Wednesday
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+    );
+  });
+
+  test("finds next scheduled day when current day is after all scheduled days", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 12:00:00.000", "America/Los_Angeles") // Wednesday noon
+        .toDate(),
+    );
+
+    const result = toInitialRecurringDueDate({
+      timezone: "America/Los_Angeles",
+      scheduleDays: [1, 3], // Monday and Wednesday
+      startToday: false,
+    });
+
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-25 23:59:59.999", "America/Los_Angeles") // Next Monday EOD
+        .toDate(),
+    );
+  });
+
+  test("handles timezone differences correctly", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-18 12:00:00.000", "Asia/Tokyo") // Monday noon
+        .toDate(),
+    );
+
+    const result = toInitialRecurringDueDate({
+      timezone: "Asia/Tokyo",
+      scheduleDays: [1, 2], // Monday and Tuesday
+      startToday: false,
+    });
+
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-19 23:59:59.999", "Asia/Tokyo") // Tuesday EOD
+        .toDate(),
+    );
+  });
+});
 
 describe("toNextRecurringDueDate", () => {
   test("returns next scheduled day when current day is before any scheduled days", () => {
