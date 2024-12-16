@@ -78,6 +78,7 @@ export type CompleteGoalEntry = {
   userEmail: Selectable<User>["email"];
   userFirstName: Selectable<User>["firstName"];
   userLastName: Selectable<User>["lastName"];
+  userTimezone: Selectable<User>["timezone"];
 };
 
 export const fetchCompleteGoalEntry = async ({
@@ -111,6 +112,7 @@ export const fetchCompleteGoalEntry = async ({
       "user.email as userEmail",
       "user.firstName as userFirstName",
       "user.lastName as userLastName",
+      "user.timezone as userTimezone",
     ])
     .$if(!!status, (eb) =>
       eb.where("goalEntry.status", "=", status as GoalEntryStatus),
@@ -145,4 +147,5 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userEmail: "committer@gmail.com",
   userFirstName: "John",
   userLastName: "Doe",
+  userTimezone: "America/Los_Angeles",
 };

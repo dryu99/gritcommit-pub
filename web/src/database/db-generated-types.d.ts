@@ -52,6 +52,7 @@ export interface User {
   id: string;
   lastName: string | null;
   password: string | null;
+  timezone: string;
   updatedAt: Generated<Timestamp>;
 }
 

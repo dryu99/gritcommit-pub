@@ -37,6 +37,7 @@ const main = async () => {
       password: testUser.password,
       firstName: testUser.firstName,
       lastName: testUser.lastName,
+      timezone: "America/Los_Angeles",
     };
 
     await DB.get()

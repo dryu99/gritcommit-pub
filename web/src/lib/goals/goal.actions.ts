@@ -10,7 +10,7 @@ import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth/auth.lib";
-import { DateUtils } from "../date";
+import { toNextDueDate } from "../date";
 import {
   sendEmail,
   toCommitterEmailSubject,
@@ -26,7 +26,6 @@ const CreateGoalReqBodySchema = z.object({
   description: z.string().min(1),
   stakeAmount: z.coerce.number().min(0),
   partnerEmail: z.string().email(),
-  timezone: z.string(),
   startToday: z.boolean().optional(),
 
   // existence implies scheduleType = RECURRING
@@ -75,7 +74,12 @@ export const createGoal = async (data: any) => {
       : null,
   };
 
-  const nextDueDate = calculateNextDueDate(reqBody);
+  const nextDueDate = toNextDueDate({
+    timezone: sessionUser.timezone,
+    dueDate: reqBody.dueDate,
+    startToday: reqBody.startToday,
+    scheduleDays: reqBody.scheduleDays,
+  });
   const newGoalEntry: Insertable<GoalEntry> = {
     id: generateModelId(),
     goalId: newGoal.id,
@@ -114,6 +118,7 @@ export const createGoal = async (data: any) => {
     userEmail: sessionUser.email,
     userFirstName: sessionUser.firstName,
     userLastName: sessionUser.lastName,
+    userTimezone: sessionUser.timezone,
   };
 
   // TODO handle email errors
@@ -135,35 +140,6 @@ export const createGoal = async (data: any) => {
   });
 
   revalidatePath("/");
-};
-
-const calculateNextDueDate = (rawGoal: CreateGoalReqBody): Date => {
-  // handle ONCE
-  if (rawGoal.dueDate) {
-    return DateUtils.dayjs(rawGoal.dueDate)
-      .tz(rawGoal.timezone)
-      .endOf("day")
-      .toDate();
-  }
-
-  // handle RECURRING
-  const clientToday = DateUtils.dayjs().tz(rawGoal.timezone);
-  if (rawGoal.startToday) {
-    return clientToday.endOf("day").toDate();
-  }
-
-  if (rawGoal.scheduleDays) {
-    const todayDay = clientToday.day();
-
-    for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
-      const checkDay = (todayDay + daysAhead) % 7;
-      if (rawGoal.scheduleDays.includes(checkDay)) {
-        return clientToday.add(daysAhead, "day").endOf("day").toDate();
-      }
-    }
-  }
-
-  throw new Error("Next due date could not be calculated");
 };
 
 const CommitterVerifyReqBodySchema = z.object({

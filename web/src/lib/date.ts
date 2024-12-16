@@ -75,3 +75,39 @@ const getDaysInYear = (year: number) => {
 
 export const CURRENT_YEAR = 2024;
 export const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
+
+export const toNextDueDate = ({
+  timezone,
+  dueDate,
+  startToday,
+  scheduleDays,
+}: {
+  timezone: string;
+  dueDate?: Date | string;
+  startToday?: boolean;
+  scheduleDays?: number[];
+}): Date => {
+  // handle ONCE
+  if (dueDate) {
+    return DateUtils.dayjs(dueDate).tz(timezone).endOf("day").toDate();
+  }
+
+  // handle RECURRING
+  const clientToday = DateUtils.dayjs().tz(timezone);
+  if (startToday) {
+    return clientToday.endOf("day").toDate();
+  }
+
+  if (scheduleDays) {
+    const todayDay = clientToday.day();
+
+    for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
+      const checkDay = (todayDay + daysAhead) % 7;
+      if (scheduleDays.includes(checkDay)) {
+        return clientToday.add(daysAhead, "day").endOf("day").toDate();
+      }
+    }
+  }
+
+  throw new Error("Next due date could not be calculated");
+};

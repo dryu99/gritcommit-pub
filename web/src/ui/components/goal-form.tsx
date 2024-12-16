@@ -76,7 +76,6 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
     const reqBody = Object.fromEntries(
       new FormData(e.currentTarget),
     ) as unknown as CreateGoalReqBody;
-    reqBody.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     reqBody.scheduleDays = isRecurring
       ? selectedDays.map((d) => d.index)
       : undefined;
