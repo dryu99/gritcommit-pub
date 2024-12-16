@@ -18,43 +18,99 @@ describe("toNextRecurringDueDate", () => {
     );
   });
 
-  // TODO write test for daylight savings
+  test("returns next scheduled day when current day is after all scheduled days", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "America/New_York",
+      scheduleDays: [2, 4], // Tuesday and Thursday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-03-22 23:59:59", "America/New_York") // Friday EOD
+        .toDate(),
+    });
 
-  // test("returns next week's first scheduled day when current day is after all scheduled days", () => {
-  //   const result = toNextRecurringDueDate({
-  //     timezone: "America/New_York",
-  //     scheduleDays: [2, 4], // Tuesday and Thursday
-  //     prevDueDate: "2024-03-22 11:59 PM America/New_York", // Friday night
-  //   });
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-26 23:59:59.999", "America/New_York") // Next Tuesday EOD
+        .toDate(),
+    );
+  });
 
-  //   expect(result.tz("America/New_York").format("YYYY-MM-DD hh:mm A")).toBe(
-  //     "2024-03-26 11:59 PM",
-  //   ); // Next Tuesday night
-  // });
+  test("returns next scheduled day when current day is on scheduled day (instead of returning current day)", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "America/Los_Angeles",
+      scheduleDays: [1], // Monday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-03-18 23:59:59", "America/Los_Angeles") // Monday EOD
+        .toDate(),
+    });
 
-  // test("handles timezone differences correctly", () => {
-  //   const result = toNextRecurringDueDate({
-  //     timezone: "Asia/Tokyo",
-  //     scheduleDays: [1], // Monday
-  //     prevDueDate: "2024-03-18 11:59 PM Asia/Tokyo", // Monday night in Tokyo
-  //   });
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-25 23:59:59.999", "America/Los_Angeles") // Next Monday EOD
+        .toDate(),
+    );
+  });
 
-  //   expect(result.tz("Asia/Tokyo").format("YYYY-MM-DD hh:mm A")).toBe(
-  //     "2024-03-25 11:59 PM",
-  //   ); // Next Monday night
-  // });
+  test("handles timezone differences correctly", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "Asia/Tokyo",
+      scheduleDays: [1, 2], // Monday and Tuesday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-03-18 23:59:59", "Asia/Tokyo") // Monday EOD
+        .toDate(),
+    });
 
-  // test("returns same day if it's a scheduled day and hasn't passed in the timezone", () => {
-  //   const result = toNextRecurringDueDate({
-  //     timezone: "America/Los_Angeles",
-  //     scheduleDays: [3], // Wednesday
-  //     prevDueDate: "2024-03-20 08:00 AM America/Los_Angeles", // Wednesday morning PT
-  //   });
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-19 23:59:59.999", "Asia/Tokyo") // Tuesday EOD
+        .toDate(),
+    );
+  });
 
-  //   expect(result.tz("America/Los_Angeles").format("YYYY-MM-DD hh:mm A")).toBe(
-  //     "2024-03-20 11:59 PM",
-  //   );
-  // });
+  test("handles daylight savings time correctly (winter)", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "America/Los_Angeles",
+      scheduleDays: [0, 6], // Sunday and Saturday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-12-16 23:59:59", "America/Los_Angeles") // Monday
+        .toDate(),
+    });
+
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-12-21 23:59:59.999", "America/Los_Angeles") // Saturday
+        .toDate(),
+    );
+  });
+
+  test("handles daylight savings time transition correctly", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "America/New_York",
+      scheduleDays: [1], // Monday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-03-09 23:59:59", "America/New_York") // Saturday before DST
+        .toDate(),
+    });
+
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-11 23:59:59.999", "America/New_York") // Monday after DST
+        .toDate(),
+    );
+  });
+
+  test("handles multiple scheduled days in same week", () => {
+    const result = toNextRecurringDueDate({
+      timezone: "America/New_York",
+      scheduleDays: [1, 3, 5], // Monday, Wednesday, Friday
+      prevDueDate: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59", "America/New_York") // Wednesday EOD
+        .toDate(),
+    });
+
+    expect(result).toEqual(
+      DateUtils.dayjs
+        .tz("2024-03-22 23:59:59.999", "America/New_York") // Friday EOD
+        .toDate(),
+    );
+  });
 });
-
-// DateUtils.dayjs("2024-03-20 23:59:59", "America/New_York").toDate(),
