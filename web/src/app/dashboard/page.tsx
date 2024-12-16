@@ -55,7 +55,7 @@ export default async function DashboardPage(props: {
       ) : (
         <div className="mx-auto text-center text-2xl opacity-50">😴</div>
       )}
-      <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
+      <div className="mb-8 flex w-full flex-col text-xs sm:w-[500px]">
         {goals.length > 0 && filteredGoals.length === 0 && (
           <div className="mx-auto text-center text-2xl opacity-50">😴</div>
         )}
