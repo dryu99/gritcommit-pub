@@ -76,38 +76,58 @@ const getDaysInYear = (year: number) => {
 export const CURRENT_YEAR = 2024;
 export const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
 
-export const toNextDueDate = ({
+/**
+ * Calculates the initial due date when creating a new recurring goal
+ */
+export const toInitialRecurringDueDate = ({
   timezone,
-  dueDate,
-  startToday,
   scheduleDays,
+  startToday,
 }: {
   timezone: string;
-  dueDate?: Date | string;
+  scheduleDays: number[];
   startToday?: boolean;
-  scheduleDays?: number[];
 }): Date => {
-  // handle ONCE
-  if (dueDate) {
-    return DateUtils.dayjs(dueDate).tz(timezone).endOf("day").toDate();
-  }
+  const today = DateUtils.dayjs().tz(timezone);
 
-  // handle RECURRING
-  const clientToday = DateUtils.dayjs().tz(timezone);
   if (startToday) {
-    return clientToday.endOf("day").toDate();
+    return today.endOf("day").toDate();
   }
 
-  if (scheduleDays) {
-    const todayDay = clientToday.day();
+  return findNextScheduledDay(today, scheduleDays);
+};
 
-    for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
-      const checkDay = (todayDay + daysAhead) % 7;
-      if (scheduleDays.includes(checkDay)) {
-        return clientToday.add(daysAhead, "day").endOf("day").toDate();
-      }
+/**
+ * Calculates the next due date for an existing recurring goal
+ */
+export const toNextRecurringDueDate = ({
+  timezone,
+  scheduleDays,
+  prevDueDate,
+}: {
+  timezone: string;
+  scheduleDays: number[];
+  prevDueDate: Date | string;
+}): Date => {
+  const lastDue = DateUtils.dayjs(prevDueDate).tz(timezone);
+  return findNextScheduledDay(lastDue, scheduleDays);
+};
+
+/**
+ * Helper function to find the next available scheduled day
+ */
+function findNextScheduledDay(
+  fromDate: dayjs.Dayjs,
+  scheduleDays: number[],
+): Date {
+  const startDay = fromDate.day();
+
+  for (let daysAhead = 1; daysAhead <= 7; daysAhead++) {
+    const checkDay = (startDay + daysAhead) % 7;
+    if (scheduleDays.includes(checkDay)) {
+      return fromDate.add(daysAhead, "day").endOf("day").toDate();
     }
   }
 
-  throw new Error("Next due date could not be calculated");
-};
+  throw new Error("No scheduled days available");
+}

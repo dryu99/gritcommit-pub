@@ -10,7 +10,7 @@ import { z } from "zod";
 import { DB } from "../../database/db";
 import { Goal, GoalEntry } from "../../database/db-generated-types";
 import { getSessionUser } from "../auth/auth.lib";
-import { toNextDueDate } from "../date";
+import { DateUtils, toInitialRecurringDueDate } from "../date";
 import {
   sendEmail,
   toCommitterEmailSubject,
@@ -74,12 +74,21 @@ export const createGoal = async (data: any) => {
       : null,
   };
 
-  const nextDueDate = toNextDueDate({
-    timezone: sessionUser.timezone,
-    dueDate: reqBody.dueDate,
-    startToday: reqBody.startToday,
-    scheduleDays: reqBody.scheduleDays,
-  });
+  const nextDueDate =
+    newGoal.scheduleType === ScheduleType.Once && reqBody.dueDate
+      ? DateUtils.dayjs(reqBody.dueDate)
+          .tz(sessionUser.timezone)
+          .endOf("day")
+          .toDate()
+      : newGoal.scheduleType === ScheduleType.Recurring && reqBody.scheduleDays
+        ? toInitialRecurringDueDate({
+            timezone: sessionUser.timezone,
+            startToday: reqBody.startToday,
+            scheduleDays: reqBody.scheduleDays,
+          })
+        : undefined;
+  if (!nextDueDate) throw new Error("Next due date could not be calculated");
+
   const newGoalEntry: Insertable<GoalEntry> = {
     id: generateModelId(),
     goalId: newGoal.id,
