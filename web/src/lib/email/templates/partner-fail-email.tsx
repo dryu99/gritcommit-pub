@@ -1,50 +1,30 @@
-import { Goal, User } from "@/database/db-generated-types";
-import { ScheduleType } from "@/types/enums";
+import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { Insertable } from "kysely";
 
-interface PartnerFailConfirmEmailProps {
-  committerUser: Insertable<User>;
-  goal: Insertable<Goal>;
-  nextDueDate: Date;
-}
-
-export default function PartnerFailConfirmEmail({
-  committerUser = {
-    email: "committer@gmail.com",
-    firstName: "John",
-    lastName: "Doe",
-    id: "1",
-  },
-  goal = {
-    description: "Run a marathon",
-    stakeAmount: 100,
-    scheduleType: ScheduleType.Recurring,
-    scheduleDays: [1, 2, 3, 4, 5],
-    createdByUserId: "1",
-    id: "1",
-    partnerEmail: "partner@gmail.com",
-  },
-}: PartnerFailConfirmEmailProps) {
-  const committerName = committerUser.lastName
-    ? `${committerUser.firstName} ${committerUser.lastName}`
-    : committerUser.firstName;
+export default function PartnerFailEmail({
+  goalEntry,
+}: {
+  goalEntry: CompleteGoalEntry;
+}) {
+  const committerName = goalEntry.userLastName
+    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
+    : goalEntry.userFirstName;
 
   return (
     <Html>
       <Body>
-        Hi {goal.partnerEmail},
+        Hi {goalEntry.goalPartnerEmail},
         <br />
         <br />
         {committerName} failed to complete their commitment:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {goal.description}
+        🎯 <strong>Commitment:</strong> {goalEntry.goalDescription}
         <br />
-        💰 <strong>Stake:</strong> ${goal.stakeAmount}
+        💰 <strong>Stake:</strong> ${goalEntry.goalStakeAmount}
         <br />
         <br />
-        They have been prompted to send you ${goal.stakeAmount}.
+        They have been prompted to send you ${goalEntry.goalStakeAmount}.
         <br />
         <br />
         Cheers,
