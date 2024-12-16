@@ -2,6 +2,7 @@
 
 import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
 import { cn } from "../classnames";
+import { ShowGoalFormButton } from "./show-goal-form-button";
 
 export type CommitSquare = {
   date: Date;
@@ -24,7 +25,13 @@ const COMMIT_MONTHS = [
   "",
 ];
 
-export const CommitGraph = ({ dates }: { dates: Date[] }) => {
+export const CommitGraph = ({
+  dates,
+  includeNewGoalButton,
+}: {
+  dates: Date[];
+  includeNewGoalButton?: boolean;
+}) => {
   const commitSquares = toCommitSquares(dates);
   const firstDateOfTheYear = commitSquares[0]!.date;
 
@@ -47,10 +54,14 @@ export const CommitGraph = ({ dates }: { dates: Date[] }) => {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-[740px]">
-        <h4 className="mb-2 text-sm text-gray-500">
-          {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
-          {CURRENT_YEAR}
-        </h4>
+        <div className="mb-2 flex items-end justify-between">
+          <h4 className="text-sm text-gray-500">
+            {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
+            {CURRENT_YEAR}
+          </h4>
+          {includeNewGoalButton && <ShowGoalFormButton />}
+        </div>
+
         <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
           <div className="-mb-[1px] flex w-[698px] justify-between">
             {COMMIT_MONTHS.map((month) => (

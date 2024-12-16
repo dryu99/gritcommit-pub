@@ -6,7 +6,6 @@ import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
 import { Link } from "@/ui/components/common/link";
-import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { redirect } from "next/navigation";
 
 type SearchParamStatus = "completed" | "dropped" | undefined;
@@ -45,11 +44,9 @@ export default async function DashboardPage(props: {
         dates={goals.flatMap((goal) =>
           goal.entries.map((entry) => new Date(entry.createdAt)),
         )}
+        includeNewGoalButton
       />
-      <CommitLine includeNode />
-      <div>
-        <ShowGoalFormButton />
-      </div>
+
       {goals.length > 0 && (
         <>
           <CommitLine height={20} includeNode />

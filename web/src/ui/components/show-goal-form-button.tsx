@@ -10,7 +10,9 @@ export function ShowGoalFormButton() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>New Commitment</Button>
+      <Button className="h-7 px-3 text-xs" onClick={() => setIsOpen(true)}>
+        New Commitment
+      </Button>
       <Modal
         title="New Commitment"
         isOpen={isOpen}
