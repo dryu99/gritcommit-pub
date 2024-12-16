@@ -46,13 +46,14 @@ export default async function DashboardPage(props: {
         )}
         includeNewGoalButton
       />
-
-      {goals.length > 0 && (
+      <CommitLine height={20} includeNode />
+      {goals.length > 0 ? (
         <>
-          <CommitLine height={20} includeNode />
           <GoalStatusFilters currentStatus={searchParams.status} />
           <CommitLine height={10} />
         </>
+      ) : (
+        <div className="mx-auto text-center text-2xl opacity-50">😴</div>
       )}
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
         {goals.length > 0 && filteredGoals.length === 0 && (

@@ -10,7 +10,10 @@ export function ShowGoalFormButton() {
 
   return (
     <>
-      <Button className="h-7 px-3 text-xs" onClick={() => setIsOpen(true)}>
+      <Button
+        className="h-7 px-3 text-xs sm:text-sm"
+        onClick={() => setIsOpen(true)}
+      >
         New Commitment
       </Button>
       <Modal
