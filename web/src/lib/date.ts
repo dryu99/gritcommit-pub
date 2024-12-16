@@ -88,7 +88,7 @@ export const toInitialRecurringDueDate = ({
   scheduleDays: number[];
   startToday?: boolean;
 }): Date => {
-  const today = DateUtils.dayjs().tz(timezone);
+  const today = DateUtils.dayjs.tz(timezone);
 
   if (startToday) {
     return today.endOf("day").toDate();
@@ -109,7 +109,7 @@ export const toNextRecurringDueDate = ({
   scheduleDays: number[];
   prevDueDate: Date | string;
 }): Date => {
-  const lastDue = DateUtils.dayjs(prevDueDate).tz(timezone);
+  const lastDue = DateUtils.dayjs.tz(prevDueDate, timezone);
   return findNextScheduledDay(lastDue, scheduleDays);
 };
 
