@@ -49,14 +49,21 @@ export default async function DashboardPage(props: {
           goal.entries.map((entry) => new Date(entry.createdAt)),
         )}
       />
-      <CommitLine />
+      <CommitLine includeNode />
       <div>
         <ShowGoalFormButton />
       </div>
-      <CommitLine />
-      <GoalStatusFilters currentStatus={searchParams.status} />
-      {goals.length > 0 && <CommitLine />}
+      {goals.length > 0 && (
+        <>
+          <CommitLine height={20} includeNode />
+          <GoalStatusFilters currentStatus={searchParams.status} />
+          <CommitLine height={10} />
+        </>
+      )}
       <div className="mb-8 flex w-full flex-col text-sm sm:w-[500px]">
+        {filteredGoals.length === 0 && (
+          <div className="mx-auto text-center text-2xl opacity-50">😴</div>
+        )}
         {filteredGoals.map((goal, i) => {
           const latestEntry = goal.entries[0];
           const scheduleText = getScheduleText(goal);
@@ -65,7 +72,7 @@ export default async function DashboardPage(props: {
             <div key={goal.id}>
               <div className="rounded-lg border border-neutral-300 p-4 sm:px-6 sm:py-5">
                 <h3 className="mb-1 flex items-center justify-between text-brand">
-                  <div>commit #{goals.length - i}</div>
+                  <div>commit {goal.id.split("-")[0]}</div>
                   {latestEntry && (
                     <div className="flex items-center gap-2">
                       <span
@@ -140,22 +147,35 @@ export default async function DashboardPage(props: {
                   </div>
                 </div>
               </div>
-              {i !== goals.length - 1 && <CommitLine />}
+              {i !== filteredGoals.length - 1 && <CommitLine includeNode />}
             </div>
           );
         })}
-        {/* <div className="mx-auto text-center text-2xl opacity-50">😴</div> */}
       </div>
     </div>
   );
 }
 
-const CommitLine = () => {
+const CommitLine = ({
+  height = 20,
+  includeNode,
+}: {
+  height?: number;
+  includeNode?: boolean;
+}) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="h-5 w-[2px] bg-neutral-300" />
-      <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
-      <div className="h-5 w-[2px] bg-neutral-300" />
+      <div
+        className="w-[2px] bg-neutral-300"
+        style={{ height: `${height}px` }}
+      />
+      {includeNode && (
+        <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
+      )}
+      <div
+        className="w-[2px] bg-neutral-300"
+        style={{ height: `${height}px` }}
+      />
     </div>
   );
 };
@@ -165,31 +185,37 @@ const GoalStatusFilters = ({
 }: {
   currentStatus?: SearchParamStatus;
 }) => {
+  const baseLinkStyles =
+    "px-4 py-2 text-center text-sm transition-colors hover:bg-neutral-300 rounded-md";
+  const activeLinkStyles =
+    "bg-primary font-medium text-primary hover:bg-primary";
+  const inactiveLinkStyles = "text-gray-500 bg-neutral-200";
+
   return (
-    <div className="grid grid-cols-3 gap-8">
+    <div className="grid w-[500px] grid-cols-3 gap-1 rounded-md border border-neutral-300 bg-neutral-200">
       <Link
         href={`/dashboard`}
-        className={cn("text-center text-sm", {
-          "font-medium text-brand": currentStatus === undefined,
-          "text-gray-500": currentStatus !== undefined,
+        className={cn(baseLinkStyles, {
+          [activeLinkStyles]: currentStatus === undefined,
+          [inactiveLinkStyles]: currentStatus !== undefined,
         })}
       >
         In Progress
       </Link>
       <Link
         href={`/dashboard?status=completed`}
-        className={cn("text-center text-sm", {
-          "font-medium text-brand": currentStatus === "completed",
-          "text-gray-500": currentStatus !== "completed",
+        className={cn(baseLinkStyles, {
+          [activeLinkStyles]: currentStatus === "completed",
+          [inactiveLinkStyles]: currentStatus !== "completed",
         })}
       >
         Completed
       </Link>
       <Link
         href={`/dashboard?status=dropped`}
-        className={cn("text-center text-sm", {
-          "font-medium text-brand": currentStatus === "dropped",
-          "text-gray-500": currentStatus !== "dropped",
+        className={cn(baseLinkStyles, {
+          [activeLinkStyles]: currentStatus === "dropped",
+          [inactiveLinkStyles]: currentStatus !== "dropped",
         })}
       >
         Dropped
