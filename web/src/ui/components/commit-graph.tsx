@@ -74,7 +74,7 @@ export const CommitGraph = ({
             ))}
           </div>
 
-          <table className="border-separate border-spacing-[3px]">
+          <table className="relative border-separate border-spacing-[3px]">
             <tbody>
               {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
                 const startsOnSecondWeek =
@@ -83,22 +83,23 @@ export const CommitGraph = ({
                   7 - firstDateOfTheYear.getUTCDay();
 
                 return (
-                  <tr key={dayIndex} className="relative">
+                  <tr key={dayIndex}>
                     {[0, 2, 4, 6].includes(dayIndex) && (
-                      <td className="absolute -left-6 h-[10px]" />
+                      <td className="absolute -left-[22px] h-[10px]" />
                     )}
+                    {/* the absolute positioning here is relative to TABLE not ROW. Would love to do row but rendering messes up on Safari. */}
                     {dayIndex === 1 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      <td className="absolute -left-[22px] bottom-[72px] h-[10px] text-xs text-primary">
                         Mon
                       </td>
                     )}
                     {dayIndex === 3 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      <td className="absolute -left-[22px] bottom-[46px] h-[10px] text-xs text-primary">
                         Wed
                       </td>
                     )}
                     {dayIndex === 5 && (
-                      <td className="absolute -left-6 bottom-1 h-[10px] text-xs text-primary">
+                      <td className="absolute -left-[22px] bottom-[20px] h-[10px] text-xs text-primary">
                         Fri
                       </td>
                     )}
