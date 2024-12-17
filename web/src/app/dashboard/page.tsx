@@ -40,13 +40,17 @@ export default async function DashboardPage(props: {
 
   // TODO would prob be better to handle this at the db level
   //      also it should prob be immutable lol
-  filteredGoals.sort((a, b) => {
-    if (a.entries[0] === undefined || b.entries[0] === undefined) return 0;
-    return (
-      new Date(a.entries[0].dueAt).getTime() -
-      new Date(b.entries[0].dueAt).getTime()
-    );
-  });
+  // filteredGoals.sort((a, b) => {
+  //   if (a.entries[0] === undefined || b.entries[0] === undefined) return 0;
+
+  //   const dueAtDiff =
+  //     new Date(a.entries[0].dueAt).getTime() -
+  //     new Date(b.entries[0].dueAt).getTime();
+
+  //   return dueAtDiff !== 0
+  //     ? dueAtDiff
+  //     : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  // });
 
   return (
     <div className="flex flex-col items-center">
