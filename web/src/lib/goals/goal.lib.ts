@@ -157,40 +157,24 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userTimezone: "America/Los_Angeles",
 };
 
-// recently expired = current time is past the due date by at most 1 hour
-// we do 1 hour check to account for timezones
-// e.g. it's 12am EST and we want to send email to those due dates that was due at 11:59pm EST
-//      we don't want to send emails for people who's goals were due at 11:59pm PST (which is 8:59pm PST)
-export const toRecentlyExpiredGoalEntries = (
-  goalEntries: CompleteGoalEntry[],
-) => {
+export const toExpiredGoalEntries = (goalEntries: CompleteGoalEntry[]) => {
   return goalEntries.filter((goalEntry) => {
-    const userTimezone = goalEntry.userTimezone;
-    const now = DateUtils.dayjs().tz(userTimezone);
-    const oneHourAgo = now.subtract(1, "hour");
-
-    const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, userTimezone);
-
-    return dueDate.isAfter(oneHourAgo) && dueDate.isBefore(now);
+    const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
+    const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
+    return dueDate.isBefore(now);
   });
 };
 
-export const toExpiredPartnerVerificationDeadlineEntries = (
+export const toExpiredPartnerVerificationEntries = (
   goalEntries: CompleteGoalEntry[],
 ) => {
   return goalEntries.filter((goalEntry) => {
+    const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
     const partnerVerifyDueDate = DateUtils.dayjs.tz(
       toPartnerVerificationDeadline(goalEntry.dueAt),
       goalEntry.userTimezone,
     );
 
-    const userTimezone = goalEntry.userTimezone;
-    const now = DateUtils.dayjs().tz(userTimezone);
-    const oneHourAgo = now.subtract(1, "hour");
-
-    return (
-      partnerVerifyDueDate.isAfter(oneHourAgo) &&
-      partnerVerifyDueDate.isBefore(now)
-    );
+    return partnerVerifyDueDate.isBefore(now);
   });
 };

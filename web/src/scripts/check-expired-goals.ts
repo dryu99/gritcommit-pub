@@ -8,7 +8,7 @@ import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
-  toRecentlyExpiredGoalEntries,
+  toExpiredGoalEntries,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
@@ -20,7 +20,7 @@ const main = async () => {
     status: GoalEntryStatus.CommitterVerifying,
   });
 
-  const expiredGoalEntries = toRecentlyExpiredGoalEntries(pendingGoalEntries);
+  const expiredGoalEntries = toExpiredGoalEntries(pendingGoalEntries);
   console.log("Expired goal entries:", expiredGoalEntries.length);
 
   for (const goalEntry of expiredGoalEntries) {
@@ -65,6 +65,7 @@ const main = async () => {
           }
         });
 
+      // TODO can remove await maybe
       await sendEmail({
         recipientEmail: goalEntry.userEmail,
         subject: toCommitterEmailSubject(goalEntry.goalDescription),

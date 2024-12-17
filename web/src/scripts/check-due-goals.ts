@@ -8,7 +8,7 @@ import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
-  toExpiredPartnerVerificationDeadlineEntries,
+  toExpiredPartnerVerificationEntries,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
@@ -31,10 +31,9 @@ const main = async () => {
     status: GoalEntryStatus.PartnerVerifying,
   });
 
-  const entriesWithExpiredPartnerDeadline =
-    toExpiredPartnerVerificationDeadlineEntries(
-      entriesAwaitingPartnerVerification,
-    );
+  const entriesWithExpiredPartnerDeadline = toExpiredPartnerVerificationEntries(
+    entriesAwaitingPartnerVerification,
+  );
 
   for (const goalEntry of entriesWithExpiredPartnerDeadline) {
     console.log("> Processing expired partner verification:", goalEntry.id);
