@@ -8,24 +8,13 @@ import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
+  isGoalEntryDueToday,
   isGoalEntryPartnerVerificationExpired,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
-// this job runs every hour i.e. runs every 12PM somewhere in the world
-const main = async () => {
-  console.log("Checking due goals START: ", new Date().toISOString());
-
-  /**
-   * Check for goal entries with status PARTNER_VERIFYING
-   *
-   * at this point, partner missed the deadline to verify
-   * - automatically approve the goal entry (set status). if recurring, create the next goal entry
-   * - send email to partner saying they missed the due date? (maybe in the partner-verify email to avoid fatigue)
-   *  - we can do a null check on partnerVerifiedAt
-   * - in committer verify email, add condition to say (your partner missed the deadline to verify so we auto verified you)
-   */
+async function processExpiredPartnerVerifications() {
   console.log("Checking for expired partner verifications");
   const partnerVerifyingEntries = await fetchCompleteGoalEntry({
     status: GoalEntryStatus.PartnerVerifying,
@@ -34,6 +23,8 @@ const main = async () => {
   const expiredPartnerVerifyingEntries = partnerVerifyingEntries.filter(
     isGoalEntryPartnerVerificationExpired,
   );
+
+  console.log("Entries to process:", expiredPartnerVerifyingEntries.length);
 
   for (const goalEntry of expiredPartnerVerifyingEntries) {
     console.log("> Processing expired partner verification:", goalEntry.id);
@@ -71,36 +62,27 @@ const main = async () => {
           }
         });
     } catch (error) {
-      console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
+      // TODO sentry
+      console.error(
+        `> Failed to process expired partner verification ${goalEntry.id}:`,
+        error,
+      );
     }
   }
+}
 
-  /**
-   * Check for goals that are due today
-   * - set status to COMMITTER_VERIFYING
-   * - send email
-   */
+async function processGoalsDueToday() {
   console.log("Checking for goals due today");
   const pendingGoalEntries = await fetchCompleteGoalEntry({
     status: GoalEntryStatus.Pending,
   });
 
-  // TODO does this timezone logic make sense... lets say we were running script in another server
-  // TODO figure out how to do this filter in sql
-  const dueTodayGoalEntries = pendingGoalEntries.filter((goalEntry) => {
-    const entryDueDate = new Date(goalEntry.dueAt);
-    return entryDueDate.getDate() === new Date().getDate();
-  });
+  const dueTodayGoalEntries = pendingGoalEntries.filter(isGoalEntryDueToday);
 
-  console.log("Due today goal entries:", dueTodayGoalEntries.length);
-
+  console.log("Entries to process:", dueTodayGoalEntries.length);
   for (const goalEntry of dueTodayGoalEntries) {
-    console.log("Processing goal entry:", {
-      description: goalEntry.goalDescription,
-      dueAt: goalEntry.dueAt,
-      userEmail: goalEntry.userEmail,
-      partnerEmail: goalEntry.goalPartnerEmail,
-    });
+    console.log("> Processing goal entry:", goalEntry.id);
+
     try {
       const newVerificationToken = crypto.randomUUID();
 
@@ -124,20 +106,37 @@ const main = async () => {
         }),
       });
     } catch (error) {
-      console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
-
+      console.error(`> Failed to process goal entry ${goalEntry.id}:`, error);
       // TODO sentry
-      // revert goalEntry update from before
-      await DB.get()
-        .updateTable("goalEntry")
-        .set({
-          status: GoalEntryStatus.Pending,
-          userVerificationToken: null,
-        })
-        .where("id", "=", goalEntry.id)
-        .execute();
     }
   }
+}
+
+/**
+ * This job runs every hour i.e. runs every 12PM somewhere in the world
+ */
+const main = async () => {
+  console.log("Checking due goals START: ", new Date().toISOString());
+
+  // TODO add error handling
+
+  /**
+   * Check for goal entries with status PARTNER_VERIFYING
+   *
+   * At this point, partner missed the deadline to verify
+   * - automatically approve the goal entry (set status). if recurring, create the next goal entry
+   * - send email to partner saying they missed the due date? (maybe in the partner-verify email to avoid fatigue)
+   *  - we can do a null check on partnerVerifiedAt
+   * - in committer verify email, add condition to say (your partner missed the deadline to verify so we auto verified you)
+   */
+  await processExpiredPartnerVerifications();
+
+  /**
+   * Check for goals that are due today
+   * - set status to COMMITTER_VERIFYING
+   * - send email
+   */
+  await processGoalsDueToday();
 
   console.log("Done checking due today goals");
   process.exit(0);

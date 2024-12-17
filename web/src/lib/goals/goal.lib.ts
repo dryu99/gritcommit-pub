@@ -157,6 +157,7 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userTimezone: "America/Los_Angeles",
 };
 
+// TODO i think we can prob just consume a safedate + move this to date file
 export const isGoalEntryExpired = (goalEntry: CompleteGoalEntry) => {
   const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
   const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
@@ -173,4 +174,11 @@ export const isGoalEntryPartnerVerificationExpired = (
   );
 
   return partnerVerifyDueDate.isBefore(now);
+};
+
+// TODO write tets
+export const isGoalEntryDueToday = (goalEntry: CompleteGoalEntry) => {
+  const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
+  const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
+  return dueDate.format("YYYY-MM-DD") === now.format("YYYY-MM-DD");
 };

@@ -13,7 +13,9 @@ import {
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
-// this job runs every hour i.e. runs every MIDNIGHT somewhere in the world
+/**
+ * This job runs every hour i.e. runs every MIDNIGHT somewhere in the world
+ */
 const main = async () => {
   console.log("Checking expired goals START: ", new Date().toISOString());
   const pendingGoalEntries = await fetchCompleteGoalEntry({
