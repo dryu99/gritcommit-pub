@@ -67,7 +67,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div
           ref={modalRef}
-          className="mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl"
+          className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl sm:mx-4"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b p-4">

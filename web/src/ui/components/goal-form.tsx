@@ -18,6 +18,8 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [selectedDays, setSelectedDays] = useState<Day[]>(DAYS);
   const [dueDate, setDueDate] = useState("");
+  const [showStartToday, setShowStartToday] = useState(true);
+  const [startToday, setStartToday] = useState(false);
 
   useEffect(() => {
     let currentText = GOAL_PLACEHOLDERS[currGoalPlaceholderIndex];
@@ -79,26 +81,23 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
     reqBody.scheduleDays = isRecurring
       ? selectedDays.map((d) => d.index)
       : undefined;
+    reqBody.startToday = isRecurring ? startToday : undefined;
 
     try {
       if (!isRecurring) {
         createGoal(reqBody);
+        onClose();
         return;
       }
 
-      const todayIndex = new Date().getDay();
-      if (selectedDays.find((d) => d.index === todayIndex)) {
-        const startToday = window.confirm(
-          "Do you want to start this commitment today?",
-        );
-        reqBody.startToday = startToday;
+      if (selectedDays.length === 0) {
+        throw new Error("Please select at least one day");
       }
 
       createGoal(reqBody);
+      onClose();
     } catch (e: any) {
       setError(e.message);
-    } finally {
-      onClose();
     }
   };
 
@@ -195,7 +194,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                 Due Dates
               </label>
               <div className="flex flex-col gap-2">
-                <p>
+                <p className="text-xs text-gray-500">
                   {selectedDays.length === 0 ? (
                     <>Never</>
                   ) : selectedDays.length === 7 ? (
@@ -220,14 +219,26 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                       key={day.short}
                       type="button"
                       onClick={() => {
+                        const todayIndex = new Date().getDay();
+
                         setSelectedDays((prev) => {
-                          return prev.find((d) => d.short === day.short)
+                          const newSelectedDays = prev.find(
+                            (d) => d.short === day.short,
+                          )
                             ? prev.filter((d) => d.short !== day.short)
                             : prev
                                 .concat(day)
                                 .sort(
                                   (a, b) => a.displayIndex - b.displayIndex,
                                 );
+
+                          setShowStartToday(
+                            !!newSelectedDays.find(
+                              (d) => d.index === todayIndex,
+                            ),
+                          );
+
+                          return newSelectedDays;
                         });
                       }}
                       className={`h-8 w-8 rounded-full text-sm font-medium ${
@@ -240,6 +251,20 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                     </button>
                   ))}
                 </div>
+                {showStartToday && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <input
+                      className="h-4 w-4"
+                      type="checkbox"
+                      id="startToday"
+                      checked={startToday}
+                      onChange={(e) => {
+                        setStartToday(e.target.checked);
+                      }}
+                    />
+                    <label htmlFor="startToday">Start today?</label>
+                  </div>
+                )}
               </div>
             </div>
           </div>
