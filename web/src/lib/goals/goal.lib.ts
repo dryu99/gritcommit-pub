@@ -171,5 +171,6 @@ export const isGoalEntryPartnerVerificationExpired = (
     toPartnerVerificationDeadline(goalEntry.dueAt),
     goalEntry.userTimezone,
   );
+
   return partnerVerifyDueDate.isBefore(now);
 };
