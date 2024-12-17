@@ -1,16 +1,87 @@
+import { toNextRecurringDueDate } from "@/lib/date";
 import {
   sendEmail,
   toCommitterEmailSubject,
   toEmailHtml,
 } from "@/lib/email/email.lib";
 import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
-import { fetchCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { generateModelId } from "@/lib/generate-model-id";
+import {
+  fetchCompleteGoalEntry,
+  toExpiredPartnerVerificationDeadlineEntries,
+} from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
-// TODO figure out how this should work across timezones. run multiple times?
-// this job runs everyday at 8am PST
+// this job runs every hour i.e. runs every 12PM somewhere in the world
 const main = async () => {
+  console.log("Checking due goals START: ", new Date().toISOString());
+
+  /**
+   * Check for goal entries with status PARTNER_VERIFYING
+   *
+   * at this point, partner missed the deadline to verify
+   * - automatically approve the goal entry (set status). if recurring, create the next goal entry
+   * - send email to partner saying they missed the due date? (maybe in the partner-verify email to avoid fatigue)
+   *  - we can do a null check on partnerVerifiedAt
+   * - in committer verify email, add condition to say (your partner missed the deadline to verify so we auto verified you)
+   */
+  console.log("Checking for expired partner verifications");
+  const entriesAwaitingPartnerVerification = await fetchCompleteGoalEntry({
+    status: GoalEntryStatus.PartnerVerifying,
+  });
+
+  const entriesWithExpiredPartnerDeadline =
+    toExpiredPartnerVerificationDeadlineEntries(
+      entriesAwaitingPartnerVerification,
+    );
+
+  for (const goalEntry of entriesWithExpiredPartnerDeadline) {
+    console.log("> Processing expired partner verification:", goalEntry.id);
+    try {
+      await DB.get()
+        .transaction()
+        .execute(async (trx) => {
+          // Update existing goal entry
+          await DB.get()
+            .updateTable("goalEntry")
+            .set({
+              status: GoalEntryStatus.Completed,
+            })
+            .where("id", "=", goalEntry.id)
+            .execute();
+
+          // Create next recurring entry if applicable
+          if (
+            goalEntry.goalScheduleType === "RECURRING" &&
+            goalEntry.goalScheduleDays
+          ) {
+            await trx
+              .insertInto("goalEntry")
+              .values({
+                id: generateModelId(),
+                status: GoalEntryStatus.Pending,
+                goalId: goalEntry.goalId,
+                dueAt: toNextRecurringDueDate({
+                  timezone: goalEntry.userTimezone,
+                  scheduleDays: goalEntry.goalScheduleDays,
+                  prevDueDate: goalEntry.dueAt,
+                }),
+              })
+              .execute();
+          }
+        });
+    } catch (error) {
+      console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
+    }
+  }
+
+  /**
+   * Check for goals that are due today
+   * - set status to COMMITTER_VERIFYING
+   * - send email
+   */
+  console.log("Checking for goals due today");
   const pendingGoalEntries = await fetchCompleteGoalEntry({
     status: GoalEntryStatus.Pending,
   });
@@ -56,7 +127,7 @@ const main = async () => {
     } catch (error) {
       console.error(`Failed to process goal entry ${goalEntry.id}:`, error);
 
-      // TODO handle this error better?
+      // TODO sentry
       // revert goalEntry update from before
       await DB.get()
         .updateTable("goalEntry")

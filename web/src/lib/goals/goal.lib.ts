@@ -3,7 +3,7 @@ import { Goal, GoalEntry, User } from "@/database/db-generated-types";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
-import { DateUtils } from "../date";
+import { DateUtils, toPartnerVerificationDeadline } from "../date";
 
 export const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
@@ -63,6 +63,8 @@ export type CompleteGoalEntry = {
   id: Selectable<GoalEntry>["id"];
   status: Selectable<GoalEntry>["status"];
   dueAt: Selectable<GoalEntry>["dueAt"];
+  partnerVerifiedAt: Selectable<GoalEntry>["partnerVerifiedAt"];
+  userVerifiedAt: Selectable<GoalEntry>["userVerifiedAt"];
   userVerificationToken: Selectable<GoalEntry>["userVerificationToken"];
   partnerVerificationToken: Selectable<GoalEntry>["partnerVerificationToken"];
 
@@ -101,6 +103,8 @@ export const fetchCompleteGoalEntry = async ({
       "goalEntry.id",
       "goalEntry.userVerificationToken",
       "goalEntry.partnerVerificationToken",
+      "goalEntry.partnerVerifiedAt",
+      "goalEntry.userVerifiedAt",
 
       "goal.id as goalId",
       "goal.partnerEmail as goalPartnerEmail",
@@ -137,6 +141,8 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   status: GoalEntryStatus.Completed,
   userVerificationToken: "1234567890",
   partnerVerificationToken: "1234567890",
+  partnerVerifiedAt: new Date("12/20/2024 16:00:00"),
+  userVerifiedAt: new Date("12/20/2024 14:00:00"),
 
   goalId: "1",
   goalDescription: "Run a marathon",
@@ -166,5 +172,25 @@ export const toRecentlyExpiredGoalEntries = (
     const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, userTimezone);
 
     return dueDate.isAfter(oneHourAgo) && dueDate.isBefore(now);
+  });
+};
+
+export const toExpiredPartnerVerificationDeadlineEntries = (
+  goalEntries: CompleteGoalEntry[],
+) => {
+  return goalEntries.filter((goalEntry) => {
+    const partnerVerifyDueDate = DateUtils.dayjs.tz(
+      toPartnerVerificationDeadline(goalEntry.dueAt),
+      goalEntry.userTimezone,
+    );
+
+    const userTimezone = goalEntry.userTimezone;
+    const now = DateUtils.dayjs().tz(userTimezone);
+    const oneHourAgo = now.subtract(1, "hour");
+
+    return (
+      partnerVerifyDueDate.isAfter(oneHourAgo) &&
+      partnerVerifyDueDate.isBefore(now)
+    );
   });
 };

@@ -116,6 +116,8 @@ export const createGoal = async (data: any) => {
     dueAt: newGoalEntry.dueAt,
     userVerificationToken: null,
     partnerVerificationToken: null,
+    userVerifiedAt: null,
+    partnerVerifiedAt: null,
 
     goalId: newGoal.id,
     goalDescription: newGoal.description,
@@ -213,66 +215,50 @@ export const handleCommitterVerify = async (formData: FormData) => {
 
   const partnerVerifyToken = crypto.randomUUID();
 
-  try {
-    await DB.get()
-      .updateTable("goalEntry")
-      .set({
+  await DB.get()
+    .updateTable("goalEntry")
+    .set({
+      partnerVerificationToken: partnerVerifyToken,
+      status: GoalEntryStatus.PartnerVerifying,
+      userVerifiedAt: new Date(),
+    })
+    .where("id", "=", goalEntry.id)
+    .execute();
+
+  await sendEmail({
+    recipientEmail: goalEntry.goalPartnerEmail,
+    subject: toPartnerEmailSubject(
+      goalEntry.userFirstName,
+      goalEntry.goalDescription,
+    ),
+    emailHtml: await toEmailHtml(PartnerVerifyEmail, {
+      goalEntry: {
+        ...goalEntry,
         partnerVerificationToken: partnerVerifyToken,
-        status: GoalEntryStatus.PartnerVerifying,
-        userVerifiedAt: new Date(),
-      })
-      .where("id", "=", goalEntry.id)
-      .execute();
-
-    await sendEmail({
-      recipientEmail: goalEntry.goalPartnerEmail,
-      subject: toPartnerEmailSubject(
-        goalEntry.userFirstName,
-        goalEntry.goalDescription,
-      ),
-      emailHtml: await toEmailHtml(PartnerVerifyEmail, {
-        goalEntry: {
-          ...goalEntry,
-          partnerVerificationToken: partnerVerifyToken,
-        },
-        committerMessage: reqBody.message,
-        hasImage: !!reqBody.image,
-      }),
-      attachments: reqBody.image
-        ? [
-            {
-              Name: "evidence.jpeg",
-              Content: await reqBody.image
-                .arrayBuffer()
-                .then((buffer) =>
-                  sharp(Buffer.from(buffer))
-                    .resize(800, 600, {
-                      fit: "inside",
-                      withoutEnlargement: true,
-                    })
-                    .jpeg({ quality: 80 })
-                    .toBuffer(),
-                )
-                .then((resizedBuffer) => resizedBuffer.toString("base64")),
-              ContentID: "cid:evidence@goalentry.image",
-              ContentType: "image/jpeg",
-            },
-          ]
-        : undefined,
-    });
-  } catch (e) {
-    console.error(e);
-
-    // TODO handle transaction better
-    await DB.get()
-      .updateTable("goalEntry")
-      .set({
-        status: GoalEntryStatus.CommitterVerifying,
-        partnerVerificationToken: null,
-      })
-      .where("id", "=", goalEntry.id)
-      .execute();
-
-    throw e;
-  }
+      },
+      committerMessage: reqBody.message,
+      hasImage: !!reqBody.image,
+    }),
+    attachments: reqBody.image
+      ? [
+          {
+            Name: "evidence.jpeg",
+            Content: await reqBody.image
+              .arrayBuffer()
+              .then((buffer) =>
+                sharp(Buffer.from(buffer))
+                  .resize(800, 600, {
+                    fit: "inside",
+                    withoutEnlargement: true,
+                  })
+                  .jpeg({ quality: 80 })
+                  .toBuffer(),
+              )
+              .then((resizedBuffer) => resizedBuffer.toString("base64")),
+            ContentID: "cid:evidence@goalentry.image",
+            ContentType: "image/jpeg",
+          },
+        ]
+      : undefined,
+  });
 };
