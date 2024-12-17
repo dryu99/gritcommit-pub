@@ -1,6 +1,6 @@
 "use client";
 
-import { Day, DAYS } from "@/lib/date";
+import { DateUtils, Day, DAYS } from "@/lib/date";
 import { createGoal, CreateGoalReqBody } from "@/lib/goals/goal.actions";
 import { useEffect, useState } from "react";
 
@@ -174,6 +174,7 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
                 name="dueDate"
                 type="date"
                 value={dueDate}
+                min={DateUtils.dayjs().format("YYYY-MM-DD")}
                 className="w-[194px] rounded-md border p-2"
                 onChange={(e) => {
                   setDueDate(e.target.value);
