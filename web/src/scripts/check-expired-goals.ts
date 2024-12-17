@@ -8,7 +8,7 @@ import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
-  toExpiredGoalEntries,
+  isGoalEntryExpired,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
@@ -20,7 +20,7 @@ const main = async () => {
     status: GoalEntryStatus.CommitterVerifying,
   });
 
-  const expiredGoalEntries = toExpiredGoalEntries(pendingGoalEntries);
+  const expiredGoalEntries = pendingGoalEntries.filter(isGoalEntryExpired);
   console.log("Expired goal entries:", expiredGoalEntries.length);
 
   for (const goalEntry of expiredGoalEntries) {

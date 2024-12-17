@@ -8,7 +8,7 @@ import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
   fetchCompleteGoalEntry,
-  toExpiredPartnerVerificationEntries,
+  isGoalEntryPartnerVerificationExpired,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
@@ -27,15 +27,15 @@ const main = async () => {
    * - in committer verify email, add condition to say (your partner missed the deadline to verify so we auto verified you)
    */
   console.log("Checking for expired partner verifications");
-  const entriesAwaitingPartnerVerification = await fetchCompleteGoalEntry({
+  const partnerVerifyingEntries = await fetchCompleteGoalEntry({
     status: GoalEntryStatus.PartnerVerifying,
   });
 
-  const entriesWithExpiredPartnerDeadline = toExpiredPartnerVerificationEntries(
-    entriesAwaitingPartnerVerification,
+  const expiredPartnerVerifyingEntries = partnerVerifyingEntries.filter(
+    isGoalEntryPartnerVerificationExpired,
   );
 
-  for (const goalEntry of entriesWithExpiredPartnerDeadline) {
+  for (const goalEntry of expiredPartnerVerifyingEntries) {
     console.log("> Processing expired partner verification:", goalEntry.id);
     try {
       await DB.get()

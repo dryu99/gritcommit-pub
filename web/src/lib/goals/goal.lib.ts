@@ -157,24 +157,19 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userTimezone: "America/Los_Angeles",
 };
 
-export const toExpiredGoalEntries = (goalEntries: CompleteGoalEntry[]) => {
-  return goalEntries.filter((goalEntry) => {
-    const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
-    const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
-    return dueDate.isBefore(now);
-  });
+export const isGoalEntryExpired = (goalEntry: CompleteGoalEntry) => {
+  const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
+  const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
+  return dueDate.isBefore(now);
 };
 
-export const toExpiredPartnerVerificationEntries = (
-  goalEntries: CompleteGoalEntry[],
+export const isGoalEntryPartnerVerificationExpired = (
+  goalEntry: CompleteGoalEntry,
 ) => {
-  return goalEntries.filter((goalEntry) => {
-    const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
-    const partnerVerifyDueDate = DateUtils.dayjs.tz(
-      toPartnerVerificationDeadline(goalEntry.dueAt),
-      goalEntry.userTimezone,
-    );
-
-    return partnerVerifyDueDate.isBefore(now);
-  });
+  const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
+  const partnerVerifyDueDate = DateUtils.dayjs.tz(
+    toPartnerVerificationDeadline(goalEntry.dueAt),
+    goalEntry.userTimezone,
+  );
+  return partnerVerifyDueDate.isBefore(now);
 };
