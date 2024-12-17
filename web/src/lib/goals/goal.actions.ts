@@ -13,9 +13,12 @@ import { getSessionUser } from "../auth/auth.lib";
 import { DateUtils, toInitialRecurringDueDate } from "../date";
 import {
   sendEmail,
+  toCommitterEmailSubject,
   toEmailHtml,
   toPartnerEmailSubject,
 } from "../email/email.lib";
+import CommitterNewGoalEmail from "../email/templates/committer-new-goal-email";
+import PartnerNewGoalEmail from "../email/templates/partner-new-goal-email";
 import PartnerVerifyEmail from "../email/templates/partner-verify-email";
 import { CompleteGoalEntry, fetchCompleteGoalEntry } from "./goal.lib";
 
@@ -140,21 +143,21 @@ export const createGoal = async (data: any) => {
 
   // TODO handle email errors
   // TODO also have to send checkin emails if user is starting today and its past 12pm
-  // sendEmail({
-  //   recipientEmail: sessionUser.email,
-  //   subject: toCommitterEmailSubject(newGoal.description),
-  //   emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
-  //     goalEntry: completeGoalEntry,
-  //   }),
-  // });
+  sendEmail({
+    recipientEmail: sessionUser.email,
+    subject: toCommitterEmailSubject(newGoal.description),
+    emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
+      goalEntry: completeGoalEntry,
+    }),
+  });
 
-  // sendEmail({
-  //   recipientEmail: reqBody.partnerEmail,
-  //   subject: toPartnerEmailSubject(sessionUser.firstName, newGoal.description),
-  //   emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
-  //     goalEntry: completeGoalEntry,
-  //   }),
-  // });
+  sendEmail({
+    recipientEmail: reqBody.partnerEmail,
+    subject: toPartnerEmailSubject(sessionUser.firstName, newGoal.description),
+    emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
+      goalEntry: completeGoalEntry,
+    }),
+  });
 
   revalidatePath("/");
 };
