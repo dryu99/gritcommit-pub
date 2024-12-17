@@ -38,6 +38,16 @@ export default async function DashboardPage(props: {
           ].includes(latestEntry.status);
   });
 
+  // TODO would prob be better to handle this at the db level
+  //      also it should prob be immutable lol
+  filteredGoals.sort((a, b) => {
+    if (a.entries[0] === undefined || b.entries[0] === undefined) return 0;
+    return (
+      new Date(a.entries[0].dueAt).getTime() -
+      new Date(b.entries[0].dueAt).getTime()
+    );
+  });
+
   return (
     <div className="flex flex-col items-center">
       <CommitGraph

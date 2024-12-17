@@ -48,7 +48,7 @@ export const fetchGoals = async (
             "goalEntry.dueAt",
           ])
           .whereRef("goal.id", "=", "goalEntry.goalId")
-          .orderBy("goalEntry.createdAt", "desc"),
+          .orderBy("goalEntry.dueAt", "desc"),
       ).as("entries"),
     ])
     .where("goal.createdByUserId", "=", userId)
