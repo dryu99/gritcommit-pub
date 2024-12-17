@@ -176,7 +176,7 @@ export const isGoalEntryPartnerVerificationExpired = (
   return partnerVerifyDueDate.isBefore(now);
 };
 
-// TODO write tets
+// TODO write tests
 export const isGoalEntryDueToday = (goalEntry: CompleteGoalEntry) => {
   const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
   const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
