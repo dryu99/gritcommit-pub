@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DateUtils } from "../date";
 import {
+  canSendGoalEntryDueTodayEmail,
   CompleteGoalEntry,
   isGoalEntryExpired,
   isGoalEntryPartnerVerificationExpired,
@@ -168,5 +169,114 @@ describe("isGoalEntryPartnerVerificationExpired", () => {
     } as CompleteGoalEntry;
 
     expect(isGoalEntryPartnerVerificationExpired(entryAtDeadline)).toBe(false);
+  });
+});
+
+describe("canSendGoalEntryDueTodayEmail", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should return true when it's 12pm and goal is due today", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 12:00:00.000", "America/Los_Angeles")
+        .toDate(),
+    );
+
+    const goalDueToday = {
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+      userTimezone: "America/Los_Angeles",
+    } as CompleteGoalEntry;
+
+    expect(canSendGoalEntryDueTodayEmail(goalDueToday)).toBe(true);
+  });
+
+  it("should return true when it's 12-something pm and goal is due today", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 12:30:00.000", "America/Los_Angeles")
+        .toDate(),
+    );
+
+    const goalDueToday = {
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+      userTimezone: "America/Los_Angeles",
+    } as CompleteGoalEntry;
+
+    expect(canSendGoalEntryDueTodayEmail(goalDueToday)).toBe(true);
+  });
+
+  it("should return false when it's not 12pm", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 11:59:59.999", "America/Los_Angeles")
+        .toDate(),
+    );
+
+    const goalDueToday = {
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+      userTimezone: "America/Los_Angeles",
+    } as CompleteGoalEntry;
+
+    expect(canSendGoalEntryDueTodayEmail(goalDueToday)).toBe(false);
+  });
+
+  it("should return false when goal is due on a different day", () => {
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 12:00:00.000", "America/Los_Angeles")
+        .toDate(),
+    );
+
+    const goalDueTomorrow = {
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-21 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+      userTimezone: "America/Los_Angeles",
+    } as CompleteGoalEntry;
+
+    expect(canSendGoalEntryDueTodayEmail(goalDueTomorrow)).toBe(false);
+  });
+
+  it("handles different timezones correctly", () => {
+    // Set system time to 12pm in New York
+    vi.setSystemTime(
+      DateUtils.dayjs
+        .tz("2024-03-20 12:00:00.000", "America/New_York")
+        .toDate(),
+    );
+
+    /**
+     * Different timezone case
+     */
+    const goalInDifferentTimezone = {
+      // Due at 11:59pm LA time (which is next day 2:59am NY time)
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/Los_Angeles")
+        .toDate(),
+      userTimezone: "America/Los_Angeles",
+    } as CompleteGoalEntry;
+
+    // Should return false because it's not 12pm in LA (it's 9am)
+    expect(canSendGoalEntryDueTodayEmail(goalInDifferentTimezone)).toBe(false);
+
+    /**
+     * Same timezone case
+     */
+    const goalInSameTimezone = {
+      dueAt: DateUtils.dayjs
+        .tz("2024-03-20 23:59:59.999", "America/New_York")
+        .toDate(),
+      userTimezone: "America/New_York",
+    } as CompleteGoalEntry;
+
+    expect(canSendGoalEntryDueTodayEmail(goalInSameTimezone)).toBe(true);
   });
 });
