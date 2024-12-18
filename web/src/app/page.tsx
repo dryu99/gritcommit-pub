@@ -29,16 +29,16 @@ export default async function HomePage() {
       <p className="mb-8 text-gray-500">
         Commit to your goals with grit (and a buddy)
       </p>
-      <div className="w-full">
+      <div className="mb-8 w-full">
         <CommitGraph
           dates={goalEntries.map((entry) => new Date(entry.createdAt))}
         />
       </div>
-      <CommitLine includeNode />
+      {/* <CommitLine includeNode />
       <div className="w-full rounded-md border border-neutral-300 p-4 text-sm sm:w-[500px]">
         GritCommit is a commitment device service that sends you notifications
       </div>
-      <CommitLine includeNode />
+      <CommitLine includeNode /> */}
       <LoginForm />
     </div>
   );
