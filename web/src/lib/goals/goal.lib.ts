@@ -159,26 +159,27 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
 
 // TODO i think we can prob just consume a safedate + move this to date file
 export const isGoalEntryExpired = (goalEntry: CompleteGoalEntry) => {
-  const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
-  const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
+  const now = DateUtils.dayjs();
+  const dueDate = DateUtils.dayjs(goalEntry.dueAt);
   return dueDate.isBefore(now);
 };
 
 export const isGoalEntryPartnerVerificationExpired = (
   goalEntry: CompleteGoalEntry,
 ) => {
-  const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
-  const partnerVerifyDueDate = DateUtils.dayjs.tz(
+  const now = DateUtils.dayjs();
+  const partnerVerifyDueDate = DateUtils.dayjs(
     toPartnerVerificationDeadline(goalEntry.dueAt),
-    goalEntry.userTimezone,
   );
 
   return partnerVerifyDueDate.isBefore(now);
 };
 
 // TODO write tests
-export const isGoalEntryDueToday = (goalEntry: CompleteGoalEntry) => {
+export const canSendGoalEntryDueTodayEmail = (goalEntry: CompleteGoalEntry) => {
   const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
+  if (now.hour() !== 12) return false; // only send if its 12pm in users timezone
+
   const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
   return dueDate.format("YYYY-MM-DD") === now.format("YYYY-MM-DD");
 };

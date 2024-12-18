@@ -8,8 +8,8 @@ import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
 import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
 import { generateModelId } from "@/lib/generate-model-id";
 import {
+  canSendGoalEntryDueTodayEmail,
   fetchCompleteGoalEntry,
-  isGoalEntryDueToday,
   isGoalEntryExpired,
   isGoalEntryPartnerVerificationExpired,
 } from "@/lib/goals/goal.lib";
@@ -81,7 +81,9 @@ async function processGoalsDueToday() {
     status: GoalEntryStatus.Pending,
   });
 
-  const dueTodayGoalEntries = pendingGoalEntries.filter(isGoalEntryDueToday);
+  const dueTodayGoalEntries = pendingGoalEntries.filter(
+    canSendGoalEntryDueTodayEmail,
+  );
 
   console.log("Entries to process:", dueTodayGoalEntries.length);
   for (const goalEntry of dueTodayGoalEntries) {
@@ -177,7 +179,13 @@ const processExpiredGoals = async () => {
 };
 
 /**
- * This job runs every hour i.e. runs every 12PM or MIDNIGHT somewhere in the world
+ * This job runs every hour.
+ *
+ * Order of operations here is important. Mainly partner_expiry_check has to come before due_goals_check.
+ * This is because partner_expiry_check can produce new goal entries which might be due today (and we want to send an email for).
+ *
+ * goal_expiry_check order shouldn't matter as much. even though due_goals_check can set status to COMMITTER_VERIFYING,
+ * the goal shouldn't be expired yet and won't be processed by goal_expiry_check
  */
 const main = async () => {
   console.log("Checking due goals START: ", new Date().toISOString());
