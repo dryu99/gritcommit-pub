@@ -1,6 +1,7 @@
 import { ScheduleType } from "@/types/enums";
 import { getScheduleText, SafeDate } from "../date";
 
+import { Link } from "@react-email/components";
 import { toFormattedDateText } from "../date";
 
 export const EmailCommitment = ({
@@ -44,6 +45,20 @@ export const EmailCommitment = ({
           {getScheduleText({ scheduleType, scheduleDays })}
         </>
       )}
+    </>
+  );
+};
+
+export const EmailSignOff = () => {
+  return (
+    <>
+      Cheers,
+      <br />
+      The GritCommittee
+      <br />
+      --
+      <br />
+      <Link href="https://www.gritcommit.app">www.gritcommit.app</Link>
     </>
   );
 };

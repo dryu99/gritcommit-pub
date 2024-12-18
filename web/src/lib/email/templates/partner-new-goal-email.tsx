@@ -1,6 +1,6 @@
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 interface PartnerNewGoalEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -50,9 +50,7 @@ export default function PartnerNewGoalEmail({
         Help keep them accountable!
         <br />
         <br />
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

@@ -1,6 +1,6 @@
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html, Section } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 import { emailButtonStyle } from "../email.lib";
 
 interface PartnerVerifyEmailProps {
@@ -74,9 +74,7 @@ export default function PartnerVerifyEmail({
         </Section>
         <br />
         <br />
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

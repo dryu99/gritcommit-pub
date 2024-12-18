@@ -1,6 +1,6 @@
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 interface CommitterVerifyDeniedEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -44,9 +44,7 @@ export default function CommitterVerifyDeniedEmail({
         keep pushing forward.
         <br />
         <br />
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

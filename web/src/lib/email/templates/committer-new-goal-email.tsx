@@ -1,6 +1,6 @@
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 interface CommitterNewGoalEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -49,9 +49,7 @@ export default function CommitterNewGoalEmail({
         Good luck!
         <br />
         <br />
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

@@ -1,6 +1,6 @@
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 interface CommitterVerifyApprovedEmailProps {
   goalEntry: CompleteGoalEntry;
@@ -42,9 +42,7 @@ export default function CommitterVerifyApprovedEmail({
         <br />
         {/* TODO insert link to dashboard */}
         {/* TODO insert fun fact e.g. % or number of people who completed goals today */}
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

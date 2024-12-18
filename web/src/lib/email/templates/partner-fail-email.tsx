@@ -1,5 +1,6 @@
 import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
+import { EmailSignOff } from "../common";
 
 export default function PartnerFailEmail({
   goalEntry,
@@ -27,9 +28,7 @@ export default function PartnerFailEmail({
         They have been prompted to send you ${goalEntry.goalStakeAmount}.
         <br />
         <br />
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );

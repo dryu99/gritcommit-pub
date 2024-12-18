@@ -1,6 +1,6 @@
 import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 export default function CommitterFailEmail({
   goalEntry,
@@ -35,9 +35,7 @@ export default function CommitterFailEmail({
         <br />
         <br />
         {/* TODO if this is recurring have to state NEXT DUE DATE */}
-        Cheers,
-        <br />
-        The GritCommittee
+        <EmailSignOff />
       </Body>
     </Html>
   );
