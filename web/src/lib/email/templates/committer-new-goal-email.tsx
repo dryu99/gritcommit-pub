@@ -26,6 +26,7 @@ export default function CommitterNewGoalEmail({
         <br />
         <br />
         <EmailCommitment
+          timezone={entry.userTimezone}
           dueAt={entry.dueAt}
           description={entry.goalDescription}
           stakeAmount={entry.goalStakeAmount}

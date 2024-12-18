@@ -51,8 +51,11 @@ export const getScheduleText = (goal: {
   return "N/A";
 };
 
-// TODO pass in timezone? rn its not clear that this is using locale
-export const toFormattedDateText = (date: SafeDate) => {
+// TODO use dayjs instead?
+/**
+ * If no timezone is given, use locale timezone
+ */
+export const toFormattedDateText = (date: SafeDate, timezone?: string) => {
   const formatted = new Date(date).toLocaleString(undefined, {
     month: "short",
     day: "numeric",
@@ -61,6 +64,7 @@ export const toFormattedDateText = (date: SafeDate) => {
     minute: "2-digit",
     hour12: true,
     timeZoneName: "short",
+    timeZone: timezone,
   });
 
   return formatted;

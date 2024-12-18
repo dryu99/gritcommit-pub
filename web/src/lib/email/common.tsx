@@ -11,6 +11,7 @@ export const EmailCommitment = ({
   scheduleType,
   scheduleDays,
   partnerEmail,
+  timezone,
 }: {
   dueAt: SafeDate;
   description: string;
@@ -18,8 +19,9 @@ export const EmailCommitment = ({
   scheduleType: ScheduleType;
   scheduleDays: number[] | null;
   partnerEmail?: string;
+  timezone?: string;
 }) => {
-  const formattedDueDate = toFormattedDateText(dueAt);
+  const formattedDueDate = toFormattedDateText(dueAt, timezone);
 
   return (
     <>

@@ -1,5 +1,7 @@
 import { Config } from "@/lib/config";
+import { toFormattedDateText, toNextRecurringDueDate } from "@/lib/date";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
@@ -26,6 +28,7 @@ export default function CommitterFailEmail({
         <br />
         <br />
         <EmailCommitment
+          timezone={entry.userTimezone}
           dueAt={entry.dueAt}
           description={entry.goalDescription}
           stakeAmount={entry.goalStakeAmount}
@@ -39,7 +42,22 @@ export default function CommitterFailEmail({
         partner.
         <br />
         <br />
-        {/* TODO if this is recurring have to state NEXT DUE DATE */}
+        {entry.goalScheduleType === ScheduleType.Recurring &&
+          entry.goalScheduleDays && (
+            <>
+              The next due date for your recurring commitment is{" "}
+              {toFormattedDateText(
+                toNextRecurringDueDate({
+                  timezone: entry.userTimezone,
+                  scheduleDays: entry.goalScheduleDays,
+                  prevDueDate: entry.dueAt,
+                }),
+                entry.userTimezone,
+              )}
+            </>
+          )}
+        <br />
+        <br />
         <EmailSignOff />
       </Body>
     </Html>
