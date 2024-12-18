@@ -1,17 +1,20 @@
+import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
-interface CommitterVerifyDeniedEmailProps {
-  goalEntry: CompleteGoalEntry;
-}
-
 export default function CommitterVerifyDeniedEmail({
-  goalEntry = mockCompleteGoalEntry,
-}: CommitterVerifyDeniedEmailProps) {
-  const name = goalEntry.userLastName
-    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
-    : goalEntry.userFirstName;
+  goalEntry,
+  useMockData = Config.NODE_ENV === "development",
+}: {
+  goalEntry: CompleteGoalEntry;
+  useMockData?: boolean;
+}) {
+  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+
+  const name = entry.userLastName
+    ? `${entry.userFirstName} ${entry.userLastName}`
+    : entry.userFirstName;
 
   return (
     <Html>
@@ -24,19 +27,18 @@ export default function CommitterVerifyDeniedEmail({
         <br />
         <br />
         <EmailCommitment
-          dueAt={goalEntry.dueAt}
-          description={goalEntry.goalDescription}
-          stakeAmount={goalEntry.goalStakeAmount}
-          scheduleType={goalEntry.goalScheduleType}
-          scheduleDays={goalEntry.goalScheduleDays}
-          partnerEmail={goalEntry.goalPartnerEmail}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+          partnerEmail={entry.goalPartnerEmail}
         />
         <br />
         <br />
         {/* TODO inclyude links to etransfer */}
         {/* TODO this should be differentg based onr ecurring and once */}
-        As per the contract, please send your partner $
-        {goalEntry.goalStakeAmount}.
+        As per the contract, please send your partner ${entry.goalStakeAmount}.
         <br />
         <br />
         Remember, achieving your goals requires patience and{" "}

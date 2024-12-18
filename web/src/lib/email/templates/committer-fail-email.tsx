@@ -1,15 +1,20 @@
-import { CompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { Config } from "@/lib/config";
+import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
 export default function CommitterFailEmail({
   goalEntry,
+  useMockData = Config.NODE_ENV === "development",
 }: {
   goalEntry: CompleteGoalEntry;
+  useMockData?: boolean;
 }) {
-  const committerName = goalEntry.userLastName
-    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
-    : goalEntry.userFirstName;
+  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+
+  const committerName = entry.userLastName
+    ? `${entry.userFirstName} ${entry.userLastName}`
+    : entry.userFirstName;
 
   return (
     <Html>
@@ -21,16 +26,16 @@ export default function CommitterFailEmail({
         <br />
         <br />
         <EmailCommitment
-          dueAt={goalEntry.dueAt}
-          description={goalEntry.goalDescription}
-          stakeAmount={goalEntry.goalStakeAmount}
-          scheduleType={goalEntry.goalScheduleType}
-          scheduleDays={goalEntry.goalScheduleDays}
-          partnerEmail={goalEntry.goalPartnerEmail}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+          partnerEmail={entry.goalPartnerEmail}
         />
         <br />
         <br />
-        Please send the stake amount of ${goalEntry.goalStakeAmount} to your
+        Please send the stake amount of ${entry.goalStakeAmount} to your
         partner.
         <br />
         <br />

@@ -1,17 +1,20 @@
+import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
-interface CommitterNewGoalEmailProps {
-  goalEntry: CompleteGoalEntry;
-}
-
 export default function CommitterNewGoalEmail({
-  goalEntry = mockCompleteGoalEntry,
-}: CommitterNewGoalEmailProps) {
-  const committerName = goalEntry.userLastName
-    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
-    : goalEntry.userFirstName;
+  goalEntry,
+  useMockData = Config.NODE_ENV === "development",
+}: {
+  goalEntry: CompleteGoalEntry;
+  useMockData?: boolean;
+}) {
+  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+
+  const committerName = entry.userLastName
+    ? `${entry.userFirstName} ${entry.userLastName}`
+    : entry.userFirstName;
 
   return (
     <Html>
@@ -23,24 +26,22 @@ export default function CommitterNewGoalEmail({
         <br />
         <br />
         <EmailCommitment
-          dueAt={goalEntry.dueAt}
-          description={goalEntry.goalDescription}
-          stakeAmount={goalEntry.goalStakeAmount}
-          scheduleType={goalEntry.goalScheduleType}
-          scheduleDays={goalEntry.goalScheduleDays}
-          partnerEmail={goalEntry.goalPartnerEmail}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+          partnerEmail={entry.goalPartnerEmail}
         />
         <br />
         <br />
         If you miss{" "}
-        {goalEntry.goalScheduleType === "RECURRING"
-          ? "a deadline"
-          : "the deadline"}
-        , you owe your partner ${goalEntry.goalStakeAmount}.
+        {entry.goalScheduleType === "RECURRING" ? "a deadline" : "the deadline"}
+        , you owe your partner ${entry.goalStakeAmount}.
         <br />
         <br />
         When{" "}
-        {goalEntry.goalScheduleType === "RECURRING"
+        {entry.goalScheduleType === "RECURRING"
           ? "a deadline"
           : "the deadline"}{" "}
         arrives, you'll receive an email to verify your completion status.

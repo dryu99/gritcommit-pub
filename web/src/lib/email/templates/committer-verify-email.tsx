@@ -1,23 +1,26 @@
+import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Button, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 import { emailButtonStyle } from "../email.lib";
-
-interface CommitterVerifyEmailProps {
-  goalEntry: CompleteGoalEntry & {
-    userVerificationToken: string;
-  };
-}
 
 export default function CommitterVerifyEmail({
   goalEntry = {
     ...mockCompleteGoalEntry,
     userVerificationToken: "1234567890",
   },
-}: CommitterVerifyEmailProps) {
-  const committerName = goalEntry.userLastName
-    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
-    : goalEntry.userFirstName;
+  useMockData = Config.NODE_ENV === "development",
+}: {
+  goalEntry: CompleteGoalEntry & {
+    userVerificationToken: string;
+  };
+  useMockData?: boolean;
+}) {
+  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+
+  const committerName = entry.userLastName
+    ? `${entry.userFirstName} ${entry.userLastName}`
+    : entry.userFirstName;
 
   return (
     <Html>
@@ -29,12 +32,12 @@ export default function CommitterVerifyEmail({
         <br />
         <br />
         <EmailCommitment
-          dueAt={goalEntry.dueAt}
-          description={goalEntry.goalDescription}
-          stakeAmount={goalEntry.goalStakeAmount}
-          scheduleType={goalEntry.goalScheduleType}
-          scheduleDays={goalEntry.goalScheduleDays}
-          partnerEmail={goalEntry.goalPartnerEmail}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+          partnerEmail={entry.goalPartnerEmail}
         />
         <br />
         <br />
@@ -42,7 +45,7 @@ export default function CommitterVerifyEmail({
         <br />
         <br />
         <Button
-          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${goalEntry.userVerificationToken}`}
+          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${entry.userVerificationToken}`}
           style={emailButtonStyle}
         >
           Done
@@ -54,7 +57,7 @@ export default function CommitterVerifyEmail({
         <br />
         There's still time!
         <br />
-        <br />${goalEntry.goalStakeAmount} is at stake!
+        <br />${entry.goalStakeAmount} is at stake!
         <br />
         <br />
         You've got this!

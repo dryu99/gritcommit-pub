@@ -1,17 +1,20 @@
+import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
-interface CommitterVerifyApprovedEmailProps {
-  goalEntry: CompleteGoalEntry;
-}
-
 export default function CommitterVerifyApprovedEmail({
-  goalEntry = mockCompleteGoalEntry,
-}: CommitterVerifyApprovedEmailProps) {
-  const name = goalEntry.userLastName
-    ? `${goalEntry.userFirstName} ${goalEntry.userLastName}`
-    : goalEntry.userFirstName;
+  goalEntry,
+  useMockData = Config.NODE_ENV === "development",
+}: {
+  goalEntry: CompleteGoalEntry;
+  useMockData?: boolean;
+}) {
+  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+
+  const name = entry.userLastName
+    ? `${entry.userFirstName} ${entry.userLastName}`
+    : entry.userFirstName;
 
   return (
     <Html>
@@ -24,12 +27,12 @@ export default function CommitterVerifyApprovedEmail({
         <br />
         <br />
         <EmailCommitment
-          dueAt={goalEntry.dueAt}
-          description={goalEntry.goalDescription}
-          stakeAmount={goalEntry.goalStakeAmount}
-          scheduleType={goalEntry.goalScheduleType}
-          scheduleDays={goalEntry.goalScheduleDays}
-          partnerEmail={goalEntry.goalPartnerEmail}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+          partnerEmail={entry.goalPartnerEmail}
         />
         <br />
         <br />
