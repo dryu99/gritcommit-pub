@@ -85,8 +85,7 @@ export const createGoal = async (data: any) => {
 
   const nextDueDate =
     newGoal.scheduleType === ScheduleType.Once && reqBody.dueDate
-      ? DateUtils.dayjs(reqBody.dueDate)
-          .tz(sessionUser.timezone)
+      ? DateUtils.dayjs(reqBody.dueDate, sessionUser.timezone)
           .endOf("day")
           .toDate()
       : newGoal.scheduleType === ScheduleType.Recurring && reqBody.scheduleDays
@@ -96,6 +95,7 @@ export const createGoal = async (data: any) => {
             scheduleDays: reqBody.scheduleDays,
           })
         : undefined;
+
   if (!nextDueDate) throw new Error("Next due date could not be calculated");
 
   const newGoalEntry: Insertable<GoalEntry> = {
