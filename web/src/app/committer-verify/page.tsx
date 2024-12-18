@@ -15,8 +15,15 @@ export default async function CommitterVerifyPage(props: {
     .where("userVerificationToken", "=", token)
     .executeTakeFirst();
 
-  if (!goalEntry || goalEntry.status !== GoalEntryStatus.CommitterVerifying)
-    return <div>oops</div>;
+  if (!goalEntry)
+    return (
+      <div>
+        Something went wrong... Please contact admin@gritcommit.app for help
+      </div>
+    );
+
+  if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
+    return <div>You've already verified this commitment!</div>;
 
   // this is UTC to UTC comparison so it should be fine
   if (new Date() > new Date(goalEntry.dueAt))
