@@ -42,7 +42,6 @@ export default function CommitterVerifyApprovedEmail({
         Congratulations! You've completed your commitment.
         <br />
         <br />
-        {/* TODO this can be better */}
         {entry.goalScheduleType === ScheduleType.Recurring &&
           entry.goalScheduleDays && (
             <>

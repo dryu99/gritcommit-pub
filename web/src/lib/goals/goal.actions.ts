@@ -85,7 +85,8 @@ export const createGoal = async (data: any) => {
 
   const nextDueDate =
     newGoal.scheduleType === ScheduleType.Once && reqBody.dueDate
-      ? DateUtils.dayjs(reqBody.dueDate, sessionUser.timezone)
+      ? DateUtils.dayjs
+          .tz(reqBody.dueDate, sessionUser.timezone)
           .endOf("day")
           .toDate()
       : newGoal.scheduleType === ScheduleType.Recurring && reqBody.scheduleDays

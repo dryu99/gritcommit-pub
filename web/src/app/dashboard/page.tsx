@@ -81,8 +81,8 @@ export default async function DashboardPage(props: {
           // TODO consider moving this to a client component like the ClientDate
           //      rn this will always show usertimezone date even if user is in diff timezone
           const daysLeft = latestEntry
-            ? DateUtils.dayjs(latestEntry.dueAt)
-                .tz(sessionUser.timezone)
+            ? DateUtils.dayjs
+                .tz(latestEntry.dueAt, sessionUser.timezone)
                 .diff(DateUtils.dayjs().tz(sessionUser.timezone), "day")
             : undefined;
 

@@ -162,6 +162,7 @@ export const mockCompleteGoalEntry: CompleteGoalEntry = {
   userTimezone: "America/Los_Angeles",
 };
 
+// TODO it should be okay these dont use timezones (we're just comparing whether date comes before) but double check
 // TODO i think we can prob just consume a safedate + move this to date file
 export const isGoalEntryExpired = (goalEntry: CompleteGoalEntry) => {
   const now = DateUtils.dayjs();
