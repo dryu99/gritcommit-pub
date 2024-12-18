@@ -15,6 +15,8 @@ import {
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
+// TODO add logging
+
 // PARTNER_VERIFYING -> COMPLETED + PENDING(recurring)
 async function processExpiredPartnerVerifications() {
   console.log("Checking for expired partner verifications");
@@ -32,17 +34,6 @@ async function processExpiredPartnerVerifications() {
     console.log("> Processing expired partner verification:", goalEntry.id);
     try {
       await finalizeGoalEntry(goalEntry, GoalEntryStatus.Completed);
-
-      // await sendEmail({
-      //   recipientEmail: goalEntry.userEmail,
-      //   subject: toCommitterEmailSubject(goalEntry.goalDescription),
-      //   emailHtml: await toEmailHtml(CommitterVerifyEmail, {
-      //     goalEntry: {
-      //       ...goalEntry,
-      //       userVerificationToken: newVerificationToken,
-      //     },
-      //   }),
-      // });
     } catch (error) {
       // TODO sentry
       console.error(

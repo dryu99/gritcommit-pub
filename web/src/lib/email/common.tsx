@@ -1,5 +1,5 @@
 import { ScheduleType } from "@/types/enums";
-import { getScheduleText, SafeDate } from "../date";
+import { getScheduleText, SafeDate, toNextRecurringDueDate } from "../date";
 
 import { Link } from "@react-email/components";
 import { toFormattedDateText } from "../date";
@@ -61,6 +61,30 @@ export const EmailSignOff = () => {
       --
       <br />
       <Link href="https://www.gritcommit.app">www.gritcommit.app</Link>
+    </>
+  );
+};
+
+export const EmailNextDueDate = ({
+  timezone,
+  scheduleDays,
+  prevDueDate,
+}: {
+  timezone: string;
+  scheduleDays: number[];
+  prevDueDate: SafeDate;
+}) => {
+  return (
+    <>
+      The next due date for your recurring commitment is{" "}
+      {toFormattedDateText(
+        toNextRecurringDueDate({
+          timezone,
+          scheduleDays,
+          prevDueDate,
+        }),
+        timezone,
+      )}
     </>
   );
 };

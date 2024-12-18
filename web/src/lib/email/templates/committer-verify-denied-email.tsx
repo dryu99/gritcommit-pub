@@ -1,7 +1,8 @@
 import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment, EmailSignOff } from "../common";
+import { EmailCommitment, EmailNextDueDate, EmailSignOff } from "../common";
 
 export default function CommitterVerifyDeniedEmail({
   goalEntry,
@@ -38,10 +39,22 @@ export default function CommitterVerifyDeniedEmail({
         <br />
         <br />
         {/* TODO inclyude links to etransfer */}
-        {/* TODO this should be differentg based onr ecurring and once */}
         As per the contract, please send your partner ${entry.goalStakeAmount}.
         <br />
         <br />
+        {entry.goalScheduleType === ScheduleType.Recurring &&
+          entry.goalScheduleDays && (
+            <>
+              <EmailNextDueDate
+                timezone={entry.userTimezone}
+                scheduleDays={entry.goalScheduleDays}
+                prevDueDate={entry.dueAt}
+              />
+              <br />
+              <br />
+            </>
+          )}
+        {/* TODO maybe remove this */}
         Remember, achieving your goals requires patience and{" "}
         <strong>grit</strong>. Even though things didn't work out this time,
         keep pushing forward.
