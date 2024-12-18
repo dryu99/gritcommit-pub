@@ -3,7 +3,12 @@ import { Goal, GoalEntry, User } from "@/database/db-generated-types";
 import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { Selectable } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
-import { DateUtils, toPartnerVerificationDeadline } from "../date";
+import {
+  DateUtils,
+  toNextRecurringDueDate,
+  toPartnerVerificationDeadline,
+} from "../date";
+import { generateModelId } from "../generate-model-id";
 
 export const TEST_USER_ID = "e09e8811-03d4-4500-83a4-2293efc79fc9";
 
@@ -175,7 +180,6 @@ export const isGoalEntryPartnerVerificationExpired = (
   return partnerVerifyDueDate.isBefore(now);
 };
 
-// TODO write tests
 export const canSendGoalEntryDueTodayEmail = (goalEntry: CompleteGoalEntry) => {
   const now = DateUtils.dayjs().tz(goalEntry.userTimezone);
   if (now.hour() !== 12) return false; // only send if its 12pm in users timezone
@@ -183,3 +187,46 @@ export const canSendGoalEntryDueTodayEmail = (goalEntry: CompleteGoalEntry) => {
   const dueDate = DateUtils.dayjs.tz(goalEntry.dueAt, goalEntry.userTimezone);
   return dueDate.format("YYYY-MM-DD") === now.format("YYYY-MM-DD");
 };
+
+/**
+ * This function does 2 things:
+ * - updates status of goal entry
+ * - creates new goal entry for recurring entries
+ */
+export async function finalizeGoalEntry(
+  goalEntry: CompleteGoalEntry,
+  newStatus: GoalEntryStatus,
+) {
+  await DB.get()
+    .transaction()
+    .execute(async (trx) => {
+      // Update existing goal entry
+      await trx
+        .updateTable("goalEntry")
+        .set({
+          status: newStatus,
+        })
+        .where("id", "=", goalEntry.id)
+        .execute();
+
+      // Create next recurring entry if applicable
+      if (
+        goalEntry.goalScheduleType === "RECURRING" &&
+        goalEntry.goalScheduleDays
+      ) {
+        await trx
+          .insertInto("goalEntry")
+          .values({
+            id: generateModelId(),
+            status: GoalEntryStatus.Pending,
+            goalId: goalEntry.goalId,
+            dueAt: toNextRecurringDueDate({
+              timezone: goalEntry.userTimezone,
+              scheduleDays: goalEntry.goalScheduleDays,
+              prevDueDate: goalEntry.dueAt,
+            }),
+          })
+          .execute();
+      }
+    });
+}

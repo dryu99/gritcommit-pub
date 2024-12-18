@@ -1,4 +1,3 @@
-import { toNextRecurringDueDate } from "@/lib/date";
 import {
   sendEmail,
   toCommitterEmailSubject,
@@ -6,10 +5,10 @@ import {
 } from "@/lib/email/email.lib";
 import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
 import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
-import { generateModelId } from "@/lib/generate-model-id";
 import {
   canSendGoalEntryDueTodayEmail,
   fetchCompleteGoalEntry,
+  finalizeGoalEntry,
   isGoalEntryExpired,
   isGoalEntryPartnerVerificationExpired,
 } from "@/lib/goals/goal.lib";
@@ -32,38 +31,18 @@ async function processExpiredPartnerVerifications() {
   for (const goalEntry of expiredPartnerVerifyingEntries) {
     console.log("> Processing expired partner verification:", goalEntry.id);
     try {
-      await DB.get()
-        .transaction()
-        .execute(async (trx) => {
-          // Update existing goal entry
-          await DB.get()
-            .updateTable("goalEntry")
-            .set({
-              status: GoalEntryStatus.Completed,
-            })
-            .where("id", "=", goalEntry.id)
-            .execute();
+      await finalizeGoalEntry(goalEntry, GoalEntryStatus.Completed);
 
-          // Create next recurring entry if applicable
-          if (
-            goalEntry.goalScheduleType === "RECURRING" &&
-            goalEntry.goalScheduleDays
-          ) {
-            await trx
-              .insertInto("goalEntry")
-              .values({
-                id: generateModelId(),
-                status: GoalEntryStatus.Pending,
-                goalId: goalEntry.goalId,
-                dueAt: toNextRecurringDueDate({
-                  timezone: goalEntry.userTimezone,
-                  scheduleDays: goalEntry.goalScheduleDays,
-                  prevDueDate: goalEntry.dueAt,
-                }),
-              })
-              .execute();
-          }
-        });
+      // await sendEmail({
+      //   recipientEmail: goalEntry.userEmail,
+      //   subject: toCommitterEmailSubject(goalEntry.goalDescription),
+      //   emailHtml: await toEmailHtml(CommitterVerifyEmail, {
+      //     goalEntry: {
+      //       ...goalEntry,
+      //       userVerificationToken: newVerificationToken,
+      //     },
+      //   }),
+      // });
     } catch (error) {
       // TODO sentry
       console.error(
@@ -132,38 +111,7 @@ const processExpiredGoals = async () => {
     console.log("> Processing goal entry:", goalEntry.id);
 
     try {
-      await DB.get()
-        .transaction()
-        .execute(async (trx) => {
-          // Update existing goal entry
-          await DB.get()
-            .updateTable("goalEntry")
-            .set({
-              status: GoalEntryStatus.Failed,
-            })
-            .where("id", "=", goalEntry.id)
-            .execute();
-
-          // Create next recurring entry if applicable
-          if (
-            goalEntry.goalScheduleType === "RECURRING" &&
-            goalEntry.goalScheduleDays
-          ) {
-            await trx
-              .insertInto("goalEntry")
-              .values({
-                id: generateModelId(),
-                status: GoalEntryStatus.Pending,
-                goalId: goalEntry.goalId,
-                dueAt: toNextRecurringDueDate({
-                  timezone: goalEntry.userTimezone,
-                  scheduleDays: goalEntry.goalScheduleDays,
-                  prevDueDate: goalEntry.dueAt,
-                }),
-              })
-              .execute();
-          }
-        });
+      await finalizeGoalEntry(goalEntry, GoalEntryStatus.Failed);
 
       // TODO can remove await maybe
       await sendEmail({

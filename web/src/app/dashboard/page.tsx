@@ -22,6 +22,7 @@ export default async function DashboardPage(props: {
 
   const goals = await fetchGoals(sessionUser.id);
 
+  // TODO would be nice to be able to do this at db level
   // TODO rn this only accounts for most recent goal entry which should be okay?
   const filteredGoals = goals.filter((goal) => {
     const latestEntry = goal.entries[0];
