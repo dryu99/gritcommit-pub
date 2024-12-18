@@ -55,7 +55,7 @@ export class DB {
       pool: this.pool,
     });
 
-    console.log(`Connecting to database: ${Config.DATABASE_URL}`);
+    console.log(`Connecting to database: ${Config.NODE_ENV}`);
 
     if (Config.NODE_ENV === "production") {
       this.db = new Kysely<DbTypes>({
