@@ -19,6 +19,7 @@
     "@aws-sdk/s3-request-presigner": "^3.712.0",
     "@heroicons/react": "^2.2.0",
     "@react-email/components": "0.0.30",
+    "@sentry/nextjs": "^8.46.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
