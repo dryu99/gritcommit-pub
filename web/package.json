@@ -12,6 +12,7 @@
     "dev:migrate-db": "cross-env NODE_ENV=development tsx ./src/database/migrate-db.ts",
     "prod:migrate-db": "cross-env NODE_ENV=production tsx ./src/database/migrate-db.ts",
     "dev:email": "email dev --dir ./src/lib/email/templates --port 3002",
+    "dev:goal-job": "cross-env NODE_ENV=development tsx ./src/scripts/process-goal-statuses.ts",
     "prod:goal-job": "cross-env NODE_ENV=production tsx ./src/scripts/process-goal-statuses.ts"
   },
   "dependencies": {
