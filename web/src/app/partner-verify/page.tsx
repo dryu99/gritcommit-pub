@@ -19,17 +19,18 @@ export default async function PartnerVerifyPage(props: {
   const searchParams = await props.searchParams;
   const token = searchParams.token;
   const approved = !!searchParams.approved;
-  if (!token || typeof token !== "string") return <div>oops</div>;
+  if (!token || typeof token !== "string")
+    return <div>Something went wrong...</div>;
 
   const goalEntries = await fetchCompleteGoalEntry({
     partnerVerificationToken: token,
   });
 
-  if (!goalEntries[0]) return <div>oops</div>;
+  if (!goalEntries[0]) return <div>Commitment not found!</div>;
   const goalEntry = goalEntries[0];
 
   if (goalEntry.status !== GoalEntryStatus.PartnerVerifying)
-    return <div>oops</div>;
+    return <div>Commitment already verified!</div>;
 
   if (new Date() > toPartnerVerificationDeadline(goalEntry.dueAt))
     return <div>Verification deadline passed!</div>;
