@@ -37,11 +37,12 @@ export default async function HomePage() {
       <div className={`flex w-[800px] justify-between`}>
         <div>
           <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+            <div className="mb-2 text-center text-sm">1</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Start a commitment
             </h3>
-            <p className="mb-4 text-center text-xs">
+            <p className="mb-4 text-center text-sm">
               Set a meaningful goal and invite a friend as your accountability
               partner. Optionally add a financial stake to boost your
               commitment.
@@ -50,34 +51,41 @@ export default async function HomePage() {
               <ShowGoalFormButton title="Try it out" />
             </div>
           </div>
+          <CommitLine height={20} />
         </div>
 
         <div>
           <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+            <div className="mb-2 text-center text-sm">2</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Receive email/SMS check-ins
             </h3>
-            <p className="text-center text-xs">
-              Get email/SMS reminders on due dates. Mark your tasks complete,
-              and your accountability partner will verify your progress.
+            <p className="text-center text-sm">
+              Get email/SMS reminders on due dates and self-verify. After
+              marking your task complete, your accountability partner will also
+              verify your progress.
             </p>
           </div>
+          <CommitLine height={20} />
         </div>
 
         <div>
           <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+            <div className="mb-2 text-center text-sm">3</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Build lasting habits
             </h3>
-            <p className="text-center text-xs">
+            <p className={`text-center text-sm`}>
               Stay on track with regular check-ins from your accountability
               buddy. Watch your progress grow as you achieve your goals.
             </p>
           </div>
+          <CommitLine height={20} />
         </div>
       </div>
+      <div className={`mx-[100px] mb-8 h-[2px] w-[580px] bg-neutral-300`} />
     </div>
   );
 }
