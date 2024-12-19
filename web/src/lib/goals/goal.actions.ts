@@ -186,7 +186,8 @@ const CommitterVerifyReqBodySchema = z.object({
         message: "File size must be less than 3MB",
       },
     )
-    .optional(),
+    .optional()
+    .nullable(),
 });
 
 export type CommitterVerifyReqBody = z.infer<
@@ -207,8 +208,7 @@ export const handleCommitterVerify = async (formData: FormData) => {
   });
 
   if (!success) {
-    console.log(error.errors);
-    return error.errors.map((e) => e.message).join(", ");
+    throw new Error(error.errors.map((e) => e.message).join(", "));
   }
 
   const goalEntries = await fetchCompleteGoalEntry({
