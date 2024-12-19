@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { CommitLine } from "@/ui/components/common/commit-line";
+import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { redirect } from "next/navigation";
 
 export const revalidate = 120;
@@ -37,24 +38,29 @@ export default async function HomePage() {
         <div>
           <CommitLine height={20} />
           <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
-            <h3 className="text-center text-lg font-bold">
+            <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Start a commitment
             </h3>
-            <p className="text-center text-xs">
-              Create a commitment with a buddy. You can commit to anything from
-              a goal to a habit.
+            <p className="mb-4 text-center text-xs">
+              Set a meaningful goal and invite a friend as your accountability
+              partner. Optionally add a financial stake to boost your
+              commitment.
             </p>
+            <div className="flex justify-center">
+              <ShowGoalFormButton title="Try it out" />
+            </div>
           </div>
         </div>
 
         <div>
           <CommitLine height={20} />
           <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
-            <h3 className="text-center text-lg font-bold">
+            <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Receive email/SMS check-ins
             </h3>
             <p className="text-center text-xs">
-              Receive email/SMS check-ins from your buddy to keep you on track.
+              Get email/SMS reminders on due dates. Mark your tasks complete,
+              and your accountability partner will verify your progress.
             </p>
           </div>
         </div>
@@ -62,12 +68,12 @@ export default async function HomePage() {
         <div>
           <CommitLine height={20} />
           <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
-            <h3 className="text-center text-lg font-bold">
-              Stay accountable with partners
+            <h3 className="mb-4 min-h-[48px] text-center font-bold">
+              Build lasting habits
             </h3>
             <p className="text-center text-xs">
-              Stay accountable with your partners by receiving check-ins from
-              them.
+              Stay on track with regular check-ins from your accountability
+              buddy. Watch your progress grow as you achieve your goals.
             </p>
           </div>
         </div>
@@ -75,15 +81,3 @@ export default async function HomePage() {
     </div>
   );
 }
-
-// const InfoBox = ({ title, description }: InfoBoxProps) => {
-//   return (
-//     <div>
-//       <div className={`h-[2px] w-[700px] bg-neutral-300`} />
-//       <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
-//         <h3 className="text-center text-lg font-bold">{title}</h3>
-//         <p className="text-center text-xs">{description}</p>
-//       </div>
-//     </div>
-//   );
-// }

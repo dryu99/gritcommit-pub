@@ -5,13 +5,17 @@ import { Button } from "./common/button";
 import { Modal } from "./common/modal";
 import { GoalForm } from "./goal-form";
 
-export function ShowGoalFormButton() {
+export function ShowGoalFormButton({
+  title = "New Commitment",
+}: {
+  title?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Button className="h-7 px-3 text-xs" onClick={() => setIsOpen(true)}>
-        New Commitment
+        {title}
       </Button>
       <Modal
         title="New Commitment"
