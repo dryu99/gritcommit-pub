@@ -1,4 +1,9 @@
-import { IBM_Plex_Mono, Inter, Roboto_Slab } from "next/font/google";
+import {
+  IBM_Plex_Mono,
+  IBM_Plex_Sans,
+  Inter,
+  Roboto_Slab,
+} from "next/font/google";
 
 export const robotoSlab = Roboto_Slab({
   subsets: ["latin"],
@@ -21,4 +26,12 @@ export const inter = Inter({
   display: "swap",
   variable: "--font-inter",
   preload: true,
+});
+
+export const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-ibm-plex-sans",
+  preload: true,
+  weight: ["300", "400", "500", "600", "700"],
 });

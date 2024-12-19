@@ -2,8 +2,7 @@ import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
-import { LoginForm } from "@/ui/components/login-form";
-import { ibmPlexMono } from "@/ui/fonts";
+import { CommitLine } from "@/ui/components/common/commit-line";
 import { redirect } from "next/navigation";
 
 export const revalidate = 120;
@@ -23,47 +22,68 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className={`${ibmPlexMono.className} mb-1 text-2xl font-bold`}>
-        GritCommit
-      </h1>
-      <p className="mb-8 text-gray-500">
+      <h1 className={`mb-1 text-2xl font-bold`}>GritCommit</h1>
+      <p className={`mb-8 text-center text-sm text-gray-500`}>
         Commit to your goals with grit (and a buddy)
       </p>
-      <div className="mb-8 w-full">
+      <div className="w-full">
         <CommitGraph
           dates={goalEntries.map((entry) => new Date(entry.createdAt))}
         />
       </div>
-      {/* <CommitLine includeNode />
-      <div className="w-full rounded-md border border-neutral-300 p-4 text-sm sm:w-[500px]">
-        GritCommit is a commitment device service that sends you notifications
+      <CommitLine includeNode height={40} />
+      <div className={`mx-[100px] h-[2px] w-[580px] bg-neutral-300`} />
+      <div className={`flex w-[800px] justify-between`}>
+        <div>
+          <CommitLine height={20} />
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+            <h3 className="text-center text-lg font-bold">
+              Start a commitment
+            </h3>
+            <p className="text-center text-xs">
+              Create a commitment with a buddy. You can commit to anything from
+              a goal to a habit.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <CommitLine height={20} />
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+            <h3 className="text-center text-lg font-bold">
+              Receive email/SMS check-ins
+            </h3>
+            <p className="text-center text-xs">
+              Receive email/SMS check-ins from your buddy to keep you on track.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <CommitLine height={20} />
+          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+            <h3 className="text-center text-lg font-bold">
+              Stay accountable with partners
+            </h3>
+            <p className="text-center text-xs">
+              Stay accountable with your partners by receiving check-ins from
+              them.
+            </p>
+          </div>
+        </div>
       </div>
-      <CommitLine includeNode /> */}
-      <LoginForm />
     </div>
   );
 }
 
-const CommitLine = ({
-  height = 20,
-  includeNode,
-}: {
-  height?: number;
-  includeNode?: boolean;
-}) => {
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className="w-[2px] bg-neutral-300"
-        style={{ height: `${height}px` }}
-      />
-      {includeNode && (
-        <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
-      )}
-      <div
-        className="w-[2px] bg-neutral-300"
-        style={{ height: `${height}px` }}
-      />
-    </div>
-  );
-};
+// const InfoBox = ({ title, description }: InfoBoxProps) => {
+//   return (
+//     <div>
+//       <div className={`h-[2px] w-[700px] bg-neutral-300`} />
+//       <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 p-2">
+//         <h3 className="text-center text-lg font-bold">{title}</h3>
+//         <p className="text-center text-xs">{description}</p>
+//       </div>
+//     </div>
+//   );
+// }

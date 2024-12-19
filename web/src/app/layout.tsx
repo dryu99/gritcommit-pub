@@ -31,13 +31,11 @@ export default async function RootLayout({
         className={`${ibmPlexMono.className} flex h-svh flex-col antialiased`}
       >
         <header className="flex h-14 items-center px-4 py-4 lg:px-6">
-          {sessionUser && (
-            <nav className="font-bold">
-              <Link href="/">
-                <span className="mr-2">🤝</span>GritCommit
-              </Link>
-            </nav>
-          )}
+          <nav className="font-bold">
+            <Link href="/">
+              <span className="mr-2">🤝</span>GritCommit
+            </Link>
+          </nav>
           {sessionUser && (
             <nav className="ml-auto flex gap-4 sm:gap-6">
               <button
