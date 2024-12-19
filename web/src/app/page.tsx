@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR, MINI_COMMIT_GRAPH_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { CommitLine } from "@/ui/components/common/commit-line";
+import { LoginForm } from "@/ui/components/login-form";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { redirect } from "next/navigation";
 
@@ -42,7 +43,7 @@ export default async function HomePage() {
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Start a commitment
             </h3>
-            <p className="mb-6 text-center text-sm">
+            <p className="mb-12 text-center text-sm">
               Set a deadline, assign an accountability partner, and add
               financial stake for motivation.
             </p>
@@ -87,7 +88,14 @@ export default async function HomePage() {
           <CommitLine height={20} />
         </div>
       </div>
-      <div className={`mx-[100px] mb-8 h-[2px] w-[580px] bg-neutral-300`} />
+      <div className={`mx-[100px] h-[2px] w-[580px] bg-neutral-300`} />
+      <CommitLine height={20} includeNode />
+
+      <div
+        className={`mb-8 w-full rounded-md border border-neutral-300 p-6 sm:w-[400px]`}
+      >
+        <LoginForm />
+      </div>
     </div>
   );
 }
