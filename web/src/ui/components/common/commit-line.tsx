@@ -1,12 +1,21 @@
+import { cn } from "@/ui/classnames";
+
 export const CommitLine = ({
   height = 20,
   includeNode,
+  hideOnMobile,
 }: {
   height?: number;
   includeNode?: boolean;
+  hideOnMobile?: boolean;
 }) => {
   return (
-    <div className="flex flex-col items-center">
+    <div
+      className={cn(
+        "flex flex-col items-center",
+        hideOnMobile && "hidden sm:flex",
+      )}
+    >
       <div
         className="w-[2px] bg-neutral-300"
         style={{ height: `${height}px` }}

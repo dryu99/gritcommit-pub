@@ -5,6 +5,7 @@ import { CommitGraph } from "@/ui/components/commit-graph";
 import { CommitLine } from "@/ui/components/common/commit-line";
 import { LoginForm } from "@/ui/components/login-form";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
+import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
 
 export const revalidate = 120;
@@ -34,11 +35,13 @@ export default async function HomePage() {
         />
       </div>
       <CommitLine includeNode height={40} />
-      <div className={`mx-[100px] h-[2px] w-[580px] bg-neutral-300`} />
-      <div className={`flex w-[800px] justify-between`}>
+      <HorizontalCommitLine />
+      <div
+        className={`flex flex-col items-center sm:w-[800px] sm:flex-row sm:justify-between`}
+      >
         <div>
-          <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+          <CommitLine hideOnMobile height={20} />
+          <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
             <div className="mb-2 text-center text-sm">1</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Start a commitment
@@ -56,23 +59,27 @@ export default async function HomePage() {
         </div>
 
         <div>
-          <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+          <CommitLine hideOnMobile height={20} />
+          <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
             <div className="mb-2 text-center text-sm">2</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Receive email/SMS check-ins
             </h3>
-            <p className="text-center text-sm">
+            <p className="mb-10 text-center text-sm">
               Get reminders and verify your progress. Your partner confirms your
               achievements.
             </p>
+            <div className="my-auto flex justify-center">
+              <EnvelopeIcon className="h-10 w-10" />
+              <PhoneIcon className="h-10 w-10" />
+            </div>
           </div>
           <CommitLine height={20} />
         </div>
 
         <div>
-          <CommitLine height={20} />
-          <div className="h-[400px] w-[220px] rounded-md border border-neutral-300 px-3 py-4">
+          <CommitLine hideOnMobile height={20} />
+          <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
             <div className="mb-2 text-center text-sm">3</div>
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Build lasting habits
@@ -85,11 +92,11 @@ export default async function HomePage() {
               <CommitGraph isMini dates={miniCommitGraphDates} />
             </div>
           </div>
-          <CommitLine height={20} />
+          <CommitLine height={20} hideOnMobile />
         </div>
       </div>
-      <div className={`mx-[100px] h-[2px] w-[580px] bg-neutral-300`} />
-      <CommitLine height={20} includeNode />
+      <HorizontalCommitLine />
+      <CommitLine height={40} includeNode />
 
       <div
         className={`mb-8 w-full rounded-md border border-neutral-300 p-6 sm:w-[400px]`}
@@ -99,6 +106,14 @@ export default async function HomePage() {
     </div>
   );
 }
+
+const HorizontalCommitLine = () => {
+  return (
+    <div
+      className={`mx-[100px] hidden h-[2px] w-[580px] bg-neutral-300 sm:block`}
+    />
+  );
+};
 
 const createDatesByArray = (counts: number[]) => {
   return counts.flatMap((count, index) =>
