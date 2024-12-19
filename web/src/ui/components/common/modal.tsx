@@ -16,12 +16,20 @@ export const Modal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Add scroll lock effect
     if (isOpen) {
+      // Calculate scrollbar width
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
+
+      // Add padding to body to compensate for scrollbar removal
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+      // Add scroll lock effect
       document.body.style.overflow = "hidden";
     }
 
     return () => {
+      document.body.style.paddingRight = "0px";
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
