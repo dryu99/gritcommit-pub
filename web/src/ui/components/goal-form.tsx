@@ -11,7 +11,13 @@ const GOAL_PLACEHOLDERS = [
   "Read everyday",
 ];
 
-export const GoalForm = ({ onClose }: { onClose: () => void }) => {
+export const GoalForm = ({
+  onClose,
+  isDemo,
+}: {
+  onClose: () => void;
+  isDemo?: boolean;
+}) => {
   const [error, setError] = useState("");
   const [goalPlaceholder, setGoalPlaceholder] = useState("");
   const [currGoalPlaceholderIndex, setCurrGoalPlaceholderIndex] = useState(0);
@@ -75,6 +81,12 @@ export const GoalForm = ({ onClose }: { onClose: () => void }) => {
   // TODO add validation to prevent empty selectedDays list from appearing
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (isDemo) {
+      onClose();
+      return;
+    }
+
     const reqBody = Object.fromEntries(
       new FormData(e.currentTarget),
     ) as unknown as CreateGoalReqBody;

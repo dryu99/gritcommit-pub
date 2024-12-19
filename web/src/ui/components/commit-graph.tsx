@@ -85,7 +85,7 @@ export const CommitGraph = ({
         <div
           className={cn(
             "overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2",
-            isMini && "p-4",
+            isMini && "border-none p-4",
           )}
         >
           {!isMini && (

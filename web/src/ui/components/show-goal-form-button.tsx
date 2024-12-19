@@ -7,8 +7,10 @@ import { GoalForm } from "./goal-form";
 
 export function ShowGoalFormButton({
   title = "New Commitment",
+  isDemo,
 }: {
   title?: string;
+  isDemo?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -22,7 +24,7 @@ export function ShowGoalFormButton({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       >
-        <GoalForm onClose={() => setIsOpen(false)} />
+        <GoalForm onClose={() => setIsOpen(false)} isDemo={isDemo} />
       </Modal>
     </>
   );

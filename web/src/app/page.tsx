@@ -48,7 +48,7 @@ export default async function HomePage() {
             </p>
             <div className="flex justify-center">
               {/* TODO analytics */}
-              <ShowGoalFormButton title="Try adding a goal" />
+              <ShowGoalFormButton title="Try adding a goal" isDemo />
             </div>
           </div>
           <CommitLine height={20} />
