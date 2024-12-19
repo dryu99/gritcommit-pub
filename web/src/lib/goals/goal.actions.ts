@@ -48,8 +48,7 @@ export const createGoal = async (data: any) => {
     data: reqBody,
   } = CreateGoalReqBodySchema.safeParse(data);
   if (!success) {
-    console.log(error.errors);
-    return error.errors.map((e) => e.message).join(", ");
+    throw new Error(error.errors.map((e) => e.message).join(", "));
   }
 
   const sessionUser = await getSessionUser();
