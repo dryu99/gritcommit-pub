@@ -1,6 +1,6 @@
 import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
-import { CURRENT_YEAR } from "@/lib/date";
+import { CURRENT_YEAR, MINI_COMMIT_GRAPH_YEAR } from "@/lib/date";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { CommitLine } from "@/ui/components/common/commit-line";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
@@ -42,13 +42,13 @@ export default async function HomePage() {
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Start a commitment
             </h3>
-            <p className="mb-4 text-center text-sm">
-              Set a meaningful goal and invite a friend as your accountability
-              partner. Optionally add a financial stake to boost your
-              commitment.
+            <p className="mb-6 text-center text-sm">
+              Set a deadline, assign an accountability partner, and add
+              financial stake for motivation.
             </p>
             <div className="flex justify-center">
-              <ShowGoalFormButton title="Try it out" />
+              {/* TODO analytics */}
+              <ShowGoalFormButton title="Try adding a goal" />
             </div>
           </div>
           <CommitLine height={20} />
@@ -62,9 +62,8 @@ export default async function HomePage() {
               Receive email/SMS check-ins
             </h3>
             <p className="text-center text-sm">
-              Get email/SMS reminders on due dates and self-verify. After
-              marking your task complete, your accountability partner will also
-              verify your progress.
+              Get reminders and verify your progress. Your partner confirms your
+              achievements.
             </p>
           </div>
           <CommitLine height={20} />
@@ -78,9 +77,12 @@ export default async function HomePage() {
               Build lasting habits
             </h3>
             <p className={`text-center text-sm`}>
-              Stay on track with regular check-ins from your accountability
-              buddy. Watch your progress grow as you achieve your goals.
+              Build consistency with partner check-ins and watch your progress
+              grow.
             </p>
+            <div>
+              <CommitGraph isMini dates={miniCommitGraphDates} />
+            </div>
           </div>
           <CommitLine height={20} />
         </div>
@@ -89,3 +91,30 @@ export default async function HomePage() {
     </div>
   );
 }
+
+const createDatesByArray = (counts: number[]) => {
+  return counts.flatMap((count, index) =>
+    count > 0
+      ? Array(count)
+          .fill(null)
+          .map(() => new Date(MINI_COMMIT_GRAPH_YEAR, 0, index + 1))
+      : [],
+  );
+};
+
+const miniCommitGraphDates = createDatesByArray([
+  // Jan 1-10
+  3, 0, 2, 5, 0, 4, 6, 0, 2, 5,
+  // Jan 11-20
+  7, 0, 8, 4, 0, 1, 9, 0, 2, 7,
+  // Jan 21-30
+  4, 0, 3, 6, 0, 2, 5, 0, 4, 8,
+  // Jan 31
+  0,
+  // Feb 1-10
+  6, 0, 3, 7, 0, 8, 4, 0, 1, 7,
+  // Feb 11-20
+  3, 0, 2, 6, 0, 4, 5, 0, 2, 8,
+  // Feb 21-25
+  3, 0, 9, 0, 7,
+]);

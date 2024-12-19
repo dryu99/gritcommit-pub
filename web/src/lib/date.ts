@@ -76,12 +76,12 @@ export function toPartnerVerificationDeadline(dueAt: SafeDate): Date {
 }
 
 // normal year = 365, leap year = 366
-const getDaysInYear = (year: number) => {
+export const getDaysInYear = (year: number) => {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
 };
 
 export const CURRENT_YEAR = 2024;
-export const DAYS_IN_CURRENT_YEAR = getDaysInYear(CURRENT_YEAR);
+export const MINI_COMMIT_GRAPH_YEAR = 2023;
 
 /**
  * Calculates the initial due date when creating a new recurring goal

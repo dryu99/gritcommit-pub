@@ -1,6 +1,10 @@
 "use client";
 
-import { CURRENT_YEAR, DAYS_IN_CURRENT_YEAR } from "@/lib/date";
+import {
+  CURRENT_YEAR,
+  getDaysInYear,
+  MINI_COMMIT_GRAPH_YEAR,
+} from "@/lib/date";
 import { cn } from "../classnames";
 import { ShowGoalFormButton } from "./show-goal-form-button";
 
@@ -28,11 +32,16 @@ const COMMIT_MONTHS = [
 export const CommitGraph = ({
   dates,
   includeNewGoalButton,
+  isMini = false,
 }: {
   dates: Date[];
   includeNewGoalButton?: boolean;
+  isMini?: boolean;
 }) => {
-  const commitSquares = toCommitSquares(dates);
+  const commitSquares = isMini
+    ? toCommitSquares({ dates, year: MINI_COMMIT_GRAPH_YEAR })
+    : toCommitSquares({ dates });
+
   const firstDateOfTheYear = commitSquares[0]!.date;
 
   const dayIndexCommitSquareMatrix = commitSquares.reduce(
@@ -45,6 +54,15 @@ export const CommitGraph = ({
     [] as (typeof commitSquares)[],
   );
 
+  if (isMini) {
+    for (let i = 0; i < dayIndexCommitSquareMatrix.length; i++) {
+      const commitSquares = dayIndexCommitSquareMatrix[i];
+      if (!commitSquares) continue;
+
+      dayIndexCommitSquareMatrix[i] = commitSquares.slice(0, 8);
+    }
+  }
+
   const maxCommits = Math.max(...commitSquares.map((c) => c.commits));
   const totalCommits = commitSquares.reduce(
     (acc, commit) => acc + commit.commits,
@@ -54,27 +72,41 @@ export const CommitGraph = ({
   return (
     <div className="w-full">
       <div className="mx-auto max-w-[740px]">
-        <div className="mb-2 flex items-end justify-between">
-          <h4 className="text-sm text-gray-500">
-            {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
-            {CURRENT_YEAR}
-          </h4>
-          {includeNewGoalButton && <ShowGoalFormButton />}
-        </div>
-
-        <div className="overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2">
-          <div className="-mb-[1px] flex w-[698px] justify-between">
-            {COMMIT_MONTHS.map((month) => (
-              <span
-                key={month}
-                className="whitespace-nowrap text-xs text-primary"
-              >
-                {month}
-              </span>
-            ))}
+        {!isMini && (
+          <div className="mb-2 flex items-end justify-between">
+            <h4 className="text-sm text-gray-500">
+              {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
+              {CURRENT_YEAR}
+            </h4>
+            {includeNewGoalButton && <ShowGoalFormButton />}
           </div>
+        )}
 
-          <table className="relative border-separate border-spacing-[3px]">
+        <div
+          className={cn(
+            "overflow-x-auto rounded-lg border border-neutral-300 p-4 pl-8 pr-2",
+            isMini && "p-4",
+          )}
+        >
+          {!isMini && (
+            <div className="-mb-[1px] flex w-[698px] justify-between">
+              {COMMIT_MONTHS.map((month) => (
+                <span
+                  key={month}
+                  className="whitespace-nowrap text-xs text-primary"
+                >
+                  {month}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <table
+            className={cn(
+              "relative border-separate border-spacing-[3px]",
+              isMini && "mx-auto",
+            )}
+          >
             <tbody>
               {dayIndexCommitSquareMatrix.map((commitSquares, dayIndex) => {
                 const startsOnSecondWeek =
@@ -84,29 +116,33 @@ export const CommitGraph = ({
 
                 return (
                   <tr key={dayIndex}>
-                    {[0, 2, 4, 6].includes(dayIndex) && (
-                      <td className="absolute -left-[22px] h-[10px]" />
-                    )}
-                    {/* the absolute positioning here is relative to TABLE not ROW. Would love to do row but rendering messes up on Safari. */}
-                    {dayIndex === 1 && (
-                      <td className="absolute -left-[22px] bottom-[72px] h-[10px] text-xs text-primary">
-                        Mon
-                      </td>
-                    )}
-                    {dayIndex === 3 && (
-                      <td className="absolute -left-[22px] bottom-[46px] h-[10px] text-xs text-primary">
-                        Wed
-                      </td>
-                    )}
-                    {dayIndex === 5 && (
-                      <td className="absolute -left-[22px] bottom-[20px] h-[10px] text-xs text-primary">
-                        Fri
-                      </td>
+                    {!isMini && (
+                      <>
+                        {[0, 2, 4, 6].includes(dayIndex) && (
+                          <td className="absolute -left-[22px] h-[10px]" />
+                        )}
+                        {dayIndex === 1 && (
+                          <td className="absolute -left-[22px] bottom-[72px] h-[10px] text-xs text-primary">
+                            Mon
+                          </td>
+                        )}
+                        {dayIndex === 3 && (
+                          <td className="absolute -left-[22px] bottom-[46px] h-[10px] text-xs text-primary">
+                            Wed
+                          </td>
+                        )}
+                        {dayIndex === 5 && (
+                          <td className="absolute -left-[22px] bottom-[20px] h-[10px] text-xs text-primary">
+                            Fri
+                          </td>
+                        )}
+                      </>
                     )}
                     {startsOnSecondWeek && <td className="h-[10px]" />}
                     {commitSquares.map((commitSquare) => {
                       const opacity =
                         (commitSquare.commits / maxCommits) * 0.8 + 0.2;
+
                       return (
                         <td
                           key={commitSquare.date.toISOString()}
@@ -164,18 +200,23 @@ export const CommitGraph = ({
   );
 };
 
-const toCommitSquares = (dates: Date[]): CommitSquare[] => {
-  const commitSquares = Array.from(
-    { length: DAYS_IN_CURRENT_YEAR },
-    (_, i) => ({
-      date: new Date(Date.UTC(CURRENT_YEAR, 0, i + 1)),
-      commits: 0,
-    }),
-  );
+const toCommitSquares = ({
+  dates,
+  year = CURRENT_YEAR,
+}: {
+  dates: Date[];
+  year?: number;
+}): CommitSquare[] => {
+  const daysInYear = getDaysInYear(year);
+
+  const commitSquares = Array.from({ length: daysInYear }, (_, i) => ({
+    date: new Date(Date.UTC(year, 0, i + 1)),
+    commits: 0,
+  }));
 
   for (const date of dates) {
     const dayOfYear = Math.floor(
-      (date.getTime() - new Date(Date.UTC(CURRENT_YEAR, 0, 1)).getTime()) /
+      (date.getTime() - new Date(Date.UTC(year, 0, 1)).getTime()) /
         (1000 * 60 * 60 * 24),
     );
     const commitSquare = commitSquares[dayOfYear];
