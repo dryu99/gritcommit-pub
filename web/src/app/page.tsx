@@ -76,7 +76,7 @@ export default async function HomePage() {
             <h3 className="mb-4 min-h-[48px] text-center font-bold">
               Build lasting habits
             </h3>
-            <p className={`text-center text-sm`}>
+            <p className={`mb-4 text-center text-sm`}>
               Build consistency with partner check-ins and watch your progress
               grow.
             </p>
@@ -103,18 +103,16 @@ const createDatesByArray = (counts: number[]) => {
 };
 
 const miniCommitGraphDates = createDatesByArray([
-  // Jan 1-10
-  3, 0, 2, 5, 0, 4, 6, 0, 2, 5,
-  // Jan 11-20
-  7, 0, 8, 4, 0, 1, 9, 0, 2, 7,
-  // Jan 21-30
-  4, 0, 3, 6, 0, 2, 5, 0, 4, 8,
-  // Jan 31
-  0,
-  // Feb 1-10
-  6, 0, 3, 7, 0, 8, 4, 0, 1, 7,
-  // Feb 11-20
-  3, 0, 2, 6, 0, 4, 5, 0, 2, 8,
-  // Feb 21-25
-  3, 0, 9, 0, 7,
+  // Jan 1-10 (lots of gaps)
+  1, 0, 0, 0, 0, 1, 0, 0, 1, 0,
+  // Jan 11-20 (still inconsistent)
+  1, 0, 0, 0, 0, 0, 0, 1, 0, 2,
+  // Jan 21-31 (starting to be more regular)
+  1, 0, 2, 0, 1, 1, 0, 1, 0, 2, 0,
+  // Feb 1-10 (more consistent)
+  1, 2, 1, 0, 2, 1, 2, 1, 0, 2,
+  // Feb 11-20 (very consistent)
+  1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
+  // Feb 21-25 (maintained consistency)
+  1, 2, 1, 2, 1,
 ]);
