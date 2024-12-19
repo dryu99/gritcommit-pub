@@ -149,11 +149,13 @@ export const CommitGraph = ({
                           className={cn(
                             "group relative h-[10px] w-[10px] min-w-[10px]",
                             "rounded-sm",
-                            `opacity-${opacity * 100}`,
-                            commitSquare.commits > 0
-                              ? "bg-green-400"
-                              : "bg-neutral-300",
                           )}
+                          style={{
+                            backgroundColor:
+                              commitSquare.commits > 0
+                                ? `rgba(74, 222, 128, ${opacity})` // green-400 in rgba
+                                : `#e5e5e5`, // neutral-200 in rgba
+                          }}
                           onMouseEnter={(e) => {
                             const rect =
                               e.currentTarget.getBoundingClientRect();
