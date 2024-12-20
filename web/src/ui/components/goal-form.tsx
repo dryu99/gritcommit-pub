@@ -26,7 +26,7 @@ export const GoalForm = ({
   const [dueDate, setDueDate] = useState("");
   const [showStartToday, setShowStartToday] = useState(true);
   const [startToday, setStartToday] = useState(false);
-
+  const [sendEmail, setSendEmail] = useState(false);
   useEffect(() => {
     let currentText = GOAL_PLACEHOLDERS[currGoalPlaceholderIndex];
     let currentChar = 0;
@@ -94,6 +94,9 @@ export const GoalForm = ({
       ? selectedDays.map((d) => d.index)
       : undefined;
     reqBody.startToday = isRecurring ? startToday : undefined;
+    if (process.env.NODE_ENV === "development") {
+      reqBody.sendEmail = sendEmail;
+    }
 
     try {
       if (!isRecurring) {
@@ -289,6 +292,20 @@ export const GoalForm = ({
       >
         Commit
       </button>
+      {process.env.NODE_ENV === "development" && (
+        <div className="mt-4 flex items-center gap-2">
+          <input
+            className="h-4 w-4"
+            type="checkbox"
+            id="sendEmail"
+            checked={sendEmail}
+            onChange={(e) => {
+              setSendEmail(e.target.checked);
+            }}
+          />
+          <label htmlFor="sendEmail">[DEV] Send email?</label>
+        </div>
+      )}
       {error && <p className="text-red-500">{error}</p>}
     </form>
   );

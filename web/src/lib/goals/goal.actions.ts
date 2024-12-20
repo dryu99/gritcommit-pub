@@ -27,6 +27,7 @@ const CreateGoalReqBodySchema = z.object({
   stakeAmount: z.coerce.number().min(0),
   partnerEmail: z.string().email(),
   startToday: z.boolean().optional(),
+  sendEmail: z.boolean().optional(), // this is just used for development
 
   // existence implies scheduleType = RECURRING
   scheduleDays: z.array(z.number()).optional(), // assume sorted
@@ -143,21 +144,26 @@ export const createGoal = async (data: any) => {
 
   // TODO handle email errors
   // TODO also have to send checkin emails if user is starting today and its past 12pm
-  sendEmail({
-    recipientEmail: sessionUser.email,
-    subject: toCommitterEmailSubject(newGoal.description),
-    emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
-      goalEntry: completeGoalEntry,
-    }),
-  });
+  if (reqBody.sendEmail || Config.NODE_ENV === "production") {
+    sendEmail({
+      recipientEmail: sessionUser.email,
+      subject: toCommitterEmailSubject(newGoal.description),
+      emailHtml: await toEmailHtml(CommitterNewGoalEmail, {
+        goalEntry: completeGoalEntry,
+      }),
+    });
 
-  sendEmail({
-    recipientEmail: reqBody.partnerEmail,
-    subject: toPartnerEmailSubject(sessionUser.firstName, newGoal.description),
-    emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
-      goalEntry: completeGoalEntry,
-    }),
-  });
+    sendEmail({
+      recipientEmail: reqBody.partnerEmail,
+      subject: toPartnerEmailSubject(
+        sessionUser.firstName,
+        newGoal.description,
+      ),
+      emailHtml: await toEmailHtml(PartnerNewGoalEmail, {
+        goalEntry: completeGoalEntry,
+      }),
+    });
+  }
 
   revalidatePath("/");
 };
