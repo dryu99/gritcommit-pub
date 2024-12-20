@@ -5,18 +5,16 @@ import { EmailCommitment, EmailSignOff } from "../common";
 import { emailButtonStyle } from "../email.lib";
 
 export default function CommitterVerifyEmail({
-  goalEntry = {
-    ...mockCompleteGoalEntry,
-    userVerificationToken: "1234567890",
-  },
-  useMockData = Config.NODE_ENV === "development",
+  goalEntry,
 }: {
   goalEntry: CompleteGoalEntry & {
     userVerificationToken: string;
   };
-  useMockData?: boolean;
 }) {
-  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+  const entry =
+    !goalEntry && Config.NODE_ENV === "development"
+      ? mockCompleteGoalEntry
+      : goalEntry;
 
   const committerName = entry.userLastName
     ? `${entry.userFirstName} ${entry.userLastName}`

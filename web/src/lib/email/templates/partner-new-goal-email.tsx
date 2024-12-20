@@ -4,13 +4,14 @@ import { Body, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 
 export default function PartnerNewGoalEmail({
-  goalEntry = mockCompleteGoalEntry,
-  useMockData = Config.NODE_ENV === "development",
+  goalEntry,
 }: {
   goalEntry: CompleteGoalEntry;
-  useMockData?: boolean;
 }) {
-  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+  const entry =
+    !goalEntry && Config.NODE_ENV === "development"
+      ? mockCompleteGoalEntry
+      : goalEntry;
 
   const committerName = entry.userLastName
     ? `${entry.userFirstName} ${entry.userLastName}`

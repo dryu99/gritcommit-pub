@@ -8,18 +8,23 @@ export default function PartnerVerifyEmail({
   goalEntry,
   committerMessage,
   hasImage,
-  useMockData = Config.NODE_ENV === "development",
 }: {
   goalEntry: CompleteGoalEntry & {
     partnerVerificationToken: string;
   };
   committerMessage?: string;
   hasImage?: boolean;
-  useMockData?: boolean;
 }) {
-  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
-  const realMessage = useMockData ? "I did the thing" : committerMessage;
-  const realHasImage = useMockData ? true : hasImage;
+  const entry =
+    !goalEntry && Config.NODE_ENV === "development"
+      ? mockCompleteGoalEntry
+      : goalEntry;
+  const realMessage =
+    !committerMessage && Config.NODE_ENV === "development"
+      ? "I did the thing"
+      : committerMessage;
+  const realHasImage =
+    !hasImage && Config.NODE_ENV === "development" ? true : hasImage;
 
   const committerName = entry.userLastName
     ? `${entry.userFirstName} ${entry.userLastName}`

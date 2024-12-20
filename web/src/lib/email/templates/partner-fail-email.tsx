@@ -5,12 +5,13 @@ import { EmailSignOff } from "../common";
 
 export default function PartnerFailEmail({
   goalEntry,
-  useMockData = Config.NODE_ENV === "development",
 }: {
   goalEntry: CompleteGoalEntry;
-  useMockData?: boolean;
 }) {
-  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+  const entry =
+    !goalEntry && Config.NODE_ENV === "development"
+      ? mockCompleteGoalEntry
+      : goalEntry;
 
   const committerName = entry.userLastName
     ? `${entry.userFirstName} ${entry.userLastName}`

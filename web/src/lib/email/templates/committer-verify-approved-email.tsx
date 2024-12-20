@@ -6,12 +6,13 @@ import { EmailCommitment, EmailNextDueDate, EmailSignOff } from "../common";
 
 export default function CommitterVerifyApprovedEmail({
   goalEntry,
-  useMockData = Config.NODE_ENV === "development",
 }: {
   goalEntry: CompleteGoalEntry;
-  useMockData?: boolean;
 }) {
-  const entry = useMockData ? mockCompleteGoalEntry : goalEntry;
+  const entry =
+    !goalEntry && Config.NODE_ENV === "development"
+      ? mockCompleteGoalEntry
+      : goalEntry;
 
   const name = entry.userLastName
     ? `${entry.userFirstName} ${entry.userLastName}`
