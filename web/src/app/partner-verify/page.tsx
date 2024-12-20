@@ -12,6 +12,7 @@ import {
   finalizeGoalEntry,
 } from "@/lib/goals/goal.lib";
 import { GoalEntryStatus } from "@/types/enums";
+import { Link } from "@/ui/components/common/link";
 
 export default async function PartnerVerifyPage(props: {
   searchParams: Promise<{ token?: string; approved?: string }>;
@@ -20,7 +21,14 @@ export default async function PartnerVerifyPage(props: {
   const token = searchParams.token;
   const approved = !!searchParams.approved;
   if (!token || typeof token !== "string")
-    return <div>Something went wrong...</div>;
+    return (
+      <div className="text-center">
+        <p>Something went wrong...</p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
+      </div>
+    );
 
   const goalEntries = await fetchCompleteGoalEntry({
     partnerVerificationToken: token,
@@ -30,10 +38,24 @@ export default async function PartnerVerifyPage(props: {
   const goalEntry = goalEntries[0];
 
   if (goalEntry.status !== GoalEntryStatus.PartnerVerifying)
-    return <div>Commitment already verified!</div>;
+    return (
+      <div className="text-center">
+        <p>Commitment already verified!</p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
+      </div>
+    );
 
   if (new Date() > toPartnerVerificationDeadline(goalEntry.dueAt))
-    return <div>Verification deadline passed!</div>;
+    return (
+      <div className="text-center">
+        <p>Verification deadline passed!</p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
+      </div>
+    );
 
   // db and email stuff can happen async
   handlePartnerVerify({

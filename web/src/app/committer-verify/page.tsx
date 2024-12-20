@@ -1,6 +1,7 @@
 import { DB } from "@/database/db";
 import { GoalEntryStatus } from "@/types/enums";
 import CommitterVerifyForm from "@/ui/components/committer-verify-form";
+import { Link } from "@/ui/components/common/link";
 
 export default async function CommitterVerifyPage(props: {
   searchParams: Promise<{ token?: string }>;
@@ -17,17 +18,36 @@ export default async function CommitterVerifyPage(props: {
 
   if (!goalEntry)
     return (
-      <div>
-        Something went wrong... Please contact admin@gritcommit.app for help
+      <div className="text-center">
+        <p>
+          Something went wrong... Please contact admin@gritcommit.app for help
+        </p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
       </div>
     );
 
   if (goalEntry.status !== GoalEntryStatus.CommitterVerifying)
-    return <div>You've already verified this commitment!</div>;
+    return (
+      <div className="text-center">
+        <p>You've already verified this commitment!</p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
+      </div>
+    );
 
   // this is UTC to UTC comparison so it should be fine
   if (new Date() > new Date(goalEntry.dueAt))
-    return <div>Due date passed!</div>;
+    return (
+      <div className="text-center">
+        <p>Due date passed!</p>
+        <Link className="text-brand" href="/dashboard">
+          Go back home
+        </Link>
+      </div>
+    );
 
   return (
     <main className="mx-auto max-w-lg p-6">
