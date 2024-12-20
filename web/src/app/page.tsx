@@ -52,7 +52,7 @@ export default async function HomePage() {
             </p>
             <div className="flex justify-center">
               {/* TODO analytics */}
-              <ShowGoalFormButton title="Try adding a goal" isDemo />
+              <ShowGoalFormButton title="Try it out" isDemo />
             </div>
           </div>
           <CommitLine height={20} />
@@ -69,7 +69,7 @@ export default async function HomePage() {
               Get reminders and verify your progress. Your partner confirms your
               achievements.
             </p>
-            <div className="my-auto flex justify-center">
+            <div className="my-auto flex justify-center gap-4">
               <EnvelopeIcon className="h-10 w-10" />
               <PhoneIcon className="h-10 w-10" />
             </div>

@@ -112,22 +112,21 @@ export default async function DashboardPage(props: {
                             latestEntry.status === "PARTNER_VERIFYING",
                         })}
                       >
-                        {latestEntry.status === "PENDING"
-                          ? daysLeft === 1
-                            ? "DUE TOMORROW"
-                            : daysLeft === 0
-                              ? "DUE TODAY"
-                              : `${daysLeft} DAYS LEFT`
-                          : latestEntry.status === "COMMITTER_VERIFYING"
-                            ? "CHECK EMAIL"
-                            : latestEntry.status === "PARTNER_VERIFYING"
-                              ? "PARTNER VERIFYING"
-                              : ""}
-                        {goal.scheduleType === ScheduleType.Recurring &&
-                          searchParams.status !== undefined && (
-                            <span className="uppercase">
-                              {filteredEntries.length}x
-                            </span>
+                        {searchParams.status === undefined &&
+                          (latestEntry.status === "PENDING"
+                            ? daysLeft === 1
+                              ? "DUE TOMORROW"
+                              : daysLeft === 0
+                                ? "DUE TODAY"
+                                : `${daysLeft} DAYS LEFT`
+                            : latestEntry.status === "COMMITTER_VERIFYING"
+                              ? "CHECK EMAIL"
+                              : latestEntry.status === "PARTNER_VERIFYING"
+                                ? "PARTNER VERIFYING"
+                                : "")}
+                        {searchParams.status !== undefined &&
+                          goal.scheduleType === ScheduleType.Recurring && (
+                            <span className="">{filteredEntries.length}x</span>
                           )}
                       </span>
                       <div
@@ -183,16 +182,21 @@ export default async function DashboardPage(props: {
                     {goal.description}
                   </div>
 
-                  {/* {goal.scheduleType === ScheduleType.Recurring &&
-                    searchParams.status !== undefined && (
-                      <div className="-mb-1 mt-5 text-center text-gray-500">
-                        {searchParams.status === "completed"
-                          ? "Completed"
-                          : searchParams.status === "dropped"
-                            ? "Dropped"
-                            : "In Progress"}{" "}
-                        {filteredEntries.length} time
-                        {filteredEntries.length === 1 ? "" : "s"}
+                  {/* {searchParams.status !== undefined &&
+                    goal.scheduleType === ScheduleType.Recurring && (
+                      <div className="-mb-1 mt-2 flex items-center justify-end gap-3">
+                        <Link
+                          className="text-brand hover:underline hover:underline-offset-2"
+                          href={`/dashboard?status=completed`}
+                        >
+                          Prev
+                        </Link>
+                        <Link
+                          className="text-brand hover:underline hover:underline-offset-2"
+                          href={`/dashboard?status=completed`}
+                        >
+                          Next
+                        </Link>
                       </div>
                     )} */}
                 </div>
@@ -264,4 +268,9 @@ function matchesStatusFilter(
           GoalEntryStatus.CommitterVerifying,
           GoalEntryStatus.PartnerVerifying,
         ].includes(entryStatus);
+}
+
+{
+  /* <Button className="px-2 py-[2px] text-xs">Prev</Button>
+                        <Button className="px-2 py-[2px] text-xs">Next</Button> */
 }
