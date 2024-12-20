@@ -17,14 +17,14 @@ export const CommitLine = ({
       )}
     >
       <div
-        className="w-[2px] bg-neutral-300"
+        className="-z-50 w-[2px] bg-neutral-300"
         style={{ height: `${height}px` }}
       />
       {includeNode && (
-        <div className="h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
+        <div className="-z-50 h-2 w-2 rounded-full border-2 border-neutral-300 bg-neutral-300" />
       )}
       <div
-        className="w-[2px] bg-neutral-300"
+        className="-z-50 w-[2px] bg-neutral-300"
         style={{ height: `${height}px` }}
       />
     </div>

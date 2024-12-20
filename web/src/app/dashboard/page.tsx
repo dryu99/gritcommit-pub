@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth/auth.lib";
 import { DateUtils, getScheduleText } from "@/lib/date";
 import { fetchGoals } from "@/lib/goals/goal.lib";
-import { GoalEntryStatus } from "@/types/enums";
+import { GoalEntryStatus, ScheduleType } from "@/types/enums";
 import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
 import { ClientDate } from "@/ui/components/common/client-date";
@@ -20,25 +20,15 @@ export default async function DashboardPage(props: {
   }
 
   const searchParams = await props.searchParams;
-
   const goals = await fetchGoals(sessionUser.id);
 
   // TODO would be nice to be able to do this at db level
   // TODO rn this only accounts for most recent goal entry which should be okay?
-  const filteredGoals = goals.filter((goal) => {
-    const latestEntry = goal.entries[0];
-    if (!latestEntry) return false;
-
-    return searchParams.status === "completed"
-      ? latestEntry.status === GoalEntryStatus.Completed
-      : searchParams.status === "dropped"
-        ? latestEntry.status === GoalEntryStatus.Failed
-        : [
-            GoalEntryStatus.Pending,
-            GoalEntryStatus.CommitterVerifying,
-            GoalEntryStatus.PartnerVerifying,
-          ].includes(latestEntry.status);
-  });
+  const filteredGoals = goals.filter((goal) =>
+    goal.entries.find((entry) =>
+      matchesStatusFilter(entry.status, searchParams.status),
+    ),
+  );
 
   // TODO would prob be better to handle this at the db level
   //      also it should prob be immutable lol
@@ -76,7 +66,10 @@ export default async function DashboardPage(props: {
           <div className="mx-auto text-center text-2xl opacity-50">😴</div>
         )}
         {filteredGoals.map((goal, i) => {
-          const latestEntry = goal.entries[0];
+          const filteredEntries = goal.entries.filter((entry) => {
+            return matchesStatusFilter(entry.status, searchParams.status);
+          });
+          const latestEntry = filteredEntries[0];
           const scheduleText = getScheduleText(goal);
 
           // TODO consider moving this to a client component like the ClientDate
@@ -95,7 +88,16 @@ export default async function DashboardPage(props: {
 
           return (
             <div key={goal.id}>
-              <div className="rounded-lg border border-neutral-300 p-4 sm:px-6 sm:py-5">
+              <div
+                className={cn(
+                  "relative rounded-lg border border-neutral-300 bg-primary p-4 sm:px-6 sm:py-5",
+
+                  // add stacking effect in background
+                  goal.scheduleType === ScheduleType.Recurring && [
+                    "before:absolute before:inset-0 before:-z-10 before:translate-x-[-7px] before:translate-y-[7px] before:rounded-lg before:border before:border-neutral-300 before:bg-primary before:content-['']",
+                  ],
+                )}
+              >
                 <h3 className="mb-1 flex items-center justify-between text-brand">
                   <div>commit {goal.id.split("-")[0]}</div>
                   {latestEntry && (
@@ -121,6 +123,12 @@ export default async function DashboardPage(props: {
                             : latestEntry.status === "PARTNER_VERIFYING"
                               ? "PARTNER VERIFYING"
                               : ""}
+                        {goal.scheduleType === ScheduleType.Recurring &&
+                          searchParams.status !== undefined && (
+                            <span className="uppercase">
+                              {filteredEntries.length}x
+                            </span>
+                          )}
                       </span>
                       <div
                         className={cn("h-2 w-2 rounded-full", {
@@ -174,6 +182,19 @@ export default async function DashboardPage(props: {
                   <div className="ml-6 mt-5 whitespace-pre-wrap text-primary">
                     {goal.description}
                   </div>
+
+                  {/* {goal.scheduleType === ScheduleType.Recurring &&
+                    searchParams.status !== undefined && (
+                      <div className="-mb-1 mt-5 text-center text-gray-500">
+                        {searchParams.status === "completed"
+                          ? "Completed"
+                          : searchParams.status === "dropped"
+                            ? "Dropped"
+                            : "In Progress"}{" "}
+                        {filteredEntries.length} time
+                        {filteredEntries.length === 1 ? "" : "s"}
+                      </div>
+                    )} */}
                 </div>
               </div>
               {i !== filteredGoals.length - 1 && <CommitLine includeNode />}
@@ -229,3 +250,18 @@ const GoalStatusFilters = ({
     </div>
   );
 };
+
+function matchesStatusFilter(
+  entryStatus: GoalEntryStatus,
+  filterStatus?: SearchParamStatus,
+): boolean {
+  return filterStatus === "completed"
+    ? entryStatus === GoalEntryStatus.Completed
+    : filterStatus === "dropped"
+      ? entryStatus === GoalEntryStatus.Failed
+      : [
+          GoalEntryStatus.Pending,
+          GoalEntryStatus.CommitterVerifying,
+          GoalEntryStatus.PartnerVerifying,
+        ].includes(entryStatus);
+}
