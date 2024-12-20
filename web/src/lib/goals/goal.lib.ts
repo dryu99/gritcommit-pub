@@ -137,6 +137,7 @@ export const fetchCompleteGoalEntry = async ({
     .$if(!!userVerificationToken, (eb) =>
       eb.where("userVerificationToken", "=", userVerificationToken as string),
     )
+    .orderBy("goalEntry.dueAt", "desc")
     .execute();
 };
 
