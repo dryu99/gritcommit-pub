@@ -1,7 +1,7 @@
 import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
 import { Body, Html } from "@react-email/components";
-import { EmailSignOff } from "../common";
+import { EmailCommitment, EmailSignOff } from "../common";
 
 export default function PartnerFailEmail({
   goalEntry,
@@ -23,12 +23,17 @@ export default function PartnerFailEmail({
         Hi {entry.goalPartnerEmail},
         <br />
         <br />
-        {committerName} failed to complete their commitment:
+        {committerName} wasn't able to complete their commitment in time:
         <br />
         <br />
-        🎯 <strong>Commitment:</strong> {entry.goalDescription}
-        <br />
-        💰 <strong>Stake:</strong> ${entry.goalStakeAmount}
+        <EmailCommitment
+          timezone={entry.userTimezone}
+          dueAt={entry.dueAt}
+          description={entry.goalDescription}
+          stakeAmount={entry.goalStakeAmount}
+          scheduleType={entry.goalScheduleType}
+          scheduleDays={entry.goalScheduleDays}
+        />
         <br />
         <br />
         They have been prompted to send you ${entry.goalStakeAmount}.

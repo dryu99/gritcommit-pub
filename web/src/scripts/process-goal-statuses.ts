@@ -2,9 +2,11 @@ import {
   sendEmail,
   toCommitterEmailSubject,
   toEmailHtml,
+  toPartnerEmailSubject,
 } from "@/lib/email/email.lib";
 import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
 import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
+import PartnerFailEmail from "@/lib/email/templates/partner-fail-email";
 import {
   canSendGoalEntryDueTodayEmail,
   fetchCompleteGoalEntry,
@@ -105,11 +107,21 @@ const processExpiredGoals = async () => {
       await finalizeGoalEntry(goalEntry, GoalEntryStatus.Failed);
 
       // TODO can remove await maybe
-      await sendEmail({
-        recipientEmail: goalEntry.userEmail,
-        subject: toCommitterEmailSubject(goalEntry.goalDescription),
-        emailHtml: await toEmailHtml(CommitterFailEmail, { goalEntry }),
-      });
+      await Promise.all([
+        sendEmail({
+          recipientEmail: goalEntry.userEmail,
+          subject: toCommitterEmailSubject(goalEntry.goalDescription),
+          emailHtml: await toEmailHtml(CommitterFailEmail, { goalEntry }),
+        }),
+        sendEmail({
+          recipientEmail: goalEntry.goalPartnerEmail,
+          subject: toPartnerEmailSubject(
+            goalEntry.goalDescription,
+            goalEntry.userFirstName,
+          ),
+          emailHtml: await toEmailHtml(PartnerFailEmail, { goalEntry }),
+        }),
+      ]);
     } catch (error) {
       // TODO sentry
       console.error(`> Failed to process expired goal ${goalEntry.id}:`, error);
