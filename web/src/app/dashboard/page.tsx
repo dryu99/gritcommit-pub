@@ -92,10 +92,12 @@ export default async function DashboardPage(props: {
                 className={cn(
                   "relative rounded-lg border border-neutral-300 bg-primary p-4 sm:px-6 sm:py-5",
 
-                  // add stacking effect in background
-                  goal.scheduleType === ScheduleType.Recurring && [
-                    "before:absolute before:inset-0 before:-z-10 before:translate-x-[-7px] before:translate-y-[7px] before:rounded-lg before:border before:border-neutral-300 before:bg-primary before:content-['']",
-                  ],
+                  // TODO consider this more
+                  // // add stacking effect in background
+                  // goal.scheduleType === ScheduleType.Recurring && [
+                  //   "before:absolute before:inset-0 before:-z-10 before:translate-x-[-7px] before:translate-y-[7px] before:rounded-lg before:border before:border-neutral-300 before:bg-primary before:content-['']",
+                  //   "after:absolute after:inset-0 after:-z-20 after:translate-x-[-13px] after:translate-y-[13px] after:rounded-lg after:border after:border-neutral-300 after:content-['']",
+                  // ],
                 )}
               >
                 <h3 className="mb-1 flex items-center justify-between text-brand">
