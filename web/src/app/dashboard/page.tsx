@@ -126,10 +126,16 @@ export default async function DashboardPage(props: {
                               : latestEntry.status === "PARTNER_VERIFYING"
                                 ? "PARTNER VERIFYING"
                                 : "")}
-                        {searchParams.status !== undefined &&
-                          goal.scheduleType === ScheduleType.Recurring && (
-                            <span className="">{filteredEntries.length}x</span>
-                          )}
+                        {searchParams.status !== undefined && (
+                          <span className="uppercase">
+                            {searchParams.status === "completed"
+                              ? "Completed"
+                              : "Dropped"}{" "}
+                            {goal.scheduleType === ScheduleType.Recurring
+                              ? filteredEntries.length + "x"
+                              : ""}
+                          </span>
+                        )}
                       </span>
                       <div
                         className={cn("h-2 w-2 rounded-full", {
