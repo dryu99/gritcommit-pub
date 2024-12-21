@@ -1,19 +1,11 @@
 import {
-  sendEmail,
-  toCommitterEmailSubject,
-  toEmailHtml,
-  toPartnerEmailSubject,
-} from "@/lib/email/email.lib";
-import CommitterFailEmail from "@/lib/email/templates/committer-fail-email";
-import CommitterVerifyEmail from "@/lib/email/templates/committer-verify-email";
-import PartnerFailEmail from "@/lib/email/templates/partner-fail-email";
-import {
   canSendGoalEntryDueTodayEmail,
   fetchCompleteGoalEntry,
   finalizeGoalEntry,
   isGoalEntryExpired,
   isGoalEntryPartnerVerificationExpired,
 } from "@/lib/goals/goal.lib";
+import { NotificationManager } from "@/lib/notifications/notification-manager";
 import { GoalEntryStatus } from "@/types/enums";
 import { DB } from "../database/db";
 
@@ -73,16 +65,11 @@ async function processGoalsDueToday() {
         .where("id", "=", goalEntry.id)
         .execute();
 
-      await sendEmail({
-        recipientEmail: goalEntry.userEmail,
-        subject: toCommitterEmailSubject(goalEntry.goalDescription),
-        emailHtml: await toEmailHtml(CommitterVerifyEmail, {
-          goalEntry: {
-            ...goalEntry,
-            userVerificationToken: newVerificationToken,
-          },
-        }),
-      });
+      await NotificationManager.sendCommitterVerify(
+        "email",
+        goalEntry,
+        newVerificationToken,
+      );
     } catch (error) {
       console.error(`> Failed to process goal entry ${goalEntry.id}:`, error);
       // TODO sentry
@@ -108,19 +95,8 @@ const processExpiredGoals = async () => {
 
       // TODO can remove await maybe
       await Promise.all([
-        sendEmail({
-          recipientEmail: goalEntry.userEmail,
-          subject: toCommitterEmailSubject(goalEntry.goalDescription),
-          emailHtml: await toEmailHtml(CommitterFailEmail, { goalEntry }),
-        }),
-        sendEmail({
-          recipientEmail: goalEntry.goalPartnerEmail,
-          subject: toPartnerEmailSubject(
-            goalEntry.goalDescription,
-            goalEntry.userFirstName,
-          ),
-          emailHtml: await toEmailHtml(PartnerFailEmail, { goalEntry }),
-        }),
+        NotificationManager.sendCommitterFail("email", goalEntry),
+        NotificationManager.sendPartnerFail("email", goalEntry),
       ]);
     } catch (error) {
       // TODO sentry

@@ -5,56 +5,99 @@ import {
   toPartnerEmailSubject,
 } from "../email/email.lib";
 import CommitterFailEmail from "../email/templates/committer-fail-email";
+import CommitterVerifyEmail from "../email/templates/committer-verify-email";
 import PartnerFailEmail from "../email/templates/partner-fail-email";
 import { CompleteGoalEntry } from "../goals/goal.lib";
 
-// notificaiotn_Type = sms | email
-// completeGoalEntry
-// notification_message = "partner fail" | "new goal" | etc
-// images?
+interface NotificationStrategy {
+  sendCommitterFail(goalEntry: CompleteGoalEntry): Promise<void>;
+  sendPartnerFail(goalEntry: CompleteGoalEntry): Promise<void>;
+  sendCommitterVerify(
+    goalEntry: CompleteGoalEntry,
+    newVerificationToken: string,
+  ): Promise<void>;
+}
 
-class NotificationManager {
-  constructor(
-    private readonly goalEntry: CompleteGoalEntry,
-    private readonly notificationType: "sms" | "email",
-  ) {}
+const emailStrategy: NotificationStrategy = {
+  async sendCommitterFail(goalEntry: CompleteGoalEntry): Promise<void> {
+    await sendEmail({
+      recipientEmail: goalEntry.userEmail,
+      subject: toCommitterEmailSubject(goalEntry.goalDescription),
+      emailHtml: await toEmailHtml(CommitterFailEmail, { goalEntry }),
+    });
+  },
 
-  public async sendCommitterFail() {
-    if (this.notificationType === "sms") {
-      // const message = CommitterFailSms(this.goalEntry);
-      // sendSms({
-      //   phoneNumber: this.goalEntry.userPhoneNumber,
-      //   message: message,
-      // });
-    } else if (this.notificationType === "email") {
-      await sendEmail({
-        recipientEmail: this.goalEntry.userEmail,
-        subject: toCommitterEmailSubject(this.goalEntry.goalDescription),
-        emailHtml: await toEmailHtml(CommitterFailEmail, {
-          goalEntry: this.goalEntry,
-        }),
-      });
-    }
+  async sendPartnerFail(goalEntry: CompleteGoalEntry): Promise<void> {
+    await sendEmail({
+      recipientEmail: goalEntry.goalPartnerEmail,
+      subject: toPartnerEmailSubject(
+        goalEntry.goalDescription,
+        goalEntry.userFirstName,
+      ),
+      emailHtml: await toEmailHtml(PartnerFailEmail, { goalEntry }),
+    });
+  },
+
+  async sendCommitterVerify(
+    goalEntry: CompleteGoalEntry,
+    newVerificationToken: string,
+  ): Promise<void> {
+    await sendEmail({
+      recipientEmail: goalEntry.userEmail,
+      subject: toCommitterEmailSubject(goalEntry.goalDescription),
+      emailHtml: await toEmailHtml(CommitterVerifyEmail, {
+        goalEntry: {
+          ...goalEntry,
+          userVerificationToken: newVerificationToken,
+        },
+      }),
+    });
+  },
+};
+
+const smsStrategy: NotificationStrategy = {
+  async sendCommitterFail(goalEntry: CompleteGoalEntry): Promise<void> {
+    // SMS implementation
+  },
+  async sendPartnerFail(goalEntry: CompleteGoalEntry): Promise<void> {
+    // SMS implementation
+  },
+  async sendCommitterVerify(
+    goalEntry: CompleteGoalEntry,
+    newVerificationToken: string,
+  ): Promise<void> {
+    // SMS implementation
+  },
+};
+
+const strategies = {
+  email: emailStrategy,
+  sms: smsStrategy,
+} as const;
+
+export class NotificationManager {
+  static sendCommitterFail(
+    type: keyof typeof strategies,
+    goalEntry: CompleteGoalEntry,
+  ): Promise<void> {
+    return strategies[type].sendCommitterFail(goalEntry);
   }
 
-  public async sendPartnerFail() {
-    if (this.notificationType === "sms") {
-      // const message = PartnerFailSms(this.goalEntry);
-      // sendSms({
-      //   phoneNumber: this.goalEntry.userPhoneNumber,
-      //   message: message,
-      // });
-    } else if (this.notificationType === "email") {
-      sendEmail({
-        recipientEmail: this.goalEntry.goalPartnerEmail,
-        subject: toPartnerEmailSubject(
-          this.goalEntry.goalDescription,
-          this.goalEntry.userFirstName,
-        ),
-        emailHtml: await toEmailHtml(PartnerFailEmail, {
-          goalEntry: this.goalEntry,
-        }),
-      });
-    }
+  static sendPartnerFail(
+    type: keyof typeof strategies,
+    goalEntry: CompleteGoalEntry,
+  ): Promise<void> {
+    return strategies[type].sendPartnerFail(goalEntry);
+  }
+
+  static sendCommitterVerify(
+    type: keyof typeof strategies,
+    goalEntry: CompleteGoalEntry,
+    newVerificationToken: string,
+  ): Promise<void> {
+    return strategies[type].sendCommitterVerify(
+      goalEntry,
+      newVerificationToken,
+    );
   }
 }
