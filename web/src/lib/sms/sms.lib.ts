@@ -1,7 +1,11 @@
 import { ScheduleType } from "@/types/enums";
 import { Twilio } from "twilio";
 import { Config } from "../config";
-import { getScheduleText, toFormattedDateText } from "../date";
+import {
+  getScheduleText,
+  toFormattedDateText,
+  toNextRecurringDueDate,
+} from "../date";
 import { CompleteGoalEntry } from "../goals/goal.lib";
 import { BASE_URL } from "../url";
 
@@ -41,7 +45,7 @@ export const sendSms = async ({
 //   .then((res) => console.log(res))
 //   .catch((err) => console.error(err));
 
-const commitmentSection = (goalEntry: CompleteGoalEntry) => {
+const SmsCommitment = (goalEntry: CompleteGoalEntry) => {
   return (
     `🎯 Commitment: ${goalEntry.goalDescription} \n` +
     `💰 Stake: ${goalEntry.goalStakeAmount} \n` +
@@ -52,15 +56,29 @@ const commitmentSection = (goalEntry: CompleteGoalEntry) => {
             scheduleDays: goalEntry.goalScheduleDays,
           })}`
         : `📅 Deadline: ${toFormattedDateText(goalEntry.dueAt)}`
-    } \n`
+    } \n` // TODO consider deleting this \n
   );
 };
 
-export const CommitterNewGoalText = (goalEntry: CompleteGoalEntry) => {
+const SmsNextDueDate = (goalEntry: CompleteGoalEntry) => {
+  return goalEntry.goalScheduleType === ScheduleType.Recurring &&
+    goalEntry.goalScheduleDays
+    ? `The next check-in is ${toFormattedDateText(
+        toNextRecurringDueDate({
+          timezone: goalEntry.userTimezone,
+          scheduleDays: goalEntry.goalScheduleDays,
+          prevDueDate: goalEntry.dueAt,
+        }),
+        goalEntry.userTimezone,
+      )}`
+    : "";
+};
+
+export const CommitterNewGoalSms = (goalEntry: CompleteGoalEntry) => {
   return (
     `You've started a new commitment: \n` +
     "\n" +
-    commitmentSection(goalEntry) +
+    SmsCommitment(goalEntry) +
     `\n` +
     `We will send you a text ${
       goalEntry.goalScheduleType === ScheduleType.Recurring
@@ -70,11 +88,11 @@ export const CommitterNewGoalText = (goalEntry: CompleteGoalEntry) => {
   );
 };
 
-export const PartnerNewGoalText = (goalEntry: CompleteGoalEntry) => {
+export const PartnerNewGoalSms = (goalEntry: CompleteGoalEntry) => {
   return (
     `${goalEntry.userFirstName} has started a new commitment and has assigned you as their accountability partner: \n` +
     "\n" +
-    commitmentSection(goalEntry) +
+    SmsCommitment(goalEntry) +
     `\n` +
     `We will send you a text ${
       goalEntry.goalScheduleType === ScheduleType.Recurring
@@ -84,28 +102,78 @@ export const PartnerNewGoalText = (goalEntry: CompleteGoalEntry) => {
   );
 };
 
-export const CommitterVerifyText = (goalEntry: CompleteGoalEntry) => {
+export const CommitterVerifySms = (goalEntry: CompleteGoalEntry) => {
   return (
     `Your commitment is due today at 11:59pm. \n` +
     "\n" +
-    commitmentSection(goalEntry) +
+    SmsCommitment(goalEntry) +
     `\n` +
     `Please verify your completion at ` +
     `${BASE_URL}/committer-verify?token=${goalEntry.userVerificationToken}`
   );
 };
 
-export const PartnerVerifyText = (goalEntry: CompleteGoalEntry) => {
+export const PartnerVerifySms = (goalEntry: CompleteGoalEntry) => {
   return (
     `${goalEntry.userFirstName} has completed commitment: \n` +
     "\n" +
-    commitmentSection(goalEntry) +
+    SmsCommitment(goalEntry) +
     `\n` +
     `Please verify their completion: \n` +
     `\n` +
     `APPROVE: ${BASE_URL}/partner-verify?token=${goalEntry.partnerVerificationToken}&approved=true` +
     `\n` +
     `DENY: ${BASE_URL}/partner-verify?token=${goalEntry.partnerVerificationToken}`
+  );
+};
+
+export const CommitterVerifyApprovedSms = (goalEntry: CompleteGoalEntry) => {
+  return (
+    `Your commitment has been approved! \n` +
+    "\n" +
+    SmsCommitment(goalEntry) +
+    `\n` +
+    `Congrats! You've completed your commitment. \n` +
+    `\n` +
+    SmsNextDueDate(goalEntry) + // TODO the spacing is incorrect here if it's a normal commitment lol
+    `\n` +
+    `Stay Gritty.`
+  );
+};
+
+export const CommitterVerifyDeniedSms = (goalEntry: CompleteGoalEntry) => {
+  return (
+    `Your commitment has been denied. \n` +
+    "\n" +
+    SmsCommitment(goalEntry) +
+    `\n` +
+    `As per the contract, please send your partner ${goalEntry.goalStakeAmount}. \n` +
+    `\n` +
+    SmsNextDueDate(goalEntry)
+  );
+};
+
+export const CommitterFailSms = (goalEntry: CompleteGoalEntry) => {
+  return (
+    `The deadline for your commitment has passed. \n` +
+    "\n" +
+    SmsCommitment(goalEntry) +
+    `\n` +
+    `As per the contract, please send your partner ${goalEntry.goalStakeAmount}. \n` +
+    `\n` +
+    SmsNextDueDate(goalEntry)
+  );
+};
+
+export const PartnerFailSms = (goalEntry: CompleteGoalEntry) => {
+  return (
+    `${goalEntry.userFirstName} wasn't able to complete their commitment in time: \n` +
+    "\n" +
+    SmsCommitment(goalEntry) +
+    `\n` +
+    `They have been prompted to send you ${goalEntry.goalStakeAmount}. \n` +
+    `\n` +
+    SmsNextDueDate(goalEntry)
   );
 };
 

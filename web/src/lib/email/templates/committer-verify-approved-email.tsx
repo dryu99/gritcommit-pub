@@ -24,8 +24,7 @@ export default function CommitterVerifyApprovedEmail({
         Hi {name},
         <br />
         <br />
-        Your accountability partner has approved your submission for the
-        following commitment:
+        Your commitment has been approved!
         <br />
         <br />
         <EmailCommitment
@@ -40,7 +39,7 @@ export default function CommitterVerifyApprovedEmail({
         <br />
         <br />
         {/* TODO this should be differentg based onr ecurring and once */}
-        Congratulations! You've completed your commitment.
+        Congrats! You've completed your commitment.
         <br />
         <br />
         {entry.goalScheduleType === ScheduleType.Recurring &&

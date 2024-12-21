@@ -76,7 +76,7 @@ export const EmailNextDueDate = ({
 }) => {
   return (
     <>
-      The next due date for your recurring commitment is{" "}
+      The next check-in is{" "}
       {toFormattedDateText(
         toNextRecurringDueDate({
           timezone,

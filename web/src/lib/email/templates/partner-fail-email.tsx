@@ -1,7 +1,8 @@
 import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { ScheduleType } from "@/types/enums";
 import { Body, Html } from "@react-email/components";
-import { EmailCommitment, EmailSignOff } from "../common";
+import { EmailCommitment, EmailNextDueDate, EmailSignOff } from "../common";
 
 export default function PartnerFailEmail({
   goalEntry,
@@ -39,6 +40,18 @@ export default function PartnerFailEmail({
         They have been prompted to send you ${entry.goalStakeAmount}.
         <br />
         <br />
+        {entry.goalScheduleType === ScheduleType.Recurring &&
+          entry.goalScheduleDays && (
+            <>
+              <EmailNextDueDate
+                timezone={entry.userTimezone}
+                scheduleDays={entry.goalScheduleDays}
+                prevDueDate={entry.dueAt}
+              />
+              <br />
+              <br />
+            </>
+          )}
         <EmailSignOff />
       </Body>
     </Html>
