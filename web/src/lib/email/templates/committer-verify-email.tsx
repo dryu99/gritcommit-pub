@@ -1,5 +1,6 @@
 import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { BASE_URL } from "@/lib/url";
 import { Body, Button, Html } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 import { emailButtonStyle } from "../email.lib";
@@ -44,7 +45,7 @@ export default function CommitterVerifyEmail({
         <br />
         <br />
         <Button
-          href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/committer-verify?token=${entry.userVerificationToken}`}
+          href={`${BASE_URL}/committer-verify?token=${entry.userVerificationToken}`}
           style={emailButtonStyle}
         >
           Done

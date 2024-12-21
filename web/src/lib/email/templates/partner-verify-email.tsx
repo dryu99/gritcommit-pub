@@ -1,5 +1,6 @@
 import { Config } from "@/lib/config";
 import { CompleteGoalEntry, mockCompleteGoalEntry } from "@/lib/goals/goal.lib";
+import { BASE_URL } from "@/lib/url";
 import { Body, Button, Html, Section } from "@react-email/components";
 import { EmailCommitment, EmailSignOff } from "../common";
 import { emailButtonStyle } from "../email.lib";
@@ -68,13 +69,13 @@ export default function PartnerVerifyEmail({
         <br />
         <Section>
           <Button
-            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${entry.partnerVerificationToken}&approved=true`}
+            href={`${BASE_URL}/partner-verify?token=${entry.partnerVerificationToken}&approved=true`}
             style={{ ...emailButtonStyle, marginRight: "24px" }}
           >
             Yes
           </Button>
           <Button
-            href={`${process.env.NODE_ENV === "production" ? "https://gritcommit.app" : "http://localhost:3000"}/partner-verify?token=${entry.partnerVerificationToken}`}
+            href={`${BASE_URL}/partner-verify?token=${entry.partnerVerificationToken}`}
             style={emailButtonStyle}
           >
             No
