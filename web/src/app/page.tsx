@@ -3,12 +3,11 @@ import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR, MINI_COMMIT_GRAPH_YEAR } from "@/lib/date";
 import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
-import { buttonStyle } from "@/ui/components/common/button";
+import { Button, buttonStyle } from "@/ui/components/common/button";
 import { CommitLine } from "@/ui/components/common/commit-line";
 import { Link } from "@/ui/components/common/link";
 import { LoginForm } from "@/ui/components/login-form";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 export const revalidate = 120;
 
@@ -57,8 +56,12 @@ export default async function HomePage() {
         <div>
           <CommitLine hideOnMobile height={20} />
           <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
-            <div className="mb-2 text-center text-sm">1</div>
-            <h3 className="mb-4 min-h-[48px] text-center font-bold">
+            <div className="mb-2 text-center">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-black text-sm">
+                1
+              </span>
+            </div>
+            <h3 className="mb-4 text-center font-bold sm:min-h-[48px]">
               Start a commitment
             </h3>
             <p className="mb-12 text-center text-sm">
@@ -67,7 +70,7 @@ export default async function HomePage() {
             </p>
             <div className="flex justify-center">
               {/* TODO analytics */}
-              <ShowGoalFormButton title="Try it out" isDemo />
+              <ShowGoalFormButton title="Test creation" isDemo />
             </div>
           </div>
           <CommitLine height={20} />
@@ -76,18 +79,29 @@ export default async function HomePage() {
         <div>
           <CommitLine hideOnMobile height={20} />
           <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
-            <div className="mb-2 text-center text-sm">2</div>
-            <h3 className="mb-4 min-h-[48px] text-center font-bold">
+            <div className="mb-2 text-center">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-black text-sm">
+                2
+              </span>
+            </div>
+            <h3 className="mb-4 text-center font-bold sm:min-h-[48px]">
               Receive email/SMS check-ins
             </h3>
-            <p className="mb-10 text-center text-sm">
+            <p className="mb-8 text-center text-sm">
               Get reminders and verify your progress. Your partner confirms your
               achievements.
             </p>
-            <div className="my-auto flex justify-center gap-4">
-              <EnvelopeIcon className="h-10 w-10" />
-              <PhoneIcon className="h-10 w-10" />
-            </div>
+            <form className="mb-4 flex flex-col items-center gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-xs"
+                required
+              />
+              <Button type="submit" className="h-7 px-3 text-xs">
+                Test reminder
+              </Button>
+            </form>
           </div>
           <CommitLine height={20} />
         </div>
@@ -95,8 +109,12 @@ export default async function HomePage() {
         <div>
           <CommitLine hideOnMobile height={20} />
           <div className="h-[300px] w-full rounded-md border border-neutral-300 px-3 py-4 sm:h-[400px] sm:w-[220px]">
-            <div className="mb-2 text-center text-sm">3</div>
-            <h3 className="mb-4 min-h-[48px] text-center font-bold">
+            <div className="mb-2 text-center text-sm">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-black text-sm">
+                3
+              </span>
+            </div>
+            <h3 className="mb-4 text-center font-bold sm:min-h-[48px]">
               Build lasting habits
             </h3>
             <p className={`mb-4 text-center text-sm`}>
