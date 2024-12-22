@@ -25,13 +25,23 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className={`mb-1 text-2xl font-bold`}>GritCommit</h1>
-      <p className={`mb-8 text-center text-sm text-gray-500`}>
-        Commit to your goals with grit (and a buddy)
-      </p>
+      <h1 className={`mb-8 text-center text-3xl font-bold`}>
+        Email/SMS Commitment Contracts
+      </h1>
+      {/* <h1 className={`mb-2 text-center text-3xl font-bold`}>
+        Commit to your goals with grit <br />
+      </h1>
+      <p className="mb-8 flex flex-col gap-1 text-center sm:block">
+        <span className="text-base opacity-90">(and a buddy) </span>
+        <span className="text-base opacity-80">(and email reminders) </span>
+        <span className="text-sm opacity-70">(or SMS) </span>
+        <span className="text-[10px] opacity-60">(goals are hard okay)</span>
+      </p> */}
+
       <div className="w-full">
         <CommitGraph
           dates={goalEntries.map((entry) => new Date(entry.createdAt))}
+          isOnHomePage
         />
       </div>
       <CommitLine includeNode height={40} />

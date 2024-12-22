@@ -32,11 +32,13 @@ const COMMIT_MONTHS = [
 export const CommitGraph = ({
   dates,
   includeNewGoalButton,
-  isMini = false,
+  isMini,
+  isOnHomePage,
 }: {
   dates: Date[];
   includeNewGoalButton?: boolean;
   isMini?: boolean;
+  isOnHomePage?: boolean;
 }) => {
   const commitSquares = isMini
     ? toCommitSquares({ dates, year: MINI_COMMIT_GRAPH_YEAR })
@@ -75,8 +77,9 @@ export const CommitGraph = ({
         {!isMini && (
           <div className="mb-2 flex items-end justify-between">
             <h4 className="text-sm text-gray-500">
-              {totalCommits} commitment{totalCommits === 1 ? "" : "s"} in{" "}
-              {CURRENT_YEAR}
+              {totalCommits} commitment
+              {totalCommits === 1 ? "" : "s"} in {CURRENT_YEAR}
+              {isOnHomePage && " (all users)"}
             </h4>
             {includeNewGoalButton && <ShowGoalFormButton />}
           </div>
