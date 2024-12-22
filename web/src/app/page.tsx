@@ -89,8 +89,8 @@ export default async function HomePage() {
               Receive email/SMS check-ins
             </h3>
             <p className="mb-8 text-center text-sm">
-              Get reminders and verify your progress. Your partner confirms your
-              achievements.
+              Get email/SMS reminders and verify your progress with your
+              partner.
             </p>
             <div className="my-auto flex justify-center gap-4">
               <EnvelopeIcon className="h-10 w-10 text-brand" />
@@ -112,7 +112,7 @@ export default async function HomePage() {
               Build lasting habits
             </h3>
             <p className={`mb-4 text-center text-sm`}>
-              Build consistency with partner check-ins and watch your progress
+              Build consistency with email/SMS check-ins and watch your progress
               grow.
             </p>
             <div>
@@ -124,7 +124,21 @@ export default async function HomePage() {
       </div>
       <HorizontalCommitLine />
       <CommitLine height={30} includeNode />
-
+      {/* <div>
+        <h3>FAQ</h3>
+        <p>
+          What if I don't have a partner?
+        </p>
+        <p>
+          How do you handle payouts for dropped commitments? "We don't at the moment! We'll prompt you to send your partner money, but we aren't facilitating that." 
+        </p>
+        <p>
+          What happens if I miss a check-in? Your commitment will automatically be dropped. Recurring commitments will keep going however.
+        </p>
+        <p>
+          What happens if my partner misses a check-in? Your commitment will automatically be completed. Recurring commitments will keep going however.
+        </p>
+      </div> */}
       <div
         className={`mb-8 w-full rounded-md border border-neutral-300 p-6 sm:w-[400px]`}
       >
