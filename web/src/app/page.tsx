@@ -3,11 +3,12 @@ import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR, MINI_COMMIT_GRAPH_YEAR } from "@/lib/date";
 import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
-import { Button, buttonStyle } from "@/ui/components/common/button";
+import { buttonStyle } from "@/ui/components/common/button";
 import { CommitLine } from "@/ui/components/common/commit-line";
 import { Link } from "@/ui/components/common/link";
 import { LoginForm } from "@/ui/components/login-form";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
+import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 export const revalidate = 120;
 
@@ -46,7 +47,7 @@ export default async function HomePage() {
         href={sessionUser ? `/dashboard` : `/signup`}
         className={cn(buttonStyle, "px-5 py-2 text-sm")}
       >
-        {sessionUser ? "Go to dashboard" : "Get started"}
+        {sessionUser ? "Go to dashboard" : "Try GritCommit"}
       </Link>
       <CommitLine includeNode height={20} />
       <HorizontalCommitLine />
@@ -91,17 +92,10 @@ export default async function HomePage() {
               Get reminders and verify your progress. Your partner confirms your
               achievements.
             </p>
-            <form className="mb-4 flex flex-col items-center gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-xs"
-                required
-              />
-              <Button type="submit" className="h-7 px-3 text-xs">
-                Test reminder
-              </Button>
-            </form>
+            <div className="my-auto flex justify-center gap-4">
+              <EnvelopeIcon className="h-10 w-10 text-brand" />
+              <PhoneIcon className="h-10 w-10 text-brand" />
+            </div>
           </div>
           <CommitLine height={20} />
         </div>
