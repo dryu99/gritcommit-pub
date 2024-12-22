@@ -6,6 +6,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "default" | "sm" | "lg";
 }
 
+export const buttonStyle =
+  "focus-visible:ring-ring ring-offset-background inline-flex items-center justify-center rounded-md bg-brand text-sm font-medium text-white transition-colors hover:bg-brandHover " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     { className = "", variant = "default", size = "default", ...props },
@@ -19,12 +23,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={cn(
-          "focus-visible:ring-ring ring-offset-background inline-flex items-center justify-center rounded-md bg-brand text-sm font-medium text-white transition-colors hover:bg-brandHover " +
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          sizes[size],
-          className,
-        )}
+        className={cn(buttonStyle, sizes[size], className)}
         ref={ref}
         {...props}
       />

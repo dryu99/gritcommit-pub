@@ -1,20 +1,19 @@
 import { DB } from "@/database/db";
 import { getSessionUser } from "@/lib/auth/auth.lib";
 import { CURRENT_YEAR, MINI_COMMIT_GRAPH_YEAR } from "@/lib/date";
+import { cn } from "@/ui/classnames";
 import { CommitGraph } from "@/ui/components/commit-graph";
+import { buttonStyle } from "@/ui/components/common/button";
 import { CommitLine } from "@/ui/components/common/commit-line";
+import { Link } from "@/ui/components/common/link";
 import { LoginForm } from "@/ui/components/login-form";
 import { ShowGoalFormButton } from "@/ui/components/show-goal-form-button";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
-import { redirect } from "next/navigation";
 
 export const revalidate = 120;
 
 export default async function HomePage() {
   const sessionUser = await getSessionUser();
-  if (sessionUser) {
-    redirect("/dashboard");
-  }
 
   const goalEntries = await DB.get()
     .selectFrom("goalEntry")
@@ -25,18 +24,17 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className={`mb-8 text-center text-3xl font-bold`}>
-        Email/SMS Commitment Contracts
-      </h1>
-      {/* <h1 className={`mb-2 text-center text-3xl font-bold`}>
-        Commit to your goals with grit <br />
-      </h1>
-      <p className="mb-8 flex flex-col gap-1 text-center sm:block">
-        <span className="text-base opacity-90">(and a buddy) </span>
-        <span className="text-base opacity-80">(and email reminders) </span>
-        <span className="text-sm opacity-70">(or SMS) </span>
-        <span className="text-[10px] opacity-60">(goals are hard okay)</span>
-      </p> */}
+      <div className="mb-16">
+        <h1 className={`mb-4 text-center text-5xl font-bold`}>
+          Email/SMS <br className="hidden sm:block" />
+          Commitment Contracts
+        </h1>
+        <p className="text-center text-gray-600">
+          Stay accountable through email or SMS reminders.{" "}
+          <br className="hidden sm:block" />
+          No apps, no downloads — just simple accountability.
+        </p>
+      </div>
 
       <div className="w-full">
         <CommitGraph
@@ -44,7 +42,14 @@ export default async function HomePage() {
           isOnHomePage
         />
       </div>
-      <CommitLine includeNode height={40} />
+      <CommitLine includeNode height={20} />
+      <Link
+        href={sessionUser ? `/dashboard` : `/signup`}
+        className={cn(buttonStyle, "px-5 py-2 text-sm")}
+      >
+        {sessionUser ? "Go to dashboard" : "Get started"}
+      </Link>
+      <CommitLine includeNode height={20} />
       <HorizontalCommitLine />
       <div
         className={`flex flex-col items-center sm:w-[800px] sm:flex-row sm:justify-between`}
@@ -106,7 +111,7 @@ export default async function HomePage() {
         </div>
       </div>
       <HorizontalCommitLine />
-      <CommitLine height={40} includeNode />
+      <CommitLine height={20} includeNode />
 
       <div
         className={`mb-8 w-full rounded-md border border-neutral-300 p-6 sm:w-[400px]`}
