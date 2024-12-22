@@ -42,14 +42,14 @@ export default async function HomePage() {
           isOnHomePage
         />
       </div>
-      <CommitLine includeNode height={20} />
+      <CommitLine includeNode height={30} />
       <Link
         href={sessionUser ? `/dashboard` : `/signup`}
         className={cn(buttonStyle, "px-5 py-2 text-sm")}
       >
         {sessionUser ? "Go to dashboard" : "Try GritCommit"}
       </Link>
-      <CommitLine includeNode height={20} />
+      <CommitLine includeNode height={30} />
       <HorizontalCommitLine />
       <div
         className={`flex flex-col items-center sm:w-[800px] sm:flex-row sm:justify-between`}
@@ -123,7 +123,7 @@ export default async function HomePage() {
         </div>
       </div>
       <HorizontalCommitLine />
-      <CommitLine height={20} includeNode />
+      <CommitLine height={30} includeNode />
 
       <div
         className={`mb-8 w-full rounded-md border border-neutral-300 p-6 sm:w-[400px]`}
