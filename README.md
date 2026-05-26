@@ -42,7 +42,6 @@ crontab -l
     - if goal is >1 week away, send reminder to user 7 days @ 12pm
     - send reminder to user day before due date @ 12pm
 - everyday/custom day
-  - 
 - x days a week
 
 ### Database flow
